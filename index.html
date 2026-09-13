@@ -2,8 +2,7 @@
 <html lang="ja"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <title>Matsu RallyCon v0.6.12</title>
-<link rel="manifest" href="manifest.webmanifest">
-<style>
+<link rel="manifest" href="manifest.webmanifest"><style>
 :root{--bg:#0d1117;--panel:#161b22;--line:#30363d;--text:#f0f6fc;--muted:#8b949e;--accent:#58a6ff;--warn:#f2cc60}
 *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:Arial,"Noto Sans JP",sans-serif}
 button{font:inherit;color:inherit;background:#21262d;border:1px solid #484f58;border-radius:8px;font-weight:800;touch-action:manipulation;min-width:0}button:active{transform:translateY(1px)}
@@ -105,8 +104,49 @@ $('legMinus').onclick=()=>adjustLeg(-0.01);$('legPlus').onclick=()=>adjustLeg(0.
 $('startBtn').onclick=()=>{running=!running;if(running){timerStart=performance.now();$('startBtn').textContent='STOP'}else $('startBtn').textContent='START'};
 let gpsWatchId=null;
 $('gpsBtn').onclick=()=>{if(gpsWatchId!==null){navigator.geolocation.clearWatch(gpsWatchId);gpsWatchId=null}if(!navigator.geolocation){setStatus('GPS非対応');return}setStatus('GPS取得中…');gpsWatchId=navigator.geolocation.watchPosition(pos=>{const now=performance.now();const c=pos.coords;const speed=c.speed!=null&&c.speed>=0?c.speed*3.6:0;if(lastTs){const dt=(now-lastTs.t)/1000;const jump=Math.hypot((c.latitude-lastTs.lat)*111000,(c.longitude-lastTs.lon)*111000*Math.cos(c.latitude*Math.PI/180));if(jump<100&&dt>0){const km=jump/1000;gpsDistance+=km}}lastTs={lat:c.latitude,lon:c.longitude,t:now,speed};$('status').textContent=`GPS ±${Math.round(c.accuracy||0)}m`;display();if(autoNext){const t=Math.max(0,gpsDistance-totalZeroBase+totalOffset);const target=ROUTE[rb+1]?.dist;if(target!=null&&t>=target){legBase=gpsDistance;legOffset=0;moveRB(1)}}},e=>{const msg=e.code===1?'位置情報の許可が必要です':e.code===2?'現在地を取得できません':e.code===3?'GPS測位がタイムアウトしました':e.message||'不明なエラー';setStatus('GPSエラー: '+msg)}, {enableHighAccuracy:true,maximumAge:1000,timeout:10000})};
-$('compassBtn').onclick=async()=>{try{if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function'){const r=await DeviceOrientationEvent.requestPermission();if(r!=='granted'){setStatus('コンパス許可が必要');return}}window.addEventListener('deviceorientation',e=>{let h=null;if(typeof e.webkitCompassHeading==='number')h=e.webkitCompassHeading;else if(typeof e.alpha==='number')h=(360-e.alpha)%360;if(h!=null)setStatus('CAP '+Math.round(h)+'°')},{passive:true});setStatus('CAP ON')}catch(err){setStatus('CAP開始失敗')}};
-const stage=$('stage');stage.addEventListener('pointerdown',e=>{if(e.target.closest('button'))return;stage.setPointerCapture?.(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});gestureMoved=false;if(pointers.size===1){stage._lastX=e.clientX;stage._lastY=e.clientY}});stage.addEventListener('pointermove',e=>{if(!pointers.has(e.pointerId))return;pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});gestureMoved=true;if(pointers.size===1){panX+=e.clientX-stage._lastX;panY+=e.clientY-stage._lastY;stage._lastX=e.clientX;stage._lastY=e.clientY;applyPan()}else if(pointers.size===2){const a=[...pointers.values()];const d=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);if(!pinchStartDist){pinchStartDist=d;pinchStartZoom=zoom}setZoom(pinchStartZoom*d/pinchStartDist,(a[0].x+a[1].x)/2,(a[0].y+a[1].y)/2)}});function end(e){pointers.delete(e.pointerId);if(pointers.size<2)pinchStartDist=0}stage.addEventListener('pointerup',end);stage.addEventListener('pointercancel',end);stage.addEventListener('wheel',e=>{e.preventDefault();setZoom(zoom*(e.deltaY<0?1.15:.87),e.clientX,e.clientY)},{passive:false});let lastTap=0;stage.addEventListener('dblclick',e=>{setZoom(zoom>1?1:2,e.clientX,e.clientY)});
+let compassOn=false,compassHandler=null;
+function screenAngle(){
+  const w=Number(window.orientation);
+  if(w===90||w===-90||w===0||w===180)return w;
+  const a=Number(screen.orientation?.angle);
+  if(a===90)return 90;
+  if(a===270)return -90;
+  if(a===180)return 180;
+  return 0;
+}
+function normalizeHeading(h){return (h%360+360)%360}
+$('compassBtn').onclick=async()=>{
+  try{
+    if(typeof DeviceOrientationEvent==='undefined'){
+      setStatus('コンパス非対応');return;
+    }
+    if(typeof DeviceOrientationEvent.requestPermission==='function'){
+      const r=await DeviceOrientationEvent.requestPermission();
+      if(r!=='granted'){
+        setStatus('コンパス許可が必要');return;
+      }
+    }
+    if(compassOn)return;
+    compassOn=true;
+    compassHandler=e=>{
+      let h=null;
+      if(typeof e.webkitCompassHeading==='number'&&e.webkitCompassHeading>=0){
+        h=normalizeHeading(e.webkitCompassHeading+screenAngle());
+      }else if(typeof e.alpha==='number'){
+        h=normalizeHeading(360-e.alpha-screenAngle());
+      }
+      if(h!=null){
+        const acc=(typeof e.webkitCompassAccuracy==='number'&&e.webkitCompassAccuracy>=0)
+          ?Math.round(e.webkitCompassAccuracy):null;
+        setStatus('CAP '+Math.round(h)+'°'+(acc!=null?' ±'+acc+'°':''));
+      }
+    };
+    window.addEventListener('deviceorientation',compassHandler,{passive:true});
+    setStatus('CAP ON');
+  }catch(err){
+    setStatus('CAP開始失敗');
+  }
+};
 setInterval(()=>{if(running&&timerStart){const s=Math.floor((performance.now()-timerStart)/1000);$('time').textContent=new Date(s*1000).toISOString().slice(11,19)}},250);
 window.addEventListener('resize',()=>{if(pdf)renderPage()});
 const defaultPdfCandidates=['KOMAREN_Classic2026.pdf','./KOMAREN_Classic2026.pdf','demo/KOMAREN_Classic2026.pdf'];(async()=>{for(const u of defaultPdfCandidates){try{const r=await fetch(u);if(r.ok){const b=await r.arrayBuffer();await loadBytes(b,'KOMAREN_Classic2026.pdf');return}}catch(e){}}setStatus('LOAD PDF でPDFを選択してください')})();
