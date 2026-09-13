@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="ja"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<title>Matsu RallyCon v0.6.9</title>
+<title>Matsu RallyCon v0.6.11</title>
 <link rel="manifest" href="manifest.webmanifest">
 <style>
 :root{--bg:#0d1117;--panel:#161b22;--line:#30363d;--text:#f0f6fc;--muted:#8b949e;--accent:#58a6ff;--warn:#f2cc60}
@@ -9,16 +9,16 @@
 button{font:inherit;color:inherit;background:#21262d;border:1px solid #484f58;border-radius:8px;font-weight:800;touch-action:manipulation;min-width:0}button:active{transform:translateY(1px)}
 #app{width:100vw;height:100dvh;display:grid;grid-template-rows:44px minmax(0,1fr) 54px;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
 .top{display:grid;grid-template-columns:minmax(170px,1fr) minmax(130px,auto) auto auto;gap:7px;align-items:center;padding:5px 10px;border-bottom:1px solid var(--line);background:#11161d;min-width:0}.brand{font-size:14px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.status{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right}.top button{height:34px;min-width:48px;padding:0 12px}
-.main{display:grid;grid-template-columns:29% 43% 28%;min-width:0;min-height:0}.panel{background:var(--panel);padding:7px;min-width:0;min-height:0}.left{display:grid;grid-template-rows:minmax(125px,1.08fr) minmax(125px,1.08fr) minmax(72px,.72fr) minmax(72px,.72fr);gap:6px;border-right:1px solid var(--line);overflow:hidden}.card{border:1px solid var(--line);border-radius:9px;background:#0f141a;padding:7px 9px;min-width:0;min-height:0;display:grid;grid-template-rows:auto minmax(0,1fr) auto;overflow:hidden}.card .value{min-height:0;align-self:center}.card.compact .value{align-self:center}.label{font-size:11px;color:var(--muted);font-weight:800;line-height:1.1}.value{font-size:clamp(25px,5.2vh,40px);font-weight:900;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:clip;align-self:center}.small{font-size:clamp(21px,4.2vh,31px)}
-.totalValue{font-size:clamp(34px,6.2vh,46px)}
-.corr{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin-top:4px}.corr button{height:28px;font-size:11px;padding:0 3px}.corrLabel{font-size:9px;color:var(--muted);font-weight:800;display:none}
-.center{min-width:0;min-height:0;position:relative;background:#20262e;display:grid;grid-template-rows:38px minmax(0,1fr);border-right:1px solid var(--line)}.pdfbar{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto auto;gap:5px;align-items:center;padding:3px 7px;border-bottom:1px solid #343b45;background:#161b22;min-width:0}.pdfbar button{height:31px;min-width:39px;padding:0 8px}.pdfname{font-size:12px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.stage{position:relative;min-width:0;min-height:0;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;display:flex;align-items:center;justify-content:center}.canvasWrap{position:relative;flex:none;transform-origin:center center;will-change:transform}.canvasWrap canvas{display:block;background:#fff;box-shadow:0 0 16px rgba(0,0,0,.5);max-width:none}.hidden{display:none!important}
-.right{border-left:0;display:grid;grid-template-rows:auto auto minmax(0,1fr) auto;gap:6px;overflow:hidden}.rbhead{display:grid;grid-template-columns:1fr 1fr;gap:6px}.rbbox{border:1px solid var(--line);border-radius:9px;padding:7px 9px;background:#0f141a;min-width:0;min-height:0}.rbnum{font-size:11px;color:var(--muted);font-weight:800}.rbval{font-size:28px;font-weight:900;line-height:1.05;white-space:nowrap;overflow:hidden}.nextbox{min-height:72px}.nextbox .rbval{font-size:31px}.rightSpacer{min-height:0}.nav{display:grid;grid-template-columns:1fr 1fr;gap:6px}.nav button{height:40px}.auto{grid-column:1/-1;height:46px;font-size:14px}.foot{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;padding:5px 9px;background:#11161d;border-top:1px solid var(--line)}.foot button{min-width:0;height:44px;font-size:12px}.file{display:none}
-@media (max-width:1100px){.main{grid-template-columns:30% 42% 28%}.value{font-size:clamp(22px,4.8vh,34px)}.small{font-size:clamp(20px,4.2vh,29px)}.corr button,.resetOnly button{font-size:11px}.pdfname{font-size:11px}.rbval{font-size:25px}.nextbox .rbval{font-size:28px}.foot button{font-size:11px}}
+.main{display:grid;grid-template-columns:29% 43% 28%;min-width:0;min-height:0}.panel{background:var(--panel);padding:7px;min-width:0;min-height:0}.left{display:grid;grid-template-rows:minmax(0,1.08fr) minmax(0,1.08fr) minmax(0,.72fr) minmax(0,.72fr);gap:6px;border-right:1px solid var(--line);overflow:hidden}.card{border:1px solid var(--line);border-radius:9px;background:#0f141a;padding:6px 8px;min-width:0;min-height:0;display:grid;grid-template-rows:auto minmax(0,1fr) auto;overflow:hidden}.card .value{min-height:0;align-self:center}.card.compact .value{align-self:center}.label{font-size:11px;color:var(--muted);font-weight:800;line-height:1.1}.value{font-size:clamp(25px,5.2vh,40px);font-weight:900;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:clip;align-self:center}.small{font-size:clamp(21px,4.2vh,31px)}
+.totalValue{font-size:clamp(38px,6.8vh,50px)}
+.corr{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin-top:4px}.corr button{height:24px;font-size:10px;padding:0 2px}.corrLabel{font-size:9px;color:var(--muted);font-weight:800;display:none}
+.center{min-width:0;min-height:0;position:relative;background:#20262e;display:grid;grid-template-rows:minmax(0,1fr);border-right:1px solid var(--line)}.stage{position:relative;min-width:0;min-height:0;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;display:flex;align-items:center;justify-content:center}.canvasWrap{position:relative;flex:none;transform-origin:center center;will-change:transform}.canvasWrap canvas{display:block;background:#fff;box-shadow:0 0 16px rgba(0,0,0,.5);max-width:none}.hidden{display:none!important}
+.right{border-left:0;display:grid;grid-template-rows:auto auto minmax(0,1fr) auto;gap:6px;overflow:hidden}.rbhead{display:grid;grid-template-columns:1fr 1fr;gap:6px}.rbbox{border:1px solid var(--line);border-radius:9px;padding:7px 9px;background:#0f141a;min-width:0;min-height:0}.rbnum{font-size:11px;color:var(--muted);font-weight:800}.rbval{font-size:28px;font-weight:900;line-height:1.05;white-space:nowrap;overflow:hidden}.nextbox{min-height:72px}.nextbox .rbval{font-size:31px}.rightSpacer{min-height:0}.nav{display:grid;grid-template-columns:1fr 1fr;gap:6px}.nav button{height:40px}.auto{grid-column:1/-1;height:46px;font-size:14px}.foot{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:5px;padding:4px 8px;background:#11161d;border-top:1px solid var(--line)}.foot button{min-width:0;height:34px;font-size:11px}.file{display:none}
+@media (max-width:1100px){.main{grid-template-columns:30% 42% 28%}.value{font-size:clamp(22px,4.8vh,34px)}.small{font-size:clamp(20px,4.2vh,29px)}.corr button,.resetOnly button{font-size:11px}.pdfname{font-size:11px}.rbval{font-size:25px}.nextbox .rbval{font-size:28px}.foot button{font-size:10px;height:32px}}
 @media (orientation:portrait){#app{grid-template-rows:46px minmax(0,1fr) 58px}.main{grid-template-columns:1fr}.left,.right{display:none}.center{border-right:0}.top{grid-template-columns:minmax(0,1fr) auto auto}.status{display:none}.foot{grid-template-columns:repeat(3,1fr);grid-auto-rows:1fr}.foot button{height:27px;font-size:11px}}
 </style></head><body>
 <div id="app">
-<header class="top"><div class="brand">Matsu RallyCon v0.6.9</div><div id="status" class="status">準備中</div><button id="gpsBtn">GPS</button><button id="compassBtn">CAP</button></header>
+<header class="top"><div class="brand">Matsu RallyCon v0.6.11</div><div id="status" class="status">準備中</div><button id="gpsBtn">GPS</button><button id="compassBtn">CAP</button></header>
 <main class="main">
 <section class="panel left">
 <div class="card"><div class="label">TOTAL km</div><div id="total" class="value totalValue">0.00</div><div class="corr"><button id="totalMinus">−10m</button><button id="totalZero">0</button><button id="totalPlus">＋10m</button></div></div>
@@ -27,7 +27,6 @@ button{font:inherit;color:inherit;background:#21262d;border:1px solid #484f58;bo
 <div class="card compact"><div class="label">TIME</div><div id="time" class="value small">00:00:00</div></div>
 </section>
 <section class="center">
-<div class="pdfbar"><button id="prevPdf">‹</button><div id="pdfName" class="pdfname">KOMAREN Classic2026</div><div id="logicalNo" class="small">1 / 39</div><button id="zoomOut">−</button><button id="zoomIn">＋</button></div>
 <div id="stage" class="stage"><div id="canvasWrap" class="canvasWrap"><canvas id="pdfCanvas"></canvas></div></div>
 </section>
 <aside class="panel right">
@@ -49,22 +48,22 @@ let pointers=new Map(),pinchStartDist=0,pinchStartZoom=1,gestureMoved=false;
 const dpr=()=>Math.min(window.devicePixelRatio||1,2);
 function fmtKm(v){return Math.max(0,v).toFixed(2)} function setStatus(t){$('status').textContent=t}
 function display(){const t=Math.max(0,gpsDistance-totalZeroBase+totalOffset);const l=Math.max(0,gpsDistance-legBase+legOffset);$('total').textContent=fmtKm(t);$('leg').textContent=fmtKm(l);$('speed').textContent=(lastTs?.speed||0).toFixed(1);const e=ROUTE[rb];$('target').textContent=e?fmtKm(e.dist):'--';$('remain').textContent=e?fmtKm(Math.max(0,e.dist-t)):'--'}
-function setRB(i){rb=clamp(i,0,ROUTE.length-1);const e=ROUTE[rb];$('rbNo').textContent=e.no;$('target').textContent=fmtKm(e.dist);$('arrow').textContent=e.arrow||'';$('instr').textContent=e.text||'';if(e.warn){$('warn').textContent=e.warn;$('warn').classList.remove('hidden')}else $('warn').classList.add('hidden'); syncLogical(false); display()}
+function setRB(i){rb=clamp(i,0,ROUTE.length-1);const e=ROUTE[rb];$('rbNo').textContent=e.no;$('target').textContent=fmtKm(e.dist); syncLogical(false); display()}
 function logicalFromRB(){return rb<=5?1:Math.floor((ROUTE[rb].no-7)/6)+2}
 function mapping(lp){if(lp===1)return {pdf:1,side:'right'};return {pdf:Math.floor(lp/2)+1,side:lp%2===0?'left':'right'}}
 function panBounds(){const st=$('stage'),c=$('pdfCanvas'),k=zoom/Math.max(.001,renderedZoom),w=c.clientWidth*k,h=c.clientHeight*k;return{x:Math.max(0,(w-st.clientWidth)/2),y:Math.max(0,(h-st.clientHeight)/2)}}
 function clampPan(){const b=panBounds();panX=clamp(panX,-b.x,b.x);panY=clamp(panY,-b.y,b.y)}
 function applyPan(){clampPan();const k=zoom/Math.max(.001,renderedZoom);$('canvasWrap').style.transform=`translate3d(${panX}px,${panY}px,0) scale(${k})`}
-function setZoom(z,fx=null,fy=null){const old=zoom;zoom=clamp(z,.5,4);if(fx!=null&&fy!=null&&old!==zoom){const st=$('stage'),cx=fx-st.clientWidth/2,cy=fy-st.clientHeight/2;panX=cx-(cx-panX)*(zoom/old);panY=cy-(cy-panY)*(zoom/old)}if(zoom<=1){panX=0;panY=0}applyPan();$('logicalNo').textContent=`${logicalPage} / ${logicalCount}`}
+function setZoom(z,fx=null,fy=null){const old=zoom;zoom=clamp(z,.5,4);if(fx!=null&&fy!=null&&old!==zoom){const st=$('stage'),cx=fx-st.clientWidth/2,cy=fy-st.clientHeight/2;panX=cx-(cx-panX)*(zoom/old);panY=cy-(cy-panY)*(zoom/old)}if(zoom<=1){panX=0;panY=0}applyPan();}
 function logicalCountForDoc(){return pdf?pdf.numPages*2-1:39}
-function syncLogical(resetPan=true){const lp=logicalFromRB();if(lp!==logicalPage){logicalPage=lp;page=mapping(lp).pdf;if(resetPan){panX=0;panY=0}renderPage()}$('logicalNo').textContent=`${logicalPage} / ${logicalCount}`}
+function syncLogical(resetPan=true){const lp=logicalFromRB();if(lp!==logicalPage){logicalPage=lp;page=mapping(lp).pdf;if(resetPan){panX=0;panY=0}renderPage()}}
 async function renderPage(){
  if(!pdf)return;
  const m=mapping(logicalPage);
  const p=await pdf.getPage(m.pdf);
  const base=p.getViewport({scale:1,rotation:p.rotate||0});
  const stage=$('stage');
- const availW=Math.max(120,stage.clientWidth-12);
+ const availW=Math.max(120,stage.clientWidth-6);
  const halfBaseW=base.width/2;
  fitScale=availW/halfBaseW;
  const fullScale=fitScale;
@@ -88,16 +87,20 @@ async function renderPage(){
  const sx=m.side==='left'?0:(off.width-halfW);
  ctx.drawImage(off,sx,0,halfW,fullH,0,0,halfW,fullH);
  renderedZoom=zoom;panX=0;panY=0;applyPan();
- $('logicalNo').textContent=`${logicalPage} / ${logicalCount}`;
+ ;
 }
-async function loadBytes(buf,name){pdf=await pdfjsLib.getDocument({data:buf}).promise;$('pdfName').textContent=name;logicalCount=logicalCountForDoc();logicalPage=1;page=1;rb=0;zoom=1;await renderPage();setRB(0);setStatus(`${name} / ${pdf.numPages} PDFページ・${logicalCount} コマ図ページ`);}
+async function loadBytes(buf,name){pdf=await pdfjsLib.getDocument({data:buf}).promise;logicalCount=logicalCountForDoc();logicalPage=1;page=1;rb=0;zoom=1;await renderPage();setRB(0);setStatus(`${name} / ${pdf.numPages} PDFページ・${logicalCount} コマ図ページ`);}
 function moveLogical(d){logicalPage=clamp(logicalPage+d,1,logicalCount);page=mapping(logicalPage).pdf;zoom=1;panX=0;panY=0;renderPage()}
 function moveRB(d){const next=clamp(rb+d,0,ROUTE.length-1);if(next!==rb&&d!==0){legBase=gpsDistance;legOffset=0}setRB(next)}
 $('loadBtn').onclick=()=>$('pdfFile').click();$('pdfFile').onchange=async e=>{const f=e.target.files[0];if(f)loadBytes(await f.arrayBuffer(),f.name)};
-$('pagePrev').onclick=()=>moveLogical(-1);$('pageNext').onclick=()=>moveLogical(1);$('prevPdf').onclick=()=>moveLogical(-1);$('zoomIn').onclick=()=>setZoom(zoom*1.25);$('zoomOut').onclick=()=>setZoom(zoom*.8);
+$('pagePrev').onclick=()=>moveLogical(-1);$('pageNext').onclick=()=>moveLogical(1);
 $('rbPrev').onclick=()=>moveRB(-1);$('rbNext').onclick=()=>moveRB(1);$('nextBtn').onclick=()=>moveRB(1);$('autoBtn').onclick=()=>{autoNext=!autoNext;$('autoBtn').textContent='AUTO NEXT: '+(autoNext?'ON':'OFF')};$('rbSync').onclick=()=>{const t=Math.max(0,gpsDistance-totalZeroBase+totalOffset);let idx=0;for(let i=0;i<ROUTE.length;i++)if(ROUTE[i].dist<=t)idx=i;setRB(idx)};
-$('totalMinus').onclick=()=>{totalOffset-=.01;display()};$('totalPlus').onclick=()=>{totalOffset+=.01;display()};$('totalZero').onclick=()=>{totalZeroBase=gpsDistance;totalOffset=0;display()};
-$('legMinus').onclick=()=>{legOffset-=.01;display()};$('legPlus').onclick=()=>{legOffset+=.01;display()};$('legZero').onclick=()=>{legBase=gpsDistance;legOffset=0;display()};
+function adjustTotal(delta){totalOffset+=delta;display()}
+function zeroTotal(){totalZeroBase=gpsDistance;totalOffset=0;display()}
+function adjustLeg(delta){legOffset+=delta;display()}
+function zeroLeg(){legBase=gpsDistance;legOffset=0;display()}
+$('totalMinus').onclick=()=>adjustTotal(-0.01);$('totalPlus').onclick=()=>adjustTotal(0.01);$('totalZero').onclick=zeroTotal;
+$('legMinus').onclick=()=>adjustLeg(-0.01);$('legPlus').onclick=()=>adjustLeg(0.01);$('legZero').onclick=zeroLeg;
 
 $('startBtn').onclick=()=>{running=!running;if(running){timerStart=performance.now();$('startBtn').textContent='STOP'}else $('startBtn').textContent='START'};
 let gpsWatchId=null;
