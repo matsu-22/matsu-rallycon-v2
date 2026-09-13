@@ -1,9 +1,11 @@
-# Matsu RallyCon v0.6.6
+# Matsu RallyCon v0.6.5
 
-- iPhone 17 landscape-first layout with Safe Area handling
-- TOTAL and LEG corrections are independent
-- TOTAL ±10m / reset and LEG ±10m / reset are separate
-- SYNC retained; WIDTH removed
-- AUTO NEXT retained and visible in landscape
-- PDF roadbook, page navigation, zoom/pan, GPS and CAP retained
-- No gesture instruction overlay
+iPhone 17 landscape-oriented layout refinement.
+
+- Removed WIDTH button.
+- Kept SYNC.
+- AUTO NEXT ON/OFF remains visible in landscape.
+- Landscape side panels are compacted so TOTAL/LEG/SPEED/TIME and distance correction remain visible.
+- Removed all gesture help overlays/text.
+- PDF drag/pinch/double-tap behavior remains available without on-screen instructions.
+- GPS fix from v0.6.3 retained.
