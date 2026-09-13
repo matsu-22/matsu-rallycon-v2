@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="ja"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<title>Matsu RallyCon v0.6.2</title>
+<title>Matsu RallyCon v0.6.3 GPS FIX</title>
 <link rel="manifest" href="manifest.webmanifest">
 <style>
 :root{--bg:#0d1117;--panel:#161b22;--line:#30363d;--text:#f0f6fc;--muted:#8b949e;--accent:#58a6ff;--warn:#f2cc60}
@@ -13,7 +13,7 @@
 @media(max-width:760px){#app{grid-template-rows:40px minmax(0,1fr) 54px}.main{grid-template-columns:minmax(125px,21%) minmax(0,1fr) minmax(155px,25%)}.left{gap:4px;padding:5px}.panel{padding:5px}.value{font-size:clamp(17px,3.7vw,25px)}.rbval{font-size:23px}.arrow{font-size:46px}.instr{font-size:18px}.foot{gap:4px;padding:4px 5px}.foot button{height:45px;font-size:11px}.top{gap:4px;padding:4px 5px}.status{max-width:24vw}}
 </style></head><body>
 <div id="app">
-<header class="top"><div class="brand">Matsu RallyCon v0.6.2</div><div id="status" class="status">準備中</div><button id="gpsBtn">GPS</button><button id="compassBtn">CAP</button></header>
+<header class="top"><div class="brand">Matsu RallyCon v0.6.3 GPS FIX</div><div id="status" class="status">準備中</div><button id="gpsBtn">GPS</button><button id="compassBtn">CAP</button></header>
 <main class="main">
 <section class="panel left">
 <div class="card"><div class="label">TOTAL km</div><div id="total" class="value">0.00</div></div>
@@ -24,7 +24,7 @@
 </section>
 <section class="center">
 <div class="pdfbar"><button id="prevPdf">‹</button><div id="pdfName" class="pdfname">KOMAREN Classic2026</div><div id="logicalNo" class="small">1 / 39</div><button id="zoomOut">−</button><button id="zoomIn">＋</button></div>
-<div id="stage" class="stage"><div id="canvasWrap" class="canvasWrap"><canvas id="pdfCanvas"></canvas></div></div>
+<div id="stage" class="stage"><div id="canvasWrap" class="canvasWrap"><canvas id="pdfCanvas"></canvas></div><div id="hint" class="hint">↕ 上下ドラッグ　🤏 ピンチ　👆ダブルタップ</div></div>
 </section>
 <aside class="panel right">
 <div class="rbhead"><div class="rbbox"><div class="rbnum">ROADBOOK</div><div id="rbNo" class="rbval">1</div></div><div class="rbbox"><div class="rbnum">TARGET km</div><div id="target" class="rbval">0.00</div></div></div>
@@ -54,7 +54,7 @@ function applyPan(){clampPan();const k=zoom/Math.max(.001,renderedZoom);$('canva
 function setZoom(z,fx=null,fy=null){const old=zoom;zoom=clamp(z,.5,4);if(fx!=null&&fy!=null&&old!==zoom){const st=$('stage'),cx=fx-st.clientWidth/2,cy=fy-st.clientHeight/2;panX=cx-(cx-panX)*(zoom/old);panY=cy-(cy-panY)*(zoom/old)}if(zoom<=1){panX=0;panY=0}applyPan();$('logicalNo').textContent=`${logicalPage} / ${logicalCount}`}
 function logicalCountForDoc(){return pdf?pdf.numPages*2-1:39}
 function syncLogical(resetPan=true){const lp=logicalFromRB();if(lp!==logicalPage){logicalPage=lp;page=mapping(lp).pdf;if(resetPan){panX=0;panY=0}renderPage()}$('logicalNo').textContent=`${logicalPage} / ${logicalCount}`}
-async function renderPage(forceWidth=false){
+async function renderPage(){
  if(!pdf)return;
  const m=mapping(logicalPage);
  const p=await pdf.getPage(m.pdf);
@@ -62,10 +62,7 @@ async function renderPage(forceWidth=false){
  const stage=$('stage');
  const availW=Math.max(120,stage.clientWidth-12);
  const halfBaseW=base.width/2;
- const availH=Math.max(120,stage.clientHeight-8);
- const fitW=availW/halfBaseW;
- const fitH=availH/base.height;
- fitScale=forceWidth?fitW:Math.min(fitW,fitH);
+ fitScale=availW/halfBaseW;
  const fullScale=fitScale;
  const fullVp=p.getViewport({scale:fullScale,rotation:p.rotate||0});
  const off=document.createElement('canvas');
@@ -93,14 +90,15 @@ async function loadBytes(buf,name){pdf=await pdfjsLib.getDocument({data:buf}).pr
 function moveLogical(d){logicalPage=clamp(logicalPage+d,1,logicalCount);page=mapping(logicalPage).pdf;zoom=1;panX=0;panY=0;renderPage()}
 function moveRB(d){setRB(rb+d)}
 $('loadBtn').onclick=()=>$('pdfFile').click();$('pdfFile').onchange=async e=>{const f=e.target.files[0];if(f)loadBytes(await f.arrayBuffer(),f.name)};
-$('pagePrev').onclick=()=>moveLogical(-1);$('pageNext').onclick=()=>moveLogical(1);$('prevPdf').onclick=()=>moveLogical(-1);$('zoomIn').onclick=()=>setZoom(zoom*1.25);$('zoomOut').onclick=()=>setZoom(zoom*.8);$('fitBtn').onclick=()=>{zoom=1;panX=panY=0;renderPage(true)};
+$('pagePrev').onclick=()=>moveLogical(-1);$('pageNext').onclick=()=>moveLogical(1);$('prevPdf').onclick=()=>moveLogical(-1);$('zoomIn').onclick=()=>setZoom(zoom*1.25);$('zoomOut').onclick=()=>setZoom(zoom*.8);$('fitBtn').onclick=()=>{zoom=1;panX=panY=0;renderPage()};
 $('rbPrev').onclick=()=>moveRB(-1);$('rbNext').onclick=()=>moveRB(1);$('nextBtn').onclick=()=>moveRB(1);$('autoBtn').onclick=()=>{autoNext=!autoNext;$('autoBtn').textContent='AUTO NEXT: '+(autoNext?'ON':'OFF')};$('rbSync').onclick=()=>{const t=Math.max(0,total+offset);let idx=0;for(let i=0;i<ROUTE.length;i++)if(ROUTE[i].dist<=t)idx=i;setRB(idx)};
 $('minus').onclick=()=>{offset-=.01;display()};$('plus').onclick=()=>{offset+=.01;display()};$('zero').onclick=()=>{offset=0;total=0;legBase=0;display()};
 $('startBtn').onclick=()=>{running=!running;if(running){timerStart=performance.now();$('startBtn').textContent='STOP'}else $('startBtn').textContent='START'};
-$('gpsBtn').onclick=()=>{if(!navigator.geolocation){setStatus('GPS非対応');return}setStatus('GPS取得中…');navigator.geolocation.watchPosition(pos=>{const now=performance.now();const c=pos.coords;const speed=c.speed!=null&&c.speed>=0?c.speed*3.6:0;if(lastTs){const dt=(now-lastTs.t)/1000;const jump=Math.hypot((c.latitude-lastTs.lat)*111000,(c.longitude-lastTs.lon)*111000*Math.cos(c.latitude*Math.PI/180));if(jump<100&&dt>0){const km=jump/1000;total+=km}}lastTs={lat:c.latitude,lon:c.longitude,t:now,speed};$('status').textContent=`GPS ±${Math.round(c.accuracy||0)}m`;display();if(autoNext){const t=Math.max(0,total+offset);const target=ROUTE[rb+1]?.dist;if(target!=null&&t>=target){legBase=t;moveRB(1)}}},{enableHighAccuracy:true,maximumAge:1000,timeout:10000},e=>setStatus('GPSエラー: '+e.message))};
+let gpsWatchId=null;
+$('gpsBtn').onclick=()=>{if(gpsWatchId!==null){navigator.geolocation.clearWatch(gpsWatchId);gpsWatchId=null}if(!navigator.geolocation){setStatus('GPS非対応');return}setStatus('GPS取得中…');gpsWatchId=navigator.geolocation.watchPosition(pos=>{const now=performance.now();const c=pos.coords;const speed=c.speed!=null&&c.speed>=0?c.speed*3.6:0;if(lastTs){const dt=(now-lastTs.t)/1000;const jump=Math.hypot((c.latitude-lastTs.lat)*111000,(c.longitude-lastTs.lon)*111000*Math.cos(c.latitude*Math.PI/180));if(jump<100&&dt>0){const km=jump/1000;total+=km}}lastTs={lat:c.latitude,lon:c.longitude,t:now,speed};$('status').textContent=`GPS ±${Math.round(c.accuracy||0)}m`;display();if(autoNext){const t=Math.max(0,total+offset);const target=ROUTE[rb+1]?.dist;if(target!=null&&t>=target){legBase=t;moveRB(1)}}},e=>{const msg=e.code===1?'位置情報の許可が必要です':e.code===2?'現在地を取得できません':e.code===3?'GPS測位がタイムアウトしました':e.message||'不明なエラー';setStatus('GPSエラー: '+msg)}, {enableHighAccuracy:true,maximumAge:1000,timeout:10000})};
 $('compassBtn').onclick=async()=>{try{if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function'){const r=await DeviceOrientationEvent.requestPermission();if(r!=='granted'){setStatus('コンパス許可が必要');return}}window.addEventListener('deviceorientation',e=>{let h=null;if(typeof e.webkitCompassHeading==='number')h=e.webkitCompassHeading;else if(typeof e.alpha==='number')h=(360-e.alpha)%360;if(h!=null)setStatus('CAP '+Math.round(h)+'°')},{passive:true});setStatus('CAP ON')}catch(err){setStatus('CAP開始失敗')}};
 const stage=$('stage');stage.addEventListener('pointerdown',e=>{if(e.target.closest('button'))return;stage.setPointerCapture?.(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});gestureMoved=false;if(pointers.size===1){stage._lastX=e.clientX;stage._lastY=e.clientY}});stage.addEventListener('pointermove',e=>{if(!pointers.has(e.pointerId))return;pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});gestureMoved=true;if(pointers.size===1){panX+=e.clientX-stage._lastX;panY+=e.clientY-stage._lastY;stage._lastX=e.clientX;stage._lastY=e.clientY;applyPan()}else if(pointers.size===2){const a=[...pointers.values()];const d=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);if(!pinchStartDist){pinchStartDist=d;pinchStartZoom=zoom}setZoom(pinchStartZoom*d/pinchStartDist,(a[0].x+a[1].x)/2,(a[0].y+a[1].y)/2)}});function end(e){pointers.delete(e.pointerId);if(pointers.size<2)pinchStartDist=0}stage.addEventListener('pointerup',end);stage.addEventListener('pointercancel',end);stage.addEventListener('wheel',e=>{e.preventDefault();setZoom(zoom*(e.deltaY<0?1.15:.87),e.clientX,e.clientY)},{passive:false});let lastTap=0;stage.addEventListener('dblclick',e=>{setZoom(zoom>1?1:2,e.clientX,e.clientY)});
 setInterval(()=>{if(running&&timerStart){const s=Math.floor((performance.now()-timerStart)/1000);$('time').textContent=new Date(s*1000).toISOString().slice(11,19)}},250);
 window.addEventListener('resize',()=>{if(pdf)renderPage()});
-const defaultPdfCandidates=['KOMAREN_Classic2026.pdf','./KOMAREN_Classic2026.pdf','demo/KOMAREN_Classic2026.pdf'];(async()=>{for(const u of defaultPdfCandidates){try{const r=await fetch(u);if(r.ok){const b=await r.arrayBuffer();await loadBytes(b,'KOMAREN_Classic2026.pdf');return}}catch(e){}}setStatus('LOAD PDF でPDFを選択してください')})();
+const defaultPdf='demo/KOMAREN_Classic2026.pdf';fetch(defaultPdf).then(r=>r.arrayBuffer()).then(b=>loadBytes(b,'KOMAREN_Classic2026.pdf')).catch(()=>setStatus('LOAD PDF でPDFを選択してください'));
 </script></body></html>
