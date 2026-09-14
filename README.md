@@ -1,4 +1,4 @@
-# Matsu RallyCon v0.6.13
+# Matsu RallyCon v0.6.25
 
 Based directly on v0.6.12. The layout, PDF viewer, GPS, independent TOTAL/LEG corrections, AUTO NEXT, and bottom controls are retained.
 
