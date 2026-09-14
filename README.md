@@ -1,10 +1,10 @@
-# Matsu RallyCon v0.6.39
+# Matsu RallyCon v0.6.40
 
 SPEED display is rounded to whole km/h for at-a-glance rally readability; internal GPS speed remains unchanged.
 
 Based on the verified v0.6.37 build. UI and existing PDF rendering/pan behavior are preserved; only TARGET-change auto-centering is added. This build hardens the distance/session core without changing the dashboard layout.
 
-## v0.6.39 PC-side hardening
+## v0.6.40 PC-side hardening
 - TOTAL / LEG / NEXTまで use one consistent corrected-distance model.
 - ±10m correction is applied to TOTAL and therefore also to NEXTまで / AUTO NEXT.
 - AUTO NEXT has an explicit internal trigger constant and handles skipped-over close roadbook points safely.
@@ -17,3 +17,10 @@ Based on the verified v0.6.37 build. UI and existing PDF rendering/pan behavior 
 - UI and CSS are unchanged. Existing PDF rendering, zoom, manual pan and scroll limits are preserved; TARGET-change auto-centering is the only PDF viewport behavior added.
 
 - TARGET roadbook-cell centering: when RB changes via START / NEXT / BACK / AUTO NEXT, the corresponding roadbook cell is automatically brought toward the vertical center of the PDF viewport. Existing pan limits remain enforced, so edge cells stop at the safe scroll boundary. Manual pan/zoom behavior and the dashboard UI are unchanged.
+
+## v0.6.40
+- START button long-press (1.6s) provides a confirmation dialog for full rally-session reset.
+- Reset clears rally session state only; PDF and AUTO setting are retained.
+- Reset stops GPS, releases wake lock, resets RB to the first target (2.65 km), and clears saved session.
+- Session restore accepts legacy v0.6.38/v0.6.39 session records and saves them as v0.6.40.
+- Existing UI/CSS/PDF and GPS/PDF behavior remain unchanged.

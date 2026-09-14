@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="ja"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<title>Matsu RallyCon v0.6.39</title>
+<title>Matsu RallyCon v0.6.40</title>
 <link rel="manifest" href="manifest.webmanifest">
 <style>
 :root{--bg:#0d1117;--panel:#161b22;--line:#30363d;--text:#f0f6fc;--muted:#8b949e;--accent:#58a6ff;--warn:#f2cc60}
@@ -35,7 +35,7 @@ button{font:inherit;color:inherit;background:#21262d;border:1px solid #484f58;bo
 .rbhead .rbbox:first-child .rbval{font-size:24px}
 </style></head><body>
 <div id="app">
-<header class="top"><div class="brand">Matsu RallyCon v0.6.39</div><div id="status" class="status">準備中</div><button id="gpsBtn">GPS</button><button id="compassBtn">CAP</button></header>
+<header class="top"><div class="brand">Matsu RallyCon v0.6.40</div><div id="status" class="status">準備中</div><button id="gpsBtn">GPS</button><button id="compassBtn">CAP</button></header>
 <main class="main">
 <section class="panel left">
 <div class="card"><div class="label">TOTAL km</div><div id="total" class="value totalValue">0.00</div><div class="corr"><button id="totalMinus">−10m</button><button id="totalZero">0</button><button id="totalPlus">＋10m</button></div></div>
@@ -64,6 +64,8 @@ let pdf=null,page=1,logicalPage=1,logicalCount=39,zoom=1,renderedZoom=1,fitScale
 let gpsDistance=0,totalZeroBase=0,totalOffset=0,legBase=0,legOffset=0,lastTs=null,timerStart=null,elapsedMs=0,running=false,stageStarted=false,autoNext=true,rb=0;
 const AUTO_NEXT_TRIGGER_M=0;
 const SESSION_KEY='matsu-rallycon-session-v036';
+const APP_VERSION='0.6.40';
+const LEGACY_SESSION_VERSIONS=new Set(['0.6.38','0.6.39','0.6.40']);
 let wakeLock=null, suppressSessionSave=false;
 let pointers=new Map(),pinchStartDist=0,pinchStartZoom=1,gestureMoved=false;
 const dpr=()=>Math.min(window.devicePixelRatio||1,2);
@@ -72,9 +74,50 @@ function getTotalKm(){return Math.max(0,gpsDistance-totalZeroBase+totalOffset)}
 function getLegKm(){return Math.max(0,gpsDistance-legBase+legOffset)}
 function display(){const t=getTotalKm(),l=getLegKm();$('total').textContent=fmtKm(t);$('leg').textContent=fmtKm(l);$('speed').textContent=Math.round(lastTs?.speed||0);const e=ROUTE[rb];$('target').textContent=e?fmtKm(e.dist):'--';$('remain').textContent=e?fmtKm(Math.max(0,e.dist-t)):'--';checkAutoNext();saveSession()}
 function checkAutoNext(){if(!autoNext||!stageStarted||!running)return;const t=getTotalKm();while(rb>0&&rb<ROUTE.length-1){const target=ROUTE[rb]?.dist;if(target==null||t < target-AUTO_NEXT_TRIGGER_M/1000)break;moveRB(1,false)}}
-function saveSession(){if(suppressSessionSave)return;try{localStorage.setItem(SESSION_KEY,JSON.stringify({version:'0.6.38',stageStarted,running:false,gpsDistance,totalZeroBase,totalOffset,legBase,legOffset,elapsedMs:elapsedMs+(running&&timerStart?performance.now()-timerStart:0),rb,autoNext,logicalPage}))}catch(e){}}
-function restoreSession(){try{const raw=localStorage.getItem(SESSION_KEY);if(!raw)return false;const x=JSON.parse(raw);if(x?.version!=='0.6.38'||!x.stageStarted)return false;gpsDistance=Number(x.gpsDistance)||0;gpsTotalMeters=gpsDistance*1000;totalZeroBase=Number(x.totalZeroBase)||0;totalOffset=Number(x.totalOffset)||0;legBase=Number(x.legBase)||0;legOffset=Number(x.legOffset)||0;elapsedMs=Math.max(0,Number(x.elapsedMs)||0);rb=clamp(Number(x.rb)||0,0,ROUTE.length-1);autoNext=x.autoNext!==false;running=false;stageStarted=true;timerStart=null;logicalPage=clamp(Number(x.logicalPage)||1,1,logicalCount);page=mapping(logicalPage).pdf;return true}catch(e){return false}}
+function saveSession(){if(suppressSessionSave)return;try{localStorage.setItem(SESSION_KEY,JSON.stringify({version:APP_VERSION,stageStarted,running:false,gpsDistance,totalZeroBase,totalOffset,legBase,legOffset,elapsedMs:elapsedMs+(running&&timerStart?performance.now()-timerStart:0),rb,autoNext,logicalPage}))}catch(e){}}
+function restoreSession(){try{const raw=localStorage.getItem(SESSION_KEY);if(!raw)return false;const x=JSON.parse(raw);if(!LEGACY_SESSION_VERSIONS.has(x?.version)||!x.stageStarted)return false;gpsDistance=Number(x.gpsDistance)||0;gpsTotalMeters=gpsDistance*1000;totalZeroBase=Number(x.totalZeroBase)||0;totalOffset=Number(x.totalOffset)||0;legBase=Number(x.legBase)||0;legOffset=Number(x.legOffset)||0;elapsedMs=Math.max(0,Number(x.elapsedMs)||0);rb=clamp(Number(x.rb)||0,0,ROUTE.length-1);autoNext=x.autoNext!==false;running=false;stageStarted=true;timerStart=null;logicalPage=clamp(Number(x.logicalPage)||1,1,logicalCount);page=mapping(logicalPage).pdf;return true}catch(e){return false}}
 function clearSession(){try{localStorage.removeItem(SESSION_KEY)}catch(e){}}
+async function resetRally(){
+  const ok=window.confirm('現在のラリー記録をすべてリセットします。\n\nTOTAL・LEG・TIME・現在のRB・GPS距離を初期状態に戻します。\n\nリセットしますか？');
+  if(!ok)return;
+  suppressSessionSave=true;
+  try{
+    running=false;
+    stageStarted=false;
+    timerStart=null;
+    elapsedMs=0;
+    gpsDistance=0;
+    gpsTotalMeters=0;
+    gpsLast=null;
+    lastTs=null;
+    gpsSampleCount=0;
+    gpsLost=false;
+    gpsActive=false;
+    gpsUserEnabled=false;
+    if(gpsWatchId!==null&&navigator.geolocation)navigator.geolocation.clearWatch(gpsWatchId);
+    gpsWatchId=null;
+    totalZeroBase=0;
+    totalOffset=0;
+    legBase=0;
+    legOffset=0;
+    rb=1;
+    logicalPage=logicalFromRB();
+    page=mapping(logicalPage).pdf;
+    zoom=1;
+    panX=0;
+    panY=0;
+    await releaseWakeLock();
+    clearSession();
+    if(pdf){await renderPage();setRB(1,false)}else{display(false)}
+    $('startBtn').textContent='START';
+    $('time').textContent='00:00:00';
+    $('speed').textContent='0';
+    setStatus('READY');
+  }finally{
+    suppressSessionSave=false;
+    clearSession();
+  }
+}
 async function requestWakeLock(){try{if(!('wakeLock' in navigator)||wakeLock)return;wakeLock=await navigator.wakeLock.request('screen');wakeLock.addEventListener?.('release',()=>{wakeLock=null})}catch(e){wakeLock=null}}
 async function releaseWakeLock(){try{await wakeLock?.release()}catch(e){}wakeLock=null}
 let targetCenterToken=0;
@@ -149,7 +192,20 @@ function zeroLeg(){legBase=gpsDistance;legOffset=0;display(false)}
 $('totalMinus').onclick=()=>adjustTotal(-0.01);$('totalPlus').onclick=()=>adjustTotal(0.01);$('totalZero').onclick=zeroTotal;
 $('legMinus').onclick=()=>adjustLeg(-0.01);$('legPlus').onclick=()=>adjustLeg(0.01);$('legZero').onclick=zeroLeg;
 
+let resetHoldTimer=null;
+let resetHoldTriggered=false;
+$('startBtn').addEventListener('pointerdown',()=>{
+  resetHoldTriggered=false;
+  clearTimeout(resetHoldTimer);
+  resetHoldTimer=setTimeout(async()=>{
+    resetHoldTriggered=true;
+    await resetRally();
+  },1600);
+});
+$('startBtn').addEventListener('pointerup',()=>clearTimeout(resetHoldTimer));
+$('startBtn').addEventListener('pointercancel',()=>clearTimeout(resetHoldTimer));
 $('startBtn').onclick=async()=>{
+  if(resetHoldTriggered){resetHoldTriggered=false;return}
   if(!running){
     if(!stageStarted){
       stageStarted=true;
