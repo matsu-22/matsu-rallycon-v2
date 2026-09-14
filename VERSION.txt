@@ -1,2 +1,2 @@
-Matsu RallyCon Web v0.6.28
+Matsu RallyCon Web v0.6.29
 UI adjustment build
