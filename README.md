@@ -1,8 +1,10 @@
-# Matsu RallyCon v0.6.38
+# Matsu RallyCon v0.6.39
+
+SPEED display is rounded to whole km/h for at-a-glance rally readability; internal GPS speed remains unchanged.
 
 Based on the verified v0.6.37 build. UI and existing PDF rendering/pan behavior are preserved; only TARGET-change auto-centering is added. This build hardens the distance/session core without changing the dashboard layout.
 
-## v0.6.38 PC-side hardening
+## v0.6.39 PC-side hardening
 - TOTAL / LEG / NEXTまで use one consistent corrected-distance model.
 - ±10m correction is applied to TOTAL and therefore also to NEXTまで / AUTO NEXT.
 - AUTO NEXT has an explicit internal trigger constant and handles skipped-over close roadbook points safely.
