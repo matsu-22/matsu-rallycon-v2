@@ -1,6 +1,8 @@
-# Matsu RallyCon v0.6.40
+# Matsu RallyCon v0.6.41
 
 SPEED display is rounded to whole km/h for at-a-glance rally readability; internal GPS speed remains unchanged.
+
+Distance correction and reset controls are hardened for glove/touch use: ±10m buttons repeat while held, TOTAL/LEG 0 buttons require a long press and confirmation, and app UI text selection/callouts are disabled.
 
 Based on the verified v0.6.37 build. UI and existing PDF rendering/pan behavior are preserved; only TARGET-change auto-centering is added. This build hardens the distance/session core without changing the dashboard layout.
 
@@ -22,5 +24,12 @@ Based on the verified v0.6.37 build. UI and existing PDF rendering/pan behavior 
 - START button long-press (1.6s) provides a confirmation dialog for full rally-session reset.
 - Reset clears rally session state only; PDF and AUTO setting are retained.
 - Reset stops GPS, releases wake lock, resets RB to the first target (2.65 km), and clears saved session.
-- Session restore accepts legacy v0.6.38/v0.6.39 session records and saves them as v0.6.40.
+- Session restore accepts legacy v0.6.38/v0.6.39 session records and saves them as v0.6.41.
 - Existing UI/CSS/PDF and GPS/PDF behavior remain unchanged.
+
+## v0.6.41 touch-operation hardening
+- TOTAL / LEG −10m and ＋10m: short tap = one 10m correction; hold = repeated 10m corrections.
+- TOTAL / LEG 0: short tap does nothing; long press opens a confirmation dialog before zeroing.
+- START long-press reset remains confirmation-protected.
+- Rally UI text selection and long-press callouts are disabled; PDF canvas behavior is unchanged.
+- UI layout/CSS geometry and existing PDF rendering behavior are otherwise preserved.
