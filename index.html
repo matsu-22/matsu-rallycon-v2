@@ -35,7 +35,7 @@ button{font:inherit;color:inherit;background:#21262d;border:1px solid #484f58;bo
 .rbhead .rbbox:first-child .rbval{font-size:24px}
 </style></head><body>
 <div id="app">
-<header class="top"><div class="brand">Matsu RallyCon v0.6.41</div><div id="status" class="status">準備中</div><button id="gpsBtn">GPS</button><button id="compassBtn">CAP</button></header>
+<header class="top"><div class="brand">Matsu RallyCon v0.6.42</div><div id="status" class="status">準備中</div><button id="gpsBtn">GPS</button><button id="compassBtn">CAP</button></header>
 <main class="main">
 <section class="panel left">
 <div class="card"><div class="label">TOTAL km</div><div id="total" class="value totalValue">0.00</div><div class="corr"><button id="totalMinus">−10m</button><button id="totalZero">0</button><button id="totalPlus">＋10m</button></div></div>
@@ -122,7 +122,7 @@ async function requestWakeLock(){try{if(!('wakeLock' in navigator)||wakeLock)ret
 async function releaseWakeLock(){try{await wakeLock?.release()}catch(e){}wakeLock=null}
 let targetCenterToken=0;
 const ROADBOOK_ROW_CENTER_X_PT=[481.595,398.39,315.925,233.46,151.205,68.7];
-function syncLegToTarget(){const t=getTotalKm();legOffset=0;legBase=gpsDistance-t}
+function syncLegToTarget(){const t=getTotalKm();const target=Number(ROUTE[rb]?.dist)||0;const desired=Math.max(0,t-target);legOffset=0;legBase=gpsDistance-desired}
 function setRB(i,doAuto=true){const prevRb=rb;rb=clamp(i,0,ROUTE.length-1);const e=ROUTE[rb];if(rb>prevRb&&stageStarted)syncLegToTarget();$('rbNo').textContent=e.no;$('target').textContent=fmtKm(e.dist);const token=++targetCenterToken;const renderPromise=syncLogical(false);Promise.resolve(renderPromise).then(()=>{if(token===targetCenterToken)centerTargetInView()});display(doAuto)}
 function logicalFromRB(){return rb<=5?1:Math.floor((ROUTE[rb].no-7)/6)+2}
 function mapping(lp){if(lp===1)return {pdf:1,side:'right'};return {pdf:Math.floor(lp/2)+1,side:lp%2===0?'left':'right'}}
