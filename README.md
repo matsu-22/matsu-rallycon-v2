@@ -1,4 +1,12 @@
-# Matsu RallyCon v0.6.41
+# Matsu RallyCon v0.6.42
+
+### v0.6.42
+- RBが前進したとき、LEGの基準を新しいTARGETへ再同期。
+- TARGET通過後に次のRBへ進んだ場合は、通過済み距離をLEGへ即時反映。
+- 例：TOTAL 2.76kmでRB3（TARGET 4.48km）へ進んだ場合、LEGは2.76km、NEXTまで1.72km。
+- LEGの±10m補正は新しいRBへの前進時にいったん0へ戻し、現在のTOTALを新しいLEG基準として再構築。
+- BACKでは既存のLEG値を変更しない。
+- UI/CSS/PDF表示は変更なし。
 
 SPEED display is rounded to whole km/h for at-a-glance rally readability; internal GPS speed remains unchanged.
 
