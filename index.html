@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="ja"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<title>Matsu RallyCon v0.6.34</title>
+<title>Matsu RallyCon v0.6.35</title>
 <link rel="manifest" href="manifest.webmanifest">
 <style>
 :root{--bg:#0d1117;--panel:#161b22;--line:#30363d;--text:#f0f6fc;--muted:#8b949e;--accent:#58a6ff;--warn:#f2cc60}
@@ -35,7 +35,7 @@ button{font:inherit;color:inherit;background:#21262d;border:1px solid #484f58;bo
 .rbhead .rbbox:first-child .rbval{font-size:24px}
 </style></head><body>
 <div id="app">
-<header class="top"><div class="brand">Matsu RallyCon v0.6.34</div><div id="status" class="status">準備中</div><button id="gpsBtn">GPS</button><button id="compassBtn">CAP</button></header>
+<header class="top"><div class="brand">Matsu RallyCon v0.6.35</div><div id="status" class="status">準備中</div><button id="gpsBtn">GPS</button><button id="compassBtn">CAP</button></header>
 <main class="main">
 <section class="panel left">
 <div class="card"><div class="label">TOTAL km</div><div id="total" class="value totalValue">0.00</div><div class="corr"><button id="totalMinus">−10m</button><button id="totalZero">0</button><button id="totalPlus">＋10m</button></div></div>
@@ -150,9 +150,12 @@ let gpsActive=false;
 let gpsLast=null;
 let gpsTotalMeters=0;
 let gpsSampleCount=0;
+let gpsLost=false;
 const GPS_MAX_ACCURACY=80;
 const GPS_MIN_MOVE_M=1.5;
 const GPS_MAX_SPEED_KMH=180;
+const GPS_LOST_TIMEOUT_SEC=5;
+const GPS_MAX_RECOVERY_GAP_SEC=600;
 function haversineMeters(a,b){
   const R=6371000, r=Math.PI/180;
   const dLat=(b.lat-a.lat)*r, dLon=(b.lon-a.lon)*r;
@@ -164,6 +167,13 @@ function resetGpsReference(pos){
   gpsLast={lat:pos.lat,lon:pos.lon,t:performance.now(),accuracy:pos.accuracy};
 }
 function gpsDistanceKm(){return gpsTotalMeters/1000}
+function markGpsLost(){
+  if(!gpsLost){gpsLost=true;setStatus('GPS LOST');}
+}
+function markGpsRecovered(accuracy){
+  gpsLost=false;
+  setStatus(`GPS ±${Math.round(accuracy)}m`);
+}
 function handleGpsPosition(pos){
   const now=performance.now(), c=pos.coords;
   const accuracy=Number.isFinite(c.accuracy)&&c.accuracy>0?c.accuracy:999;
@@ -175,57 +185,74 @@ function handleGpsPosition(pos){
     gpsActive=true;
     gpsDistance=gpsDistanceKm();
     resetGpsReference({lat:c.latitude,lon:c.longitude,accuracy});
-    setStatus(`GPS ±${Math.round(accuracy)}m`);
+    markGpsRecovered(accuracy);
     display();
     return;
   }
 
-  if(!gpsLast){resetGpsReference({lat:c.latitude,lon:c.longitude,accuracy});setStatus(`GPS ±${Math.round(accuracy)}m`);return;}
-  const dt=(now-gpsLast.t)/1000;
   const current={lat:c.latitude,lon:c.longitude,t:now,accuracy};
-  if(dt<=0 || dt>15){resetGpsReference(current);return;}
+  if(!gpsLast){
+    resetGpsReference(current);
+    markGpsRecovered(accuracy);
+    display();
+    return;
+  }
 
-  // Accuracy gate: keep the last good point when the fix becomes very poor.
+  // Poor fixes are not allowed to become distance anchors.
   if(accuracy>GPS_MAX_ACCURACY){
-    setStatus(`GPS ±${Math.round(accuracy)}m`);
+    markGpsLost();
+    display();
+    return;
+  }
+
+  const dt=(now-gpsLast.t)/1000;
+  if(dt<=0)return;
+  if(dt>GPS_MAX_RECOVERY_GAP_SEC){
+    // Too long to make a safe distance estimate: re-anchor instead of guessing.
+    resetGpsReference(current);
+    markGpsRecovered(accuracy);
+    display();
     return;
   }
 
   const meters=haversineMeters(gpsLast,current);
   const impliedKmh=(meters/dt)*3.6;
-  // Reject GPS spikes that imply an impossible jump, but keep a fresh reference.
+
   if(impliedKmh<=GPS_MAX_SPEED_KMH){
-    // Distance is counted only while the rally stage is actually running.
-    // During STOP/START pauses the reference is rebuilt, so parked movement is never added.
+    // During a GPS outage (e.g. tunnel), the direct distance from the last good
+    // fix to the first good fix is counted once when GPS returns.
     if(stageStarted && running && meters>=GPS_MIN_MOVE_M){
       gpsTotalMeters+=meters;
       gpsDistance=gpsDistanceKm();
     }
     gpsLast=current;
+    markGpsRecovered(accuracy);
   }else{
+    // Reject the jump and use the new good fix as the next anchor.
     gpsLast=current;
+    markGpsLost();
   }
 
-  setStatus(`GPS ±${Math.round(accuracy)}m`);
   display();
   if(autoNext && stageStarted && running){
     const t=Math.max(0,gpsDistance-totalZeroBase+totalOffset);
     const target=ROUTE[rb]?.dist;
-    if(target!=null&&rb>0&&t>=target&&rb<ROUTE.length-1){moveRB(1)}
+    if(target!=null&&rb>0&&t>=target&&rb<ROUTE.length-1)moveRB(1);
   }
 }
 function startGps(){
   if(gpsWatchId!==null)return;
   if(!navigator.geolocation){setStatus('GPS非対応');return}
+  gpsLost=false;
   setStatus('GPS取得中…');
   gpsWatchId=navigator.geolocation.watchPosition(handleGpsPosition,e=>{
-    const msg=e.code===1?'位置情報の許可が必要です':e.code===2?'現在地を取得できません':e.code===3?'GPS測位がタイムアウトしました':e.message||'不明なエラー';
-    setStatus('GPSエラー: '+msg);
+    if(e.code===1){setStatus('GPSエラー: 位置情報の許可が必要です');return}
+    markGpsLost();
   },{enableHighAccuracy:true,maximumAge:1000,timeout:10000});
 }
 function stopGps(){
   if(gpsWatchId!==null){navigator.geolocation.clearWatch(gpsWatchId);gpsWatchId=null}
-  gpsActive=false;gpsLast=null;
+  gpsActive=false;gpsLast=null;gpsLost=false;
   setStatus('GPS OFF');
 }
 $('gpsBtn').onclick=()=>{if(gpsWatchId!==null)stopGps();else startGps()};
@@ -272,7 +299,16 @@ $('compassBtn').onclick=async()=>{
 };
 window.addEventListener('orientationchange',()=>{if(compassOn)setStatus('CAP ON')});
 const stage=$('stage');stage.addEventListener('pointerdown',e=>{if(e.target.closest('button'))return;stage.setPointerCapture?.(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});gestureMoved=false;if(pointers.size===1){stage._lastX=e.clientX;stage._lastY=e.clientY}});stage.addEventListener('pointermove',e=>{if(!pointers.has(e.pointerId))return;pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});gestureMoved=true;if(pointers.size===1){panX+=e.clientX-stage._lastX;panY+=e.clientY-stage._lastY;stage._lastX=e.clientX;stage._lastY=e.clientY;applyPan()}else if(pointers.size===2){const a=[...pointers.values()];const d=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);if(!pinchStartDist){pinchStartDist=d;pinchStartZoom=zoom}setZoom(pinchStartZoom*d/pinchStartDist,(a[0].x+a[1].x)/2,(a[0].y+a[1].y)/2)}});function end(e){pointers.delete(e.pointerId);if(pointers.size<2)pinchStartDist=0}stage.addEventListener('pointerup',end);stage.addEventListener('pointercancel',end);stage.addEventListener('wheel',e=>{e.preventDefault();setZoom(zoom*(e.deltaY<0?1.15:.87),e.clientX,e.clientY)},{passive:false});let lastTap=0;stage.addEventListener('dblclick',e=>{setZoom(zoom>1?1:2,e.clientX,e.clientY)});
-setInterval(()=>{const ms=elapsedMs+(running&&timerStart?performance.now()-timerStart:0);const s=Math.floor(ms/1000);$('time').textContent=new Date(s*1000).toISOString().slice(11,19)},250);
+setInterval(()=>{
+  const now=performance.now();
+  const ms=elapsedMs+(running&&timerStart?now-timerStart:0);
+  const s=Math.floor(ms/1000);
+  $('time').textContent=new Date(s*1000).toISOString().slice(11,19);
+  if(gpsWatchId!==null&&gpsLast&&stageStarted&&running&&!gpsLost){
+    const age=(now-gpsLast.t)/1000;
+    if(age>=GPS_LOST_TIMEOUT_SEC)markGpsLost();
+  }
+},250);
 window.addEventListener('resize',()=>{if(pdf)renderPage()});
 const defaultPdfCandidates=['KOMAREN_Classic2026.pdf','./KOMAREN_Classic2026.pdf','demo/KOMAREN_Classic2026.pdf'];(async()=>{for(const u of defaultPdfCandidates){try{const r=await fetch(u);if(r.ok){const b=await r.arrayBuffer();await loadBytes(b,'KOMAREN_Classic2026.pdf');return}}catch(e){}}setStatus('LOAD PDF でPDFを選択してください')})();
 </script></body></html>
