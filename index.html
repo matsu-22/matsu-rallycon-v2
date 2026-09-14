@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="ja"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<title>Matsu RallyCon v0.6.37</title>
+<title>Matsu RallyCon v0.6.38</title>
 <link rel="manifest" href="manifest.webmanifest">
 <style>
 :root{--bg:#0d1117;--panel:#161b22;--line:#30363d;--text:#f0f6fc;--muted:#8b949e;--accent:#58a6ff;--warn:#f2cc60}
@@ -35,7 +35,7 @@ button{font:inherit;color:inherit;background:#21262d;border:1px solid #484f58;bo
 .rbhead .rbbox:first-child .rbval{font-size:24px}
 </style></head><body>
 <div id="app">
-<header class="top"><div class="brand">Matsu RallyCon v0.6.37</div><div id="status" class="status">準備中</div><button id="gpsBtn">GPS</button><button id="compassBtn">CAP</button></header>
+<header class="top"><div class="brand">Matsu RallyCon v0.6.38</div><div id="status" class="status">準備中</div><button id="gpsBtn">GPS</button><button id="compassBtn">CAP</button></header>
 <main class="main">
 <section class="panel left">
 <div class="card"><div class="label">TOTAL km</div><div id="total" class="value totalValue">0.00</div><div class="corr"><button id="totalMinus">−10m</button><button id="totalZero">0</button><button id="totalPlus">＋10m</button></div></div>
@@ -72,20 +72,38 @@ function getTotalKm(){return Math.max(0,gpsDistance-totalZeroBase+totalOffset)}
 function getLegKm(){return Math.max(0,gpsDistance-legBase+legOffset)}
 function display(){const t=getTotalKm(),l=getLegKm();$('total').textContent=fmtKm(t);$('leg').textContent=fmtKm(l);$('speed').textContent=(lastTs?.speed||0).toFixed(1);const e=ROUTE[rb];$('target').textContent=e?fmtKm(e.dist):'--';$('remain').textContent=e?fmtKm(Math.max(0,e.dist-t)):'--';checkAutoNext();saveSession()}
 function checkAutoNext(){if(!autoNext||!stageStarted||!running)return;const t=getTotalKm();while(rb>0&&rb<ROUTE.length-1){const target=ROUTE[rb]?.dist;if(target==null||t < target-AUTO_NEXT_TRIGGER_M/1000)break;moveRB(1,false)}}
-function saveSession(){if(suppressSessionSave)return;try{localStorage.setItem(SESSION_KEY,JSON.stringify({version:'0.6.37',stageStarted,running:false,gpsDistance,totalZeroBase,totalOffset,legBase,legOffset,elapsedMs:elapsedMs+(running&&timerStart?performance.now()-timerStart:0),rb,autoNext,logicalPage}))}catch(e){}}
-function restoreSession(){try{const raw=localStorage.getItem(SESSION_KEY);if(!raw)return false;const x=JSON.parse(raw);if(x?.version!=='0.6.37'||!x.stageStarted)return false;gpsDistance=Number(x.gpsDistance)||0;gpsTotalMeters=gpsDistance*1000;totalZeroBase=Number(x.totalZeroBase)||0;totalOffset=Number(x.totalOffset)||0;legBase=Number(x.legBase)||0;legOffset=Number(x.legOffset)||0;elapsedMs=Math.max(0,Number(x.elapsedMs)||0);rb=clamp(Number(x.rb)||0,0,ROUTE.length-1);autoNext=x.autoNext!==false;running=false;stageStarted=true;timerStart=null;logicalPage=clamp(Number(x.logicalPage)||1,1,logicalCount);page=mapping(logicalPage).pdf;return true}catch(e){return false}}
+function saveSession(){if(suppressSessionSave)return;try{localStorage.setItem(SESSION_KEY,JSON.stringify({version:'0.6.38',stageStarted,running:false,gpsDistance,totalZeroBase,totalOffset,legBase,legOffset,elapsedMs:elapsedMs+(running&&timerStart?performance.now()-timerStart:0),rb,autoNext,logicalPage}))}catch(e){}}
+function restoreSession(){try{const raw=localStorage.getItem(SESSION_KEY);if(!raw)return false;const x=JSON.parse(raw);if(x?.version!=='0.6.38'||!x.stageStarted)return false;gpsDistance=Number(x.gpsDistance)||0;gpsTotalMeters=gpsDistance*1000;totalZeroBase=Number(x.totalZeroBase)||0;totalOffset=Number(x.totalOffset)||0;legBase=Number(x.legBase)||0;legOffset=Number(x.legOffset)||0;elapsedMs=Math.max(0,Number(x.elapsedMs)||0);rb=clamp(Number(x.rb)||0,0,ROUTE.length-1);autoNext=x.autoNext!==false;running=false;stageStarted=true;timerStart=null;logicalPage=clamp(Number(x.logicalPage)||1,1,logicalCount);page=mapping(logicalPage).pdf;return true}catch(e){return false}}
 function clearSession(){try{localStorage.removeItem(SESSION_KEY)}catch(e){}}
 async function requestWakeLock(){try{if(!('wakeLock' in navigator)||wakeLock)return;wakeLock=await navigator.wakeLock.request('screen');wakeLock.addEventListener?.('release',()=>{wakeLock=null})}catch(e){wakeLock=null}}
 async function releaseWakeLock(){try{await wakeLock?.release()}catch(e){}wakeLock=null}
-function setRB(i,doAuto=true){rb=clamp(i,0,ROUTE.length-1);const e=ROUTE[rb];$('rbNo').textContent=e.no;$('target').textContent=fmtKm(e.dist); syncLogical(false); display(doAuto)}
+let targetCenterToken=0;
+const ROADBOOK_ROW_CENTER_X_PT=[481.595,398.39,315.925,233.46,151.205,68.7];
+function setRB(i,doAuto=true){rb=clamp(i,0,ROUTE.length-1);const e=ROUTE[rb];$('rbNo').textContent=e.no;$('target').textContent=fmtKm(e.dist);const token=++targetCenterToken;const renderPromise=syncLogical(false);Promise.resolve(renderPromise).then(()=>{if(token===targetCenterToken)centerTargetInView()});display(doAuto)}
 function logicalFromRB(){return rb<=5?1:Math.floor((ROUTE[rb].no-7)/6)+2}
 function mapping(lp){if(lp===1)return {pdf:1,side:'right'};return {pdf:Math.floor(lp/2)+1,side:lp%2===0?'left':'right'}}
+function targetRowIndex(){return rb<6?rb:(rb-6)%6}
+function centerTargetInView(){
+ const st=$('stage'),c=$('pdfCanvas');
+ if(!st||!c||!c.clientHeight)return;
+ const baseHeight=595.21997;
+ const yPt=baseHeight-ROADBOOK_ROW_CENTER_X_PT[targetRowIndex()];
+ const targetY=yPt/baseHeight*c.clientHeight;
+ const k=zoom/Math.max(.001,renderedZoom);
+ const targetRect=c.getBoundingClientRect();
+ const stageRect=st.getBoundingClientRect();
+ const targetScreenY=targetRect.top+targetY*k;
+ const desiredShift=stageRect.top+stageRect.height/2-targetScreenY;
+ if(Math.abs(desiredShift)<0.5)return;
+ panY+=desiredShift;
+ applyPan();
+}
 function panBounds(){const st=$('stage'),c=$('pdfCanvas'),k=zoom/Math.max(.001,renderedZoom),w=c.clientWidth*k,h=c.clientHeight*k;return{x:Math.max(0,(w-st.clientWidth)/2),y:Math.max(0,h-st.clientHeight)}}
 function clampPan(){const b=panBounds();panX=clamp(panX,-b.x,b.x);panY=clamp(panY,-b.y,0)}
 function applyPan(){clampPan();const k=zoom/Math.max(.001,renderedZoom);$('canvasWrap').style.transform=`translate3d(${panX}px,${panY}px,0) scale(${k})`}
 function setZoom(z,fx=null,fy=null){const old=zoom;zoom=clamp(z,.5,4);if(fx!=null&&fy!=null&&old!==zoom){const st=$('stage'),cx=fx-st.clientWidth/2,cy=fy-st.clientHeight/2;panX=cx-(cx-panX)*(zoom/old);panY=cy-(cy-panY)*(zoom/old)}if(zoom<=1){panX=0;panY=0}applyPan();}
 function logicalCountForDoc(){return pdf?pdf.numPages*2-1:39}
-function syncLogical(resetPan=true){const lp=logicalFromRB();if(lp!==logicalPage){logicalPage=lp;page=mapping(lp).pdf;if(resetPan){panX=0;panY=0}renderPage()}}
+function syncLogical(resetPan=true){const lp=logicalFromRB();if(lp!==logicalPage){logicalPage=lp;page=mapping(lp).pdf;if(resetPan){panX=0;panY=0}return renderPage()}return Promise.resolve()}
 async function renderPage(){
  if(!pdf)return;
  const m=mapping(logicalPage);
