@@ -1,4 +1,4 @@
-# Matsu RallyCon v0.6.29
+# Matsu RallyCon v0.6.30
 
 Based directly on v0.6.28. The 60% center PDF area is preserved. This build only tightens internal left/right panel spacing so the PDF remains large while the side controls have more usable room. Correction buttons are kept on one line, and the RB indicator remains simplified.
 
