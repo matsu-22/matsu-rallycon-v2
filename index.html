@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="ja"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<title>Matsu RallyCon v0.6.35</title>
+<title>Matsu RallyCon v0.6.36</title>
 <link rel="manifest" href="manifest.webmanifest">
 <style>
 :root{--bg:#0d1117;--panel:#161b22;--line:#30363d;--text:#f0f6fc;--muted:#8b949e;--accent:#58a6ff;--warn:#f2cc60}
@@ -35,7 +35,7 @@ button{font:inherit;color:inherit;background:#21262d;border:1px solid #484f58;bo
 .rbhead .rbbox:first-child .rbval{font-size:24px}
 </style></head><body>
 <div id="app">
-<header class="top"><div class="brand">Matsu RallyCon v0.6.35</div><div id="status" class="status">準備中</div><button id="gpsBtn">GPS</button><button id="compassBtn">CAP</button></header>
+<header class="top"><div class="brand">Matsu RallyCon v0.6.36</div><div id="status" class="status">準備中</div><button id="gpsBtn">GPS</button><button id="compassBtn">CAP</button></header>
 <main class="main">
 <section class="panel left">
 <div class="card"><div class="label">TOTAL km</div><div id="total" class="value totalValue">0.00</div><div class="corr"><button id="totalMinus">−10m</button><button id="totalZero">0</button><button id="totalPlus">＋10m</button></div></div>
@@ -62,11 +62,22 @@ const ROUTE=[{"no":1,"dist":0.0,"inter":0.0,"page":1,"logicalPage":1,"side":"rig
 const $=id=>document.getElementById(id), clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 let pdf=null,page=1,logicalPage=1,logicalCount=39,zoom=1,renderedZoom=1,fitScale=1,panX=0,panY=0;
 let gpsDistance=0,totalZeroBase=0,totalOffset=0,legBase=0,legOffset=0,lastTs=null,timerStart=null,elapsedMs=0,running=false,stageStarted=false,autoNext=true,rb=0;
+const AUTO_NEXT_TRIGGER_M=0;
+const SESSION_KEY='matsu-rallycon-session-v036';
+let wakeLock=null, suppressSessionSave=false;
 let pointers=new Map(),pinchStartDist=0,pinchStartZoom=1,gestureMoved=false;
 const dpr=()=>Math.min(window.devicePixelRatio||1,2);
 function fmtKm(v){return Math.max(0,v).toFixed(2)} function setStatus(t){$('status').textContent=t}
-function display(){const t=Math.max(0,gpsDistance-totalZeroBase+totalOffset);const l=Math.max(0,gpsDistance-legBase+legOffset);$('total').textContent=fmtKm(t);$('leg').textContent=fmtKm(l);$('speed').textContent=(lastTs?.speed||0).toFixed(1);const e=ROUTE[rb];$('target').textContent=e?fmtKm(e.dist):'--';$('remain').textContent=e?fmtKm(Math.max(0,e.dist-t)):'--'}
-function setRB(i){rb=clamp(i,0,ROUTE.length-1);const e=ROUTE[rb];$('rbNo').textContent=e.no;$('target').textContent=fmtKm(e.dist); syncLogical(false); display()}
+function getTotalKm(){return Math.max(0,gpsDistance-totalZeroBase+totalOffset)}
+function getLegKm(){return Math.max(0,gpsDistance-legBase+legOffset)}
+function display(){const t=getTotalKm(),l=getLegKm();$('total').textContent=fmtKm(t);$('leg').textContent=fmtKm(l);$('speed').textContent=(lastTs?.speed||0).toFixed(1);const e=ROUTE[rb];$('target').textContent=e?fmtKm(e.dist):'--';$('remain').textContent=e?fmtKm(Math.max(0,e.dist-t)):'--';checkAutoNext();saveSession()}
+function checkAutoNext(){if(!autoNext||!stageStarted||!running)return;const t=getTotalKm();while(rb>0&&rb<ROUTE.length-1){const target=ROUTE[rb]?.dist;if(target==null||t < target-AUTO_NEXT_TRIGGER_M/1000)break;moveRB(1,false)}}
+function saveSession(){if(suppressSessionSave)return;try{localStorage.setItem(SESSION_KEY,JSON.stringify({version:'0.6.36',stageStarted,running:false,gpsDistance,totalZeroBase,totalOffset,legBase,legOffset,elapsedMs:elapsedMs+(running&&timerStart?performance.now()-timerStart:0),rb,autoNext,logicalPage}))}catch(e){}}
+function restoreSession(){try{const raw=localStorage.getItem(SESSION_KEY);if(!raw)return false;const x=JSON.parse(raw);if(x?.version!=='0.6.36'||!x.stageStarted)return false;gpsDistance=Number(x.gpsDistance)||0;gpsTotalMeters=gpsDistance*1000;totalZeroBase=Number(x.totalZeroBase)||0;totalOffset=Number(x.totalOffset)||0;legBase=Number(x.legBase)||0;legOffset=Number(x.legOffset)||0;elapsedMs=Math.max(0,Number(x.elapsedMs)||0);rb=clamp(Number(x.rb)||0,0,ROUTE.length-1);autoNext=x.autoNext!==false;running=false;stageStarted=true;timerStart=null;logicalPage=clamp(Number(x.logicalPage)||1,1,logicalCount);page=mapping(logicalPage).pdf;return true}catch(e){return false}}
+function clearSession(){try{localStorage.removeItem(SESSION_KEY)}catch(e){}}
+async function requestWakeLock(){try{if(!('wakeLock' in navigator)||wakeLock)return;wakeLock=await navigator.wakeLock.request('screen');wakeLock.addEventListener?.('release',()=>{wakeLock=null})}catch(e){wakeLock=null}}
+async function releaseWakeLock(){try{await wakeLock?.release()}catch(e){}wakeLock=null}
+function setRB(i,doAuto=true){rb=clamp(i,0,ROUTE.length-1);const e=ROUTE[rb];$('rbNo').textContent=e.no;$('target').textContent=fmtKm(e.dist); syncLogical(false); display(doAuto)}
 function logicalFromRB(){return rb<=5?1:Math.floor((ROUTE[rb].no-7)/6)+2}
 function mapping(lp){if(lp===1)return {pdf:1,side:'right'};return {pdf:Math.floor(lp/2)+1,side:lp%2===0?'left':'right'}}
 function panBounds(){const st=$('stage'),c=$('pdfCanvas'),k=zoom/Math.max(.001,renderedZoom),w=c.clientWidth*k,h=c.clientHeight*k;return{x:Math.max(0,(w-st.clientWidth)/2),y:Math.max(0,h-st.clientHeight)}}
@@ -107,20 +118,20 @@ async function renderPage(){
  renderedZoom=zoom;panX=0;panY=0;applyPan();
  ;
 }
-async function loadBytes(buf,name){pdf=await pdfjsLib.getDocument({data:buf}).promise;logicalCount=logicalCountForDoc();logicalPage=1;page=1;rb=0;stageStarted=false;running=false;timerStart=null;elapsedMs=0;gpsLast=null;gpsDistance=0;totalZeroBase=0;totalOffset=0;legBase=0;legOffset=0;zoom=1;await renderPage();$('startBtn').textContent='START';$('time').textContent='00:00:00';setRB(0);setStatus('READY');}
+async function loadBytes(buf,name,preserveSession=false){pdf=await pdfjsLib.getDocument({data:buf}).promise;logicalCount=logicalCountForDoc();logicalPage=1;page=1;rb=0;stageStarted=false;running=false;timerStart=null;elapsedMs=0;gpsLast=null;gpsDistance=0;totalZeroBase=0;totalOffset=0;legBase=0;legOffset=0;zoom=1;if(!preserveSession)clearSession();await releaseWakeLock();await renderPage();$('startBtn').textContent='START';$('time').textContent='00:00:00';setRB(0,false);setStatus('READY');}
 function moveLogical(d){logicalPage=clamp(logicalPage+d,1,logicalCount);page=mapping(logicalPage).pdf;zoom=1;panX=0;panY=0;renderPage()}
-function moveRB(d){const next=clamp(rb+d,0,ROUTE.length-1);if(next!==rb&&d!==0){legBase=gpsDistance;legOffset=0}setRB(next)}
-$('loadBtn').onclick=()=>$('pdfFile').click();$('pdfFile').onchange=async e=>{const f=e.target.files[0];if(f)loadBytes(await f.arrayBuffer(),f.name)};
+function moveRB(d,doAuto=true){const next=clamp(rb+d,0,ROUTE.length-1);setRB(next,doAuto)}
+$('loadBtn').onclick=()=>$('pdfFile').click();$('pdfFile').onchange=async e=>{const f=e.target.files[0];if(f)loadBytes(await f.arrayBuffer(),f.name,false)};
 $('pagePrev').onclick=()=>moveLogical(-1);$('pageNext').onclick=()=>moveLogical(1);
 $('backBtn').onclick=()=>moveRB(-1);$('nextBtn').onclick=()=>moveRB(1);$('autoBtn').onclick=()=>{autoNext=!autoNext;$('autoBtn').textContent='AUTO: '+(autoNext?'ON':'OFF')};
-function adjustTotal(delta){totalOffset+=delta;display()}
-function zeroTotal(){totalZeroBase=gpsDistance;totalOffset=0;display()}
-function adjustLeg(delta){legOffset+=delta;display()}
-function zeroLeg(){legBase=gpsDistance;legOffset=0;display()}
+function adjustTotal(delta){totalOffset+=delta;display();checkAutoNext()}
+function zeroTotal(){totalZeroBase=gpsDistance;totalOffset=0;display();checkAutoNext()}
+function adjustLeg(delta){legOffset+=delta;display(false)}
+function zeroLeg(){legBase=gpsDistance;legOffset=0;display(false)}
 $('totalMinus').onclick=()=>adjustTotal(-0.01);$('totalPlus').onclick=()=>adjustTotal(0.01);$('totalZero').onclick=zeroTotal;
 $('legMinus').onclick=()=>adjustLeg(-0.01);$('legPlus').onclick=()=>adjustLeg(0.01);$('legZero').onclick=zeroLeg;
 
-$('startBtn').onclick=()=>{
+$('startBtn').onclick=async()=>{
   if(!running){
     if(!stageStarted){
       stageStarted=true;
@@ -129,20 +140,24 @@ $('startBtn').onclick=()=>{
       legBase=gpsDistance;
       legOffset=0;
       elapsedMs=0;
-      if(ROUTE.length>1) setRB(1);
-      else display();
+      if(ROUTE.length>1) setRB(1,false);
+      else display(false);
     }
     timerStart=performance.now();
     gpsLast=null;
     running=true;
     $('startBtn').textContent='STOP';
+    await requestWakeLock();
     setStatus(gpsWatchId!==null?'GPS RUN':'GPS未接続');
+    saveSession();
   }else{
     if(timerStart){elapsedMs+=performance.now()-timerStart;timerStart=null}
     running=false;
     gpsLast=null;
     $('startBtn').textContent='START';
+    await releaseWakeLock();
     setStatus(gpsWatchId!==null?'GPS PAUSE':'READY');
+    saveSession();
   }
 };
 let gpsWatchId=null;
@@ -234,11 +249,6 @@ function handleGpsPosition(pos){
   }
 
   display();
-  if(autoNext && stageStarted && running){
-    const t=Math.max(0,gpsDistance-totalZeroBase+totalOffset);
-    const target=ROUTE[rb]?.dist;
-    if(target!=null&&rb>0&&t>=target&&rb<ROUTE.length-1)moveRB(1);
-  }
 }
 function startGps(){
   if(gpsWatchId!==null)return;
@@ -310,5 +320,7 @@ setInterval(()=>{
   }
 },250);
 window.addEventListener('resize',()=>{if(pdf)renderPage()});
-const defaultPdfCandidates=['KOMAREN_Classic2026.pdf','./KOMAREN_Classic2026.pdf','demo/KOMAREN_Classic2026.pdf'];(async()=>{for(const u of defaultPdfCandidates){try{const r=await fetch(u);if(r.ok){const b=await r.arrayBuffer();await loadBytes(b,'KOMAREN_Classic2026.pdf');return}}catch(e){}}setStatus('LOAD PDF でPDFを選択してください')})();
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&running)requestWakeLock();saveSession()});
+window.addEventListener('pagehide',saveSession);
+const defaultPdfCandidates=['KOMAREN_Classic2026.pdf','./KOMAREN_Classic2026.pdf','demo/KOMAREN_Classic2026.pdf'];(async()=>{for(const u of defaultPdfCandidates){try{const r=await fetch(u);if(r.ok){const b=await r.arrayBuffer();suppressSessionSave=true;await loadBytes(b,'KOMAREN_Classic2026.pdf',true);const restored=restoreSession();suppressSessionSave=false;if(restored){await renderPage();setRB(rb,false);$('startBtn').textContent='START';$('time').textContent=new Date(Math.floor(elapsedMs/1000)*1000).toISOString().slice(11,19);setStatus('RESTORED / PAUSE')}else{setStatus('READY')}return}}catch(e){suppressSessionSave=false}}setStatus('LOAD PDF でPDFを選択してください')})();
 </script></body></html>

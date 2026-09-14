@@ -1,11 +1,13 @@
-# Matsu RallyCon v0.6.35
+# Matsu RallyCon v0.6.36
 
-Based on the verified v0.6.33 build. UI and PDF viewport behavior are preserved. This build strengthens the rally-distance and timing core: GPS distance is counted only while the stage is running, STOP/START pauses do not add parked distance, GPS references are rebuilt across pauses, and TIME resumes from the previous elapsed value instead of resetting.
+Based on the verified v0.6.35 build. UI and PDF viewport behavior are preserved. This build hardens the distance/session core without changing the dashboard layout.
 
-
-## v0.6.35 GPSロスト／復帰
-- GPSロスト中は最後の正常測位点を保持し、距離を推定加算しない。
-- GPS復帰時はロスト前の正常測位点から復帰地点までの直線距離を1回だけ加算。
-- 復帰時の異常な速度ジャンプは距離に加算せず、新しい正常地点を基準に再開。
-- 長時間ロスト（10分超）は経路を推定せず再アンカー。
-- 5秒以上GPS更新がない場合はGPS LOST表示。UI/PDF表示は変更なし。
+## v0.6.36 PC-side hardening
+- TOTAL / LEG / NEXTまで use one consistent corrected-distance model.
+- ±10m correction is applied to TOTAL and therefore also to NEXTまで / AUTO NEXT.
+- AUTO NEXT has an explicit internal trigger constant and handles skipped-over close roadbook points safely.
+- BACK / NEXT no longer silently resets LEG; LEG is independently reset with its existing 0 button.
+- START / STOP remains pause/resume; screen Wake Lock is requested while running and reacquired after returning from background when supported.
+- Session state is saved locally and restored as PAUSED after a reload; a reload never silently resumes motion or GPS measurement.
+- Existing GPS loss/recovery behavior from v0.6.35 is preserved.
+- UI, CSS, PDF rendering and PDF pan/viewport behavior are unchanged.
