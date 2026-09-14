@@ -1,3 +1,3 @@
-# Matsu RallyCon v0.6.33
+# Matsu RallyCon v0.6.34
 
-Based on the previous verified build. UI and PDF viewport behavior are preserved. This build focuses only on the rally-distance core: START initializes the stage at TOTAL 0.00 and targets the first actual roadbook point after START; NEXTまで is TARGET minus TOTAL; AUTO advances to the next target after the current target is reached while the stage is running.
+Based on the verified v0.6.33 build. UI and PDF viewport behavior are preserved. This build strengthens the rally-distance and timing core: GPS distance is counted only while the stage is running, STOP/START pauses do not add parked distance, GPS references are rebuilt across pauses, and TIME resumes from the previous elapsed value instead of resetting.
