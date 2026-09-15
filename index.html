@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="ja"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<title>Matsu RallyCon v0.6.44</title>
+<title>Matsu RallyCon v0.6.45</title>
 <link rel="manifest" href="manifest.webmanifest">
 <style>
 :root{--bg:#0d1117;--panel:#161b22;--line:#30363d;--text:#f0f6fc;--muted:#8b949e;--accent:#58a6ff;--warn:#f2cc60}
@@ -36,7 +36,7 @@ button{font:inherit;color:inherit;background:#21262d;border:1px solid #484f58;bo
 .rbhead .rbbox:first-child .rbval{font-size:clamp(16px,35cqw,24px);letter-spacing:-.2px}
 </style></head><body>
 <div id="app">
-<header class="top"><div class="brand">Matsu RallyCon v0.6.44</div><div class="clock"><span id="clockDate" class="clockDate"></span><span id="clockTime" class="clockTime">--:--</span></div><div id="status" class="status">準備中</div><button id="gpsBtn">GPS</button><button id="compassBtn">CAP</button></header>
+<header class="top"><div class="brand">Matsu RallyCon v0.6.45</div><div class="clock"><span id="clockDate" class="clockDate"></span><span id="clockTime" class="clockTime">--:--</span></div><div id="status" class="status">準備中</div><button id="gpsBtn">GPS</button><button id="compassBtn">CAP</button></header>
 <main class="main">
 <section class="panel left">
 <div class="card"><div class="label">TOTAL km</div><div id="total" class="value totalValue">0.00</div><div class="corr"><button id="totalMinus">−10m</button><button id="totalZero">0</button><button id="totalPlus">＋10m</button></div></div>
@@ -65,8 +65,8 @@ let pdf=null,page=1,logicalPage=1,logicalCount=39,zoom=1,renderedZoom=1,fitScale
 let gpsDistance=0,totalZeroBase=0,totalOffset=0,legBase=0,legOffset=0,lastTs=null,timerStart=null,elapsedMs=0,running=false,stageStarted=false,autoNext=true,rb=0;
 const AUTO_NEXT_TRIGGER_M=0;
 const SESSION_KEY='matsu-rallycon-session-v036';
-const APP_VERSION='0.6.44';
-const LEGACY_SESSION_VERSIONS=new Set(['0.6.38','0.6.39','0.6.40','0.6.41','0.6.42','0.6.43','0.6.44']);
+const APP_VERSION='0.6.45';
+const LEGACY_SESSION_VERSIONS=new Set(['0.6.38','0.6.39','0.6.40','0.6.41','0.6.42','0.6.43','0.6.44','0.6.45']);
 let wakeLock=null, suppressSessionSave=false;
 let pointers=new Map(),pinchStartDist=0,pinchStartZoom=1,gestureMoved=false;
 const dpr=()=>Math.min(window.devicePixelRatio||1,2);
@@ -191,21 +191,46 @@ function adjustTotal(delta){totalOffset+=delta;display();checkAutoNext()}
 function zeroTotal(){totalZeroBase=gpsDistance;totalOffset=0;display();checkAutoNext()}
 function adjustLeg(delta){legOffset+=delta;display(false)}
 function zeroLeg(){legBase=gpsDistance;legOffset=0;display(false)}
-function bindHoldAdjust(id,delta,holdMs=550,repeatMs=120){
-  const el=$(id);let timer=null,interval=null,held=false,suppressClick=false;
-  const stop=()=>{clearTimeout(timer);clearInterval(interval);timer=null;interval=null};
+function holdAdjustStep(elapsedMs){
+  if(elapsedMs<1000)return 0.01;
+  if(elapsedMs<2500)return 0.05;
+  if(elapsedMs<4500)return 0.10;
+  return 0.50;
+}
+function bindHoldAdjust(id,delta,holdMs=550,repeatMs=300){
+  const el=$(id);let timer=null,interval=null,held=false,suppressClick=false,holdStarted=0;
+  const stop=()=>{clearTimeout(timer);clearInterval(interval);timer=null;interval=null;holdStarted=0};
   el.addEventListener('pointerdown',e=>{
     e.preventDefault();held=false;suppressClick=false;stop();
     try{el.setPointerCapture?.(e.pointerId)}catch(err){}
     timer=setTimeout(()=>{
-      held=true;suppressClick=true;
-      interval=setInterval(()=>delta(),repeatMs);
+      held=true;suppressClick=true;holdStarted=performance.now();
+      interval=setInterval(()=>delta(holdAdjustStep(performance.now()-holdStarted)),repeatMs);
     },holdMs);
   });
   el.addEventListener('pointerup',e=>{e.preventDefault();stop();if(held){e.stopPropagation();held=false}});
   el.addEventListener('pointercancel',e=>{stop();held=false;suppressClick=false});
   el.addEventListener('contextmenu',e=>e.preventDefault());
-  el.onclick=e=>{e.preventDefault();if(suppressClick){suppressClick=false;return}delta()};
+  el.onclick=e=>{e.preventDefault();if(suppressClick){suppressClick=false;return}delta(0.01)};
+}
+function parseDistanceInput(label,current){
+  const raw=window.prompt(`${label}をkmで入力してください`,fmtKm(current));
+  if(raw===null)return null;
+  const value=Number(String(raw).trim().replace(',','.'));
+  if(!Number.isFinite(value)||value<0){window.alert('0以上の数値を入力してください。');return null}
+  return value;
+}
+function setTotalDirect(){
+  const current=getTotalKm(),value=parseDistanceInput('TOTAL',current);
+  if(value===null)return;
+  totalOffset=value-(gpsDistance-totalZeroBase);
+  display();checkAutoNext();
+}
+function setLegDirect(){
+  const current=getLegKm(),value=parseDistanceInput('LEG',current);
+  if(value===null)return;
+  legOffset=value-(gpsDistance-legBase);
+  display(false);
 }
 function bindHoldReset(id,resetFn,holdMs=700){
   const el=$(id);let timer=null,held=false,suppressClick=false;
@@ -224,10 +249,12 @@ function bindHoldReset(id,resetFn,holdMs=700){
   el.addEventListener('contextmenu',e=>e.preventDefault());
   el.onclick=e=>{e.preventDefault();if(suppressClick){suppressClick=false;return}};
 }
-bindHoldAdjust('totalMinus',()=>adjustTotal(-0.01));
-bindHoldAdjust('totalPlus',()=>adjustTotal(0.01));
-bindHoldAdjust('legMinus',()=>adjustLeg(-0.01));
-bindHoldAdjust('legPlus',()=>adjustLeg(0.01));
+bindHoldAdjust('totalMinus',step=>adjustTotal(-step));
+bindHoldAdjust('totalPlus',step=>adjustTotal(step));
+bindHoldAdjust('legMinus',step=>adjustLeg(-step));
+bindHoldAdjust('legPlus',step=>adjustLeg(step));
+$('total').addEventListener('click',setTotalDirect);
+$('leg').addEventListener('click',setLegDirect);
 bindHoldReset('totalZero',zeroTotal);
 bindHoldReset('legZero',zeroLeg);
 
