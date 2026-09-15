@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="ja"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<title>Matsu RallyCon v0.7.1 DEV2</title>
+<title>Matsu RallyCon v0.7.1</title>
 <link rel="manifest" href="manifest.webmanifest">
 <style>
 :root{--bg:#0d1117;--panel:#161b22;--line:#30363d;--text:#f0f6fc;--muted:#8b949e;--accent:#58a6ff;--warn:#f2cc60}
@@ -34,7 +34,7 @@ button{font:inherit;color:inherit;background:#21262d;border:1px solid #484f58;bo
 .rbhead{grid-template-columns:.60fr 1.40fr}
 .rbhead .rbbox:first-child{container-type:inline-size;padding-left:5px;padding-right:5px}
 .rbhead .rbbox:first-child .rbval{font-size:clamp(16px,35cqw,24px);letter-spacing:-.2px}.rbhead .rbbox:first-child .rbval.threeDigit{font-size:15px;letter-spacing:-.5px}
-/* v0.7.1 DEV2: LEG / SPEED / NEXT numeric values unified and slightly enlarged for real-world visibility test. */
+/* v0.7.1: LEG / SPEED / NEXT numeric values unified and slightly enlarged for real-world visibility. */
 .card:first-child,.card:nth-child(2){container-type:inline-size}
 .totalValue.threeDigit{font-size:clamp(34px,13.5cqw,47px);letter-spacing:-1px;text-align:center;width:100%}
 .card:nth-child(2) .value,.card.compact .value,.nextbox .rbval{font-size:clamp(36px,6.2vh,50px);text-align:center;letter-spacing:-.5px;width:100%;padding-right:0}
@@ -49,7 +49,7 @@ button{font:inherit;color:inherit;background:#21262d;border:1px solid #484f58;bo
 @media (max-width:1100px){.card:nth-child(2) .value,.card.compact .value,.nextbox .rbval{font-size:clamp(34px,5.8vh,46px)}}
 </style></head><body>
 <div id="app">
-<header class="top"><div class="brand">Matsu RallyCon v0.7.1 DEV2</div><div class="clock"><span id="clockDate" class="clockDate"></span><span id="clockTime" class="clockTime">--:--</span></div><div id="status" class="status">準備中</div><button id="gpsBtn">GPS</button><button id="compassBtn">CAP</button></header>
+<header class="top"><div class="brand">Matsu RallyCon v0.7.1</div><div class="clock"><span id="clockDate" class="clockDate"></span><span id="clockTime" class="clockTime">--:--</span></div><div id="status" class="status">準備中</div><button id="gpsBtn">GPS</button><button id="compassBtn">CAP</button></header>
 <main class="main">
 <section class="panel left">
 <div class="card"><div class="label">TOTAL km</div><div id="total" class="value totalValue">0.00</div><div class="corr"><button id="totalMinus">−10m</button><button id="totalZero">0</button><button id="totalPlus">＋10m</button></div></div>
@@ -237,7 +237,7 @@ let pdf=null,page=1,logicalPage=1,logicalCount=39,zoom=1,renderedZoom=1,fitScale
 let gpsDistance=0,totalZeroBase=0,totalOffset=0,legBase=0,legOffset=0,lastTs=null,timerStart=null,elapsedMs=0,running=false,stageStarted=false,autoNext=true,rb=0;
 const AUTO_NEXT_TRIGGER_M=0;
 const SESSION_KEY='matsu-rallycon-session-v0651-a5dev';
-const APP_VERSION='0.7';
+const APP_VERSION='0.7.1';
 const A5_DEV_LABEL='A4/A5 PDF AUTO: A5 KomaRen parser';
 const LEGACY_SESSION_VERSIONS=new Set(['0.6.38','0.6.39','0.6.40','0.6.41','0.6.42','0.6.43','0.6.44','0.6.45','0.6.46','0.6.47','0.6.48','0.6.49']);
 let wakeLock=null, suppressSessionSave=false;

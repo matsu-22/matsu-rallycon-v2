@@ -1,10 +1,16 @@
-# Matsu RallyCon v0.7
+# Matsu RallyCon v0.7.1
 
 Koma-zuka (roadbook) rally navigation web app.
 
-## v0.7
+## v0.7.1
 
-### A4 / A5 automatic PDF support
+### Numeric display refinement
+- LEG / SPEED / NEXTまで numeric values use the same enlarged display size.
+- LEG / SPEED / TARGET / NEXTまで remain centered for quick visual recognition.
+- TOTAL remains centered with its existing adaptive sizing for larger values.
+- No functional rally-navigation behavior was changed for this UI refinement.
+
+### v0.7 foundation
 - Automatically detects A4 and A5 roadbook PDFs when a PDF is loaded.
 - Existing A4 route behavior is preserved.
 - A5 KomaRen PDFs are parsed automatically on the device/browser and converted into the rally route.
@@ -27,14 +33,15 @@ Koma-zuka (roadbook) rally navigation web app.
 - Touch-safe distance correction controls.
 
 ### UI
-- Existing v0.6.x rally dashboard layout is preserved.
+- Existing v0.7 dashboard layout is preserved.
 - TOTAL / LEG / SPEED on the left.
 - Roadbook PDF in the center.
 - RB / TARGET / NEXTまで / TIME / AUTO on the right.
-- UI/CSS layout is unchanged for the v0.7 milestone.
+- This release changes numeric display sizing/alignment only; overall layout is unchanged.
 
 ## Important
 
-v0.7 is the first milestone release that combines the established A4 rally behavior with automatic A5 roadbook detection and parsing in the same app.
+v0.7.1 is the formal release of the verified numeric-display refinement following real-device visibility testing.
 
+The v0.7 production archive remains preserved separately.
 The v0.6.50 stable baseline remains preserved separately.
