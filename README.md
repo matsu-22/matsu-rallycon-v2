@@ -1,11 +1,12 @@
-# Matsu RallyCon v0.6.45
+# Matsu RallyCon v0.6.46
 
-
-### v0.6.45
+### v0.6.46
 - 上部バー中央に現在の日付と時刻を表示。既存のトップバーのグリッド領域を変更せず、中央絶対配置で追加。
 - バックグラウンド復帰時、および復帰に伴う画面レイアウト再計算後に、現在のRBのターゲットコマを再センタリング。
 - 既存のGPS距離計算、PDF表示、UI配置、操作仕様は維持。
-- RB番号表示をコンテナ幅に応じて自動縮小。3桁（例: 100～234）でも見切れないようにし、既存レイアウトの列幅は変更しない。
+- 3桁のRB（100～234）は18pxへ自動縮小し、RB番号が見切れないように調整。既存レイアウトの列幅は変更しない。
+- 3桁のTOTAL（100.00km以上）は52pxへ自動縮小し、365.19kmまで見切れないように調整。
+- 既存の2桁以下のTOTAL/RB表示サイズ、UIレイアウト、PDF表示、操作ロジックは変更なし。
 - TOTAL / LEGの数字をタップすると、任意のkm値を直接入力して設定可能。
 - ±10m補正の長押しは時間に応じて10m → 50m → 100m → 500mへ段階的に加速し、大幅な距離修正を短時間で行える。短いタップは従来どおり10mを1回だけ補正。
 
@@ -50,4 +51,6 @@ Based on the verified v0.6.37 build. UI and existing PDF rendering/pan behavior 
 - START long-press reset remains confirmation-protected.
 - Rally UI text selection and long-press callouts are disabled; PDF canvas behavior is unchanged.
 - UI layout/CSS geometry and existing PDF rendering behavior are otherwise preserved.
+
+
 
