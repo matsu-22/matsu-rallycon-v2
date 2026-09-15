@@ -1,4 +1,10 @@
-# Matsu RallyCon v0.6.42
+# Matsu RallyCon v0.6.43
+
+
+### v0.6.43
+- 上部バー中央に現在の日付と時刻を表示。既存のトップバーのグリッド領域を変更せず、中央絶対配置で追加。
+- バックグラウンド復帰時、および復帰に伴う画面レイアウト再計算後に、現在のRBのターゲットコマを再センタリング。
+- 既存のGPS距離計算、PDF表示、UI配置、操作仕様は維持。
 
 ### v0.6.42
 - RBが前進したとき、LEGの基準を新しいTARGETへ再同期。
@@ -41,3 +47,9 @@ Based on the verified v0.6.37 build. UI and existing PDF rendering/pan behavior 
 - START long-press reset remains confirmation-protected.
 - Rally UI text selection and long-press callouts are disabled; PDF canvas behavior is unchanged.
 - UI layout/CSS geometry and existing PDF rendering behavior are otherwise preserved.
+
+
+## v0.6.43
+- 上部中央に現在の日付・時刻を表示。既存のトップバーのレイアウト領域を変更せず、絶対配置で表示。
+- バックグラウンド復帰時、および復帰に伴うレイアウト再計算後に、現在のRBのターゲットコマを再センタリング。
+- 既存のGPS距離計算、PDF表示、既存UI配置、操作仕様は維持。

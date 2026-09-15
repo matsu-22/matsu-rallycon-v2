@@ -1,14 +1,14 @@
 <!doctype html>
 <html lang="ja"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<title>Matsu RallyCon v0.6.42</title>
+<title>Matsu RallyCon v0.6.43</title>
 <link rel="manifest" href="manifest.webmanifest">
 <style>
 :root{--bg:#0d1117;--panel:#161b22;--line:#30363d;--text:#f0f6fc;--muted:#8b949e;--accent:#58a6ff;--warn:#f2cc60}
 *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:Arial,"Noto Sans JP",sans-serif;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
 button{font:inherit;color:inherit;background:#21262d;border:1px solid #484f58;border-radius:8px;font-weight:800;touch-action:manipulation;min-width:0}button:active{transform:translateY(1px)}
 #app{width:100vw;height:100dvh;display:grid;grid-template-rows:44px minmax(0,1fr) 54px;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
-.top{display:grid;grid-template-columns:minmax(170px,1fr) minmax(130px,auto) auto auto;gap:7px;align-items:center;padding:5px 10px;border-bottom:1px solid var(--line);background:#11161d;min-width:0}.brand{font-size:14px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.status{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right}.top button{height:34px;min-width:48px;padding:0 12px}
+.top{display:grid;grid-template-columns:minmax(170px,1fr) minmax(130px,auto) auto auto;gap:7px;align-items:center;padding:5px 10px;border-bottom:1px solid var(--line);background:#11161d;min-width:0;position:relative}.brand{font-size:14px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.status{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right}.top button{height:34px;min-width:48px;padding:0 12px}.clock{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;align-items:baseline;gap:8px;white-space:nowrap;pointer-events:none;font-variant-numeric:tabular-nums}.clockDate{font-size:12px;color:var(--muted);font-weight:800}.clockTime{font-size:22px;font-weight:900;line-height:1}
 .main{display:grid;grid-template-columns:20% 60% 20%;min-width:0;min-height:0}.panel{background:var(--panel);padding:7px;min-width:0;min-height:0}.left{display:grid;grid-template-rows:minmax(0,1.18fr) minmax(0,1.18fr) minmax(0,.78fr);gap:6px;border-right:1px solid var(--line);overflow:hidden}.card{border:1px solid var(--line);border-radius:9px;background:#0f141a;padding:6px 8px;min-width:0;min-height:0;display:grid;grid-template-rows:auto minmax(0,1fr) auto;overflow:hidden}.card .value{min-height:0;align-self:center}.card.compact .value{align-self:center}.label{font-size:11px;color:var(--muted);font-weight:800;line-height:1.1}.value{font-size:clamp(30px,5.8vh,46px);font-weight:900;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:clip;align-self:center}.small{font-size:clamp(21px,4.2vh,31px)}
 .totalValue{font-size:clamp(44px,7.5vh,66px)}
 .corr{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin-top:4px}.corr button{height:24px;font-size:10px;padding:0 2px}.corrLabel{font-size:9px;color:var(--muted);font-weight:800;display:none}
@@ -35,7 +35,7 @@ button{font:inherit;color:inherit;background:#21262d;border:1px solid #484f58;bo
 .rbhead .rbbox:first-child .rbval{font-size:24px}
 </style></head><body>
 <div id="app">
-<header class="top"><div class="brand">Matsu RallyCon v0.6.42</div><div id="status" class="status">準備中</div><button id="gpsBtn">GPS</button><button id="compassBtn">CAP</button></header>
+<header class="top"><div class="brand">Matsu RallyCon v0.6.43</div><div class="clock"><span id="clockDate" class="clockDate"></span><span id="clockTime" class="clockTime">--:--</span></div><div id="status" class="status">準備中</div><button id="gpsBtn">GPS</button><button id="compassBtn">CAP</button></header>
 <main class="main">
 <section class="panel left">
 <div class="card"><div class="label">TOTAL km</div><div id="total" class="value totalValue">0.00</div><div class="corr"><button id="totalMinus">−10m</button><button id="totalZero">0</button><button id="totalPlus">＋10m</button></div></div>
@@ -64,8 +64,8 @@ let pdf=null,page=1,logicalPage=1,logicalCount=39,zoom=1,renderedZoom=1,fitScale
 let gpsDistance=0,totalZeroBase=0,totalOffset=0,legBase=0,legOffset=0,lastTs=null,timerStart=null,elapsedMs=0,running=false,stageStarted=false,autoNext=true,rb=0;
 const AUTO_NEXT_TRIGGER_M=0;
 const SESSION_KEY='matsu-rallycon-session-v036';
-const APP_VERSION='0.6.42';
-const LEGACY_SESSION_VERSIONS=new Set(['0.6.38','0.6.39','0.6.40','0.6.41','0.6.42']);
+const APP_VERSION='0.6.43';
+const LEGACY_SESSION_VERSIONS=new Set(['0.6.38','0.6.39','0.6.40','0.6.41','0.6.42','0.6.43']);
 let wakeLock=null, suppressSessionSave=false;
 let pointers=new Map(),pinchStartDist=0,pinchStartZoom=1,gestureMoved=false;
 const dpr=()=>Math.min(window.devicePixelRatio||1,2);
@@ -428,6 +428,16 @@ $('compassBtn').onclick=async()=>{
 };
 window.addEventListener('orientationchange',()=>{if(compassOn)setStatus('CAP ON')});
 const stage=$('stage');stage.addEventListener('pointerdown',e=>{if(e.target.closest('button'))return;stage.setPointerCapture?.(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});gestureMoved=false;if(pointers.size===1){stage._lastX=e.clientX;stage._lastY=e.clientY}});stage.addEventListener('pointermove',e=>{if(!pointers.has(e.pointerId))return;pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});gestureMoved=true;if(pointers.size===1){panX+=e.clientX-stage._lastX;panY+=e.clientY-stage._lastY;stage._lastX=e.clientX;stage._lastY=e.clientY;applyPan()}else if(pointers.size===2){const a=[...pointers.values()];const d=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);if(!pinchStartDist){pinchStartDist=d;pinchStartZoom=zoom}setZoom(pinchStartZoom*d/pinchStartDist,(a[0].x+a[1].x)/2,(a[0].y+a[1].y)/2)}});function end(e){pointers.delete(e.pointerId);if(pointers.size<2)pinchStartDist=0}stage.addEventListener('pointerup',end);stage.addEventListener('pointercancel',end);stage.addEventListener('wheel',e=>{e.preventDefault();setZoom(zoom*(e.deltaY<0?1.15:.87),e.clientX,e.clientY)},{passive:false});let lastTap=0;stage.addEventListener('dblclick',e=>{setZoom(zoom>1?1:2,e.clientX,e.clientY)});
+function updateClock(){
+  const d=new Date();
+  $('clockDate').textContent=`${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}(${['日','月','火','水','木','金','土'][d.getDay()]})`;
+  $('clockTime').textContent=`${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+updateClock();
+setInterval(updateClock,1000);
+function recenterTargetAfterLayout(){
+  requestAnimationFrame(()=>requestAnimationFrame(()=>centerTargetInView()));
+}
 setInterval(()=>{
   const now=performance.now();
   const ms=elapsedMs+(running&&timerStart?now-timerStart:0);
@@ -438,20 +448,22 @@ setInterval(()=>{
     if(age>=GPS_LOST_TIMEOUT_SEC)markGpsLost();
   }
 },250);
-window.addEventListener('resize',()=>{if(pdf)renderPage()});
+window.addEventListener('resize',()=>{if(pdf)renderPage().then(()=>{if(stageStarted)recenterTargetAfterLayout()})});
 async function resumeFromBackground(){
   if(!running)return;
   await requestWakeLock();
   resumeFixPending=true;
+  recenterTargetAfterLayout();
   if(gpsUserEnabled&&gpsWatchId===null)startGps();
   if(gpsUserEnabled&&navigator.geolocation){
     navigator.geolocation.getCurrentPosition(
-      pos=>{resumeFixPending=false;handleGpsPosition(pos);},
-      ()=>{resumeFixPending=false;markGpsLost();},
+      pos=>{resumeFixPending=false;handleGpsPosition(pos);recenterTargetAfterLayout();},
+      ()=>{resumeFixPending=false;markGpsLost();recenterTargetAfterLayout();},
       {enableHighAccuracy:true,maximumAge:0,timeout:10000}
     );
   }else{
     resumeFixPending=false;
+    recenterTargetAfterLayout();
   }
 }
 document.addEventListener('visibilitychange',()=>{
