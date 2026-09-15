@@ -1,2 +1,2 @@
-Matsu RallyCon v0.7.1
-LEG / SPEED / NEXT numeric values unified and slightly enlarged; centered numeric UI retained from v0.7.
+Matsu RallyCon v0.7.2 GPS DEV
+GPS distance correction: 50%–150% in 1% steps; applies only to newly accumulated GPS distance and persists in session.

@@ -1,47 +1,21 @@
-# Matsu RallyCon v0.7.1
+# Matsu RallyCon v0.7.2 GPS DEV
 
-Koma-zuka (roadbook) rally navigation web app.
+Development build based on v0.7.1.
 
-## v0.7.1
+## Change in this DEV build
+- Adds GPS distance correction from **50% to 150%** in **1% steps**.
+- Default is **100%**.
+- The correction is applied only to GPS distance accumulated **after the rate is changed**.
+- Previously accumulated TOTAL/LEG distance is not recalculated when the rate changes.
+- The correction rate is saved/restored with the rally session.
+- GPS raw distance remains separate from corrected rally distance.
+- GPS quality, loss/recovery, jump rejection, and speed calculations are unchanged.
 
-### Numeric display refinement
-- LEG / SPEED / NEXTまで numeric values use the same enlarged display size.
-- LEG / SPEED / TARGET / NEXTまで remain centered for quick visual recognition.
-- TOTAL remains centered with its existing adaptive sizing for larger values.
-- No functional rally-navigation behavior was changed for this UI refinement.
+## Existing v0.7.1 behavior preserved
+- A4/A5 PDF auto-detection
+- A5 KomaRen auto-parse
+- Rally navigation core and current UI
+- Embedded A4 startup PDF
+- Classic2026: 234 RB / 365.19 km
 
-### v0.7 foundation
-- Automatically detects A4 and A5 roadbook PDFs when a PDF is loaded.
-- Existing A4 route behavior is preserved.
-- A5 KomaRen PDFs are parsed automatically on the device/browser and converted into the rally route.
-- A5 roadbooks are handled as full-page displays with current-roadbook-row positioning.
-- A4 and A5 PDFs can be switched back and forth with `LOAD PDF`.
-
-### Verified roadbooks
-- A4 KOMAREN Classic2026: 234 RB / 365.19 km
-- A5 KOMAREN Classic2026: 234 RB / 365.19 km
-- A5 第6回なのはなラリー: 66 RB / 177.33 km
-
-### Rally navigation core
-- GPS distance measurement with accuracy and abnormal-jump filtering.
-- TOTAL / LEG / TARGET / NEXTまで distance model.
-- Automatic NEXT progression and multiple-point skip handling.
-- TARGET roadbook-cell auto-centering while preserving safe PDF pan limits.
-- GPS loss/recovery handling and background/foreground recovery.
-- Rally session persistence; reload restores as PAUSED rather than silently resuming.
-- START long-press session reset with confirmation.
-- Touch-safe distance correction controls.
-
-### UI
-- Existing v0.7 dashboard layout is preserved.
-- TOTAL / LEG / SPEED on the left.
-- Roadbook PDF in the center.
-- RB / TARGET / NEXTまで / TIME / AUTO on the right.
-- This release changes numeric display sizing/alignment only; overall layout is unchanged.
-
-## Important
-
-v0.7.1 is the formal release of the verified numeric-display refinement following real-device visibility testing.
-
-The v0.7 production archive remains preserved separately.
-The v0.6.50 stable baseline remains preserved separately.
+This is a DEV build for real-device testing. Do not treat it as a production release until verified.
