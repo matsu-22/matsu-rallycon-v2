@@ -1,1 +1,2 @@
-0.6.50
+Matsu RallyCon v0.6.64-AUTO-RC
+A4/A5 PDF auto-detect and A5 KomaRen auto-parse release candidate

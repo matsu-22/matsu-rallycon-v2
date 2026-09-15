@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="ja"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<title>Matsu RallyCon v0.6.50</title>
+<title>Matsu RallyCon v0.6.64-AUTO-RC</title>
 <link rel="manifest" href="manifest.webmanifest">
 <style>
 :root{--bg:#0d1117;--panel:#161b22;--line:#30363d;--text:#f0f6fc;--muted:#8b949e;--accent:#58a6ff;--warn:#f2cc60}
@@ -48,7 +48,7 @@ button{font:inherit;color:inherit;background:#21262d;border:1px solid #484f58;bo
 @media (max-width:1100px){.card:nth-child(2) .value{font-size:clamp(29px,5.0vh,38px)}}
 </style></head><body>
 <div id="app">
-<header class="top"><div class="brand">Matsu RallyCon v0.6.50</div><div class="clock"><span id="clockDate" class="clockDate"></span><span id="clockTime" class="clockTime">--:--</span></div><div id="status" class="status">準備中</div><button id="gpsBtn">GPS</button><button id="compassBtn">CAP</button></header>
+<header class="top"><div class="brand">Matsu RallyCon v0.6.64-AUTO-RC</div><div class="clock"><span id="clockDate" class="clockDate"></span><span id="clockTime" class="clockTime">--:--</span></div><div id="status" class="status">準備中</div><button id="gpsBtn">GPS</button><button id="compassBtn">CAP</button></header>
 <main class="main">
 <section class="panel left">
 <div class="card"><div class="label">TOTAL km</div><div id="total" class="value totalValue">0.00</div><div class="corr"><button id="totalMinus">−10m</button><button id="totalZero">0</button><button id="totalPlus">＋10m</button></div></div>
@@ -71,13 +71,173 @@ button{font:inherit;color:inherit;background:#21262d;border:1px solid #484f58;bo
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>
-const ROUTE=[{"no":1,"dist":0.0,"inter":0.0,"page":1,"logicalPage":1,"side":"right","pdfPage":1},{"no":2,"dist":2.65,"inter":2.65,"page":1,"logicalPage":1,"side":"right","pdfPage":1},{"no":3,"dist":4.48,"inter":1.83,"page":1,"logicalPage":1,"side":"right","pdfPage":1},{"no":4,"dist":8.06,"inter":3.58,"page":1,"logicalPage":1,"side":"right","pdfPage":1},{"no":5,"dist":14.61,"inter":6.55,"page":1,"logicalPage":1,"side":"right","pdfPage":1},{"no":6,"dist":17.83,"inter":3.22,"page":1,"logicalPage":1,"side":"right","pdfPage":1},{"no":7,"dist":18.78,"inter":0.95,"page":2,"logicalPage":2,"side":"left","pdfPage":2},{"no":8,"dist":19.12,"inter":0.34,"page":2,"logicalPage":2,"side":"left","pdfPage":2},{"no":9,"dist":19.52,"inter":0.4,"page":2,"logicalPage":2,"side":"left","pdfPage":2},{"no":10,"dist":20.05,"inter":0.53,"page":2,"logicalPage":2,"side":"left","pdfPage":2},{"no":11,"dist":20.67,"inter":0.62,"page":2,"logicalPage":2,"side":"left","pdfPage":2},{"no":12,"dist":20.77,"inter":0.1,"page":2,"logicalPage":2,"side":"left","pdfPage":2},{"no":13,"dist":22.24,"inter":1.47,"page":2,"logicalPage":3,"side":"right","pdfPage":2},{"no":14,"dist":22.68,"inter":0.44,"page":2,"logicalPage":3,"side":"right","pdfPage":2},{"no":15,"dist":23.07,"inter":0.39,"page":2,"logicalPage":3,"side":"right","pdfPage":2},{"no":16,"dist":32.05,"inter":8.98,"page":2,"logicalPage":3,"side":"right","pdfPage":2},{"no":17,"dist":33.0,"inter":0.95,"page":2,"logicalPage":3,"side":"right","pdfPage":2},{"no":18,"dist":34.85,"inter":1.85,"page":2,"logicalPage":3,"side":"right","pdfPage":2},{"no":19,"dist":35.2,"inter":0.35,"page":3,"logicalPage":4,"side":"left","pdfPage":3},{"no":20,"dist":36.39,"inter":1.19,"page":3,"logicalPage":4,"side":"left","pdfPage":3},{"no":21,"dist":39.03,"inter":2.64,"page":3,"logicalPage":4,"side":"left","pdfPage":3},{"no":22,"dist":39.36,"inter":0.33,"page":3,"logicalPage":4,"side":"left","pdfPage":3},{"no":23,"dist":42.57,"inter":3.21,"page":3,"logicalPage":4,"side":"left","pdfPage":3},{"no":24,"dist":43.26,"inter":0.69,"page":3,"logicalPage":4,"side":"left","pdfPage":3},{"no":25,"dist":43.58,"inter":0.32,"page":3,"logicalPage":5,"side":"right","pdfPage":3},{"no":26,"dist":45.03,"inter":1.45,"page":3,"logicalPage":5,"side":"right","pdfPage":3},{"no":27,"dist":45.74,"inter":0.71,"page":3,"logicalPage":5,"side":"right","pdfPage":3},{"no":28,"dist":46.36,"inter":0.62,"page":3,"logicalPage":5,"side":"right","pdfPage":3},{"no":29,"dist":46.47,"inter":0.11,"page":3,"logicalPage":5,"side":"right","pdfPage":3},{"no":30,"dist":46.86,"inter":0.39,"page":3,"logicalPage":5,"side":"right","pdfPage":3},{"no":31,"dist":47.35,"inter":0.49,"page":4,"logicalPage":6,"side":"left","pdfPage":4},{"no":32,"dist":48.02,"inter":0.67,"page":4,"logicalPage":6,"side":"left","pdfPage":4},{"no":33,"dist":49.02,"inter":1.0,"page":4,"logicalPage":6,"side":"left","pdfPage":4},{"no":34,"dist":49.34,"inter":0.32,"page":4,"logicalPage":6,"side":"left","pdfPage":4},{"no":35,"dist":49.92,"inter":0.58,"page":4,"logicalPage":6,"side":"left","pdfPage":4},{"no":36,"dist":50.04,"inter":0.12,"page":4,"logicalPage":6,"side":"left","pdfPage":4},{"no":37,"dist":50.38,"inter":0.34,"page":4,"logicalPage":7,"side":"right","pdfPage":4},{"no":38,"dist":50.96,"inter":0.58,"page":4,"logicalPage":7,"side":"right","pdfPage":4},{"no":39,"dist":52.55,"inter":1.59,"page":4,"logicalPage":7,"side":"right","pdfPage":4},{"no":40,"dist":53.93,"inter":1.38,"page":4,"logicalPage":7,"side":"right","pdfPage":4},{"no":41,"dist":54.9,"inter":0.97,"page":4,"logicalPage":7,"side":"right","pdfPage":4},{"no":42,"dist":55.77,"inter":0.87,"page":4,"logicalPage":7,"side":"right","pdfPage":4},{"no":43,"dist":55.87,"inter":0.1,"page":5,"logicalPage":8,"side":"left","pdfPage":5},{"no":44,"dist":56.21,"inter":0.34,"page":5,"logicalPage":8,"side":"left","pdfPage":5},{"no":45,"dist":58.37,"inter":2.16,"page":5,"logicalPage":8,"side":"left","pdfPage":5},{"no":46,"dist":58.48,"inter":0.11,"page":5,"logicalPage":8,"side":"left","pdfPage":5},{"no":47,"dist":59.55,"inter":1.07,"page":5,"logicalPage":8,"side":"left","pdfPage":5},{"no":48,"dist":60.62,"inter":1.07,"page":5,"logicalPage":8,"side":"left","pdfPage":5},{"no":49,"dist":60.78,"inter":0.16,"page":5,"logicalPage":9,"side":"right","pdfPage":5},{"no":50,"dist":60.88,"inter":0.1,"page":5,"logicalPage":9,"side":"right","pdfPage":5},{"no":51,"dist":61.33,"inter":0.45,"page":5,"logicalPage":9,"side":"right","pdfPage":5},{"no":52,"dist":61.45,"inter":0.12,"page":5,"logicalPage":9,"side":"right","pdfPage":5},{"no":53,"dist":62.14,"inter":0.69,"page":5,"logicalPage":9,"side":"right","pdfPage":5},{"no":54,"dist":62.63,"inter":0.49,"page":5,"logicalPage":9,"side":"right","pdfPage":5},{"no":55,"dist":63.44,"inter":0.81,"page":6,"logicalPage":10,"side":"left","pdfPage":6},{"no":56,"dist":64.34,"inter":0.9,"page":6,"logicalPage":10,"side":"left","pdfPage":6},{"no":57,"dist":64.67,"inter":0.33,"page":6,"logicalPage":10,"side":"left","pdfPage":6},{"no":58,"dist":65.24,"inter":0.57,"page":6,"logicalPage":10,"side":"left","pdfPage":6},{"no":59,"dist":67.2,"inter":1.96,"page":6,"logicalPage":10,"side":"left","pdfPage":6},{"no":60,"dist":69.32,"inter":2.12,"page":6,"logicalPage":10,"side":"left","pdfPage":6},{"no":61,"dist":70.63,"inter":1.31,"page":6,"logicalPage":11,"side":"right","pdfPage":6},{"no":62,"dist":71.41,"inter":0.78,"page":6,"logicalPage":11,"side":"right","pdfPage":6},{"no":63,"dist":71.88,"inter":0.47,"page":6,"logicalPage":11,"side":"right","pdfPage":6},{"no":64,"dist":72.21,"inter":0.33,"page":6,"logicalPage":11,"side":"right","pdfPage":6},{"no":65,"dist":73.04,"inter":0.83,"page":6,"logicalPage":11,"side":"right","pdfPage":6},{"no":66,"dist":73.31,"inter":0.27,"page":6,"logicalPage":11,"side":"right","pdfPage":6},{"no":67,"dist":73.89,"inter":0.58,"page":7,"logicalPage":12,"side":"left","pdfPage":7},{"no":68,"dist":74.27,"inter":0.38,"page":7,"logicalPage":12,"side":"left","pdfPage":7},{"no":69,"dist":77.03,"inter":2.76,"page":7,"logicalPage":12,"side":"left","pdfPage":7},{"no":70,"dist":79.98,"inter":2.95,"page":7,"logicalPage":12,"side":"left","pdfPage":7},{"no":71,"dist":80.76,"inter":0.78,"page":7,"logicalPage":12,"side":"left","pdfPage":7},{"no":72,"dist":81.28,"inter":0.52,"page":7,"logicalPage":12,"side":"left","pdfPage":7},{"no":73,"dist":82.68,"inter":1.4,"page":7,"logicalPage":13,"side":"right","pdfPage":7},{"no":74,"dist":83.24,"inter":0.56,"page":7,"logicalPage":13,"side":"right","pdfPage":7},{"no":75,"dist":85.62,"inter":2.38,"page":7,"logicalPage":13,"side":"right","pdfPage":7},{"no":76,"dist":86.57,"inter":0.95,"page":7,"logicalPage":13,"side":"right","pdfPage":7},{"no":77,"dist":89.01,"inter":2.44,"page":7,"logicalPage":13,"side":"right","pdfPage":7},{"no":78,"dist":90.87,"inter":1.86,"page":7,"logicalPage":13,"side":"right","pdfPage":7},{"no":79,"dist":91.61,"inter":0.74,"page":8,"logicalPage":14,"side":"left","pdfPage":8},{"no":80,"dist":91.99,"inter":0.38,"page":8,"logicalPage":14,"side":"left","pdfPage":8},{"no":81,"dist":92.46,"inter":0.47,"page":8,"logicalPage":14,"side":"left","pdfPage":8},{"no":82,"dist":92.94,"inter":0.48,"page":8,"logicalPage":14,"side":"left","pdfPage":8},{"no":83,"dist":93.43,"inter":0.49,"page":8,"logicalPage":14,"side":"left","pdfPage":8},{"no":84,"dist":93.67,"inter":0.24,"page":8,"logicalPage":14,"side":"left","pdfPage":8},{"no":85,"dist":94.56,"inter":0.89,"page":8,"logicalPage":15,"side":"right","pdfPage":8},{"no":86,"dist":95.09,"inter":0.53,"page":8,"logicalPage":15,"side":"right","pdfPage":8},{"no":87,"dist":95.94,"inter":0.85,"page":8,"logicalPage":15,"side":"right","pdfPage":8},{"no":88,"dist":96.05,"inter":0.11,"page":8,"logicalPage":15,"side":"right","pdfPage":8},{"no":89,"dist":97.59,"inter":1.54,"page":8,"logicalPage":15,"side":"right","pdfPage":8},{"no":90,"dist":99.25,"inter":1.66,"page":8,"logicalPage":15,"side":"right","pdfPage":8},{"no":91,"dist":100.88,"inter":1.63,"page":9,"logicalPage":16,"side":"left","pdfPage":9},{"no":92,"dist":101.7,"inter":0.82,"page":9,"logicalPage":16,"side":"left","pdfPage":9},{"no":93,"dist":102.01,"inter":0.31,"page":9,"logicalPage":16,"side":"left","pdfPage":9},{"no":94,"dist":104.17,"inter":2.16,"page":9,"logicalPage":16,"side":"left","pdfPage":9},{"no":95,"dist":104.3,"inter":0.13,"page":9,"logicalPage":16,"side":"left","pdfPage":9},{"no":96,"dist":104.6,"inter":0.3,"page":9,"logicalPage":16,"side":"left","pdfPage":9},{"no":97,"dist":104.87,"inter":0.27,"page":9,"logicalPage":17,"side":"right","pdfPage":9},{"no":98,"dist":104.98,"inter":0.11,"page":9,"logicalPage":17,"side":"right","pdfPage":9},{"no":99,"dist":105.11,"inter":0.13,"page":9,"logicalPage":17,"side":"right","pdfPage":9},{"no":100,"dist":105.33,"inter":0.22,"page":9,"logicalPage":17,"side":"right","pdfPage":9},{"no":101,"dist":105.43,"inter":0.1,"page":9,"logicalPage":17,"side":"right","pdfPage":9},{"no":102,"dist":105.71,"inter":0.28,"page":9,"logicalPage":17,"side":"right","pdfPage":9},{"no":103,"dist":107.16,"inter":1.45,"page":10,"logicalPage":18,"side":"left","pdfPage":10},{"no":104,"dist":107.3,"inter":0.14,"page":10,"logicalPage":18,"side":"left","pdfPage":10},{"no":105,"dist":110.34,"inter":3.04,"page":10,"logicalPage":18,"side":"left","pdfPage":10},{"no":106,"dist":112.51,"inter":2.17,"page":10,"logicalPage":18,"side":"left","pdfPage":10},{"no":107,"dist":114.75,"inter":2.24,"page":10,"logicalPage":18,"side":"left","pdfPage":10},{"no":108,"dist":117.08,"inter":2.33,"page":10,"logicalPage":18,"side":"left","pdfPage":10},{"no":109,"dist":117.95,"inter":0.87,"page":10,"logicalPage":19,"side":"right","pdfPage":10},{"no":110,"dist":118.26,"inter":0.31,"page":10,"logicalPage":19,"side":"right","pdfPage":10},{"no":111,"dist":121.23,"inter":2.97,"page":10,"logicalPage":19,"side":"right","pdfPage":10},{"no":112,"dist":123.66,"inter":2.43,"page":10,"logicalPage":19,"side":"right","pdfPage":10},{"no":113,"dist":126.17,"inter":2.51,"page":10,"logicalPage":19,"side":"right","pdfPage":10},{"no":114,"dist":126.63,"inter":0.46,"page":10,"logicalPage":19,"side":"right","pdfPage":10},{"no":115,"dist":127.75,"inter":1.12,"page":11,"logicalPage":20,"side":"left","pdfPage":11},{"no":116,"dist":128.54,"inter":0.79,"page":11,"logicalPage":20,"side":"left","pdfPage":11},{"no":117,"dist":128.9,"inter":0.36,"page":11,"logicalPage":20,"side":"left","pdfPage":11},{"no":118,"dist":130.73,"inter":1.83,"page":11,"logicalPage":20,"side":"left","pdfPage":11},{"no":119,"dist":131.13,"inter":0.4,"page":11,"logicalPage":20,"side":"left","pdfPage":11},{"no":120,"dist":131.68,"inter":0.55,"page":11,"logicalPage":20,"side":"left","pdfPage":11},{"no":121,"dist":132.29,"inter":0.61,"page":11,"logicalPage":21,"side":"right","pdfPage":11},{"no":122,"dist":132.86,"inter":0.57,"page":11,"logicalPage":21,"side":"right","pdfPage":11},{"no":123,"dist":134.59,"inter":1.73,"page":11,"logicalPage":21,"side":"right","pdfPage":11},{"no":124,"dist":135.12,"inter":0.53,"page":11,"logicalPage":21,"side":"right","pdfPage":11},{"no":125,"dist":137.68,"inter":2.56,"page":11,"logicalPage":21,"side":"right","pdfPage":11},{"no":126,"dist":140.17,"inter":2.49,"page":11,"logicalPage":21,"side":"right","pdfPage":11},{"no":127,"dist":145.87,"inter":5.7,"page":12,"logicalPage":22,"side":"left","pdfPage":12},{"no":128,"dist":146.47,"inter":0.6,"page":12,"logicalPage":22,"side":"left","pdfPage":12},{"no":129,"dist":150.48,"inter":4.01,"page":12,"logicalPage":22,"side":"left","pdfPage":12},{"no":130,"dist":151.11,"inter":0.63,"page":12,"logicalPage":22,"side":"left","pdfPage":12},{"no":131,"dist":151.58,"inter":0.47,"page":12,"logicalPage":22,"side":"left","pdfPage":12},{"no":132,"dist":153.48,"inter":1.9,"page":12,"logicalPage":22,"side":"left","pdfPage":12},{"no":133,"dist":162.42,"inter":8.94,"page":12,"logicalPage":23,"side":"right","pdfPage":12},{"no":134,"dist":164.69,"inter":2.27,"page":12,"logicalPage":23,"side":"right","pdfPage":12},{"no":135,"dist":165.0,"inter":0.31,"page":12,"logicalPage":23,"side":"right","pdfPage":12},{"no":136,"dist":165.61,"inter":0.61,"page":12,"logicalPage":23,"side":"right","pdfPage":12},{"no":137,"dist":166.82,"inter":1.21,"page":12,"logicalPage":23,"side":"right","pdfPage":12},{"no":138,"dist":168.81,"inter":1.99,"page":12,"logicalPage":23,"side":"right","pdfPage":12},{"no":139,"dist":169.62,"inter":0.81,"page":13,"logicalPage":24,"side":"left","pdfPage":13},{"no":140,"dist":174.0,"inter":4.38,"page":13,"logicalPage":24,"side":"left","pdfPage":13},{"no":141,"dist":182.52,"inter":8.52,"page":13,"logicalPage":24,"side":"left","pdfPage":13},{"no":142,"dist":186.48,"inter":3.96,"page":13,"logicalPage":24,"side":"left","pdfPage":13},{"no":143,"dist":186.88,"inter":0.4,"page":13,"logicalPage":24,"side":"left","pdfPage":13},{"no":144,"dist":188.18,"inter":1.3,"page":13,"logicalPage":24,"side":"left","pdfPage":13},{"no":145,"dist":189.34,"inter":1.16,"page":13,"logicalPage":25,"side":"right","pdfPage":13},{"no":146,"dist":194.35,"inter":5.01,"page":13,"logicalPage":25,"side":"right","pdfPage":13},{"no":147,"dist":195.5,"inter":1.15,"page":13,"logicalPage":25,"side":"right","pdfPage":13},{"no":148,"dist":196.66,"inter":1.16,"page":13,"logicalPage":25,"side":"right","pdfPage":13},{"no":149,"dist":206.26,"inter":9.6,"page":13,"logicalPage":25,"side":"right","pdfPage":13},{"no":150,"dist":207.66,"inter":1.4,"page":13,"logicalPage":25,"side":"right","pdfPage":13},{"no":151,"dist":210.02,"inter":2.36,"page":14,"logicalPage":26,"side":"left","pdfPage":14},{"no":152,"dist":211.81,"inter":1.79,"page":14,"logicalPage":26,"side":"left","pdfPage":14},{"no":153,"dist":212.79,"inter":0.98,"page":14,"logicalPage":26,"side":"left","pdfPage":14},{"no":154,"dist":214.83,"inter":2.04,"page":14,"logicalPage":26,"side":"left","pdfPage":14},{"no":155,"dist":215.47,"inter":0.64,"page":14,"logicalPage":26,"side":"left","pdfPage":14},{"no":156,"dist":215.99,"inter":0.52,"page":14,"logicalPage":26,"side":"left","pdfPage":14},{"no":157,"dist":216.86,"inter":0.87,"page":14,"logicalPage":27,"side":"right","pdfPage":14},{"no":158,"dist":217.23,"inter":0.37,"page":14,"logicalPage":27,"side":"right","pdfPage":14},{"no":159,"dist":217.35,"inter":0.12,"page":14,"logicalPage":27,"side":"right","pdfPage":14},{"no":160,"dist":217.69,"inter":0.34,"page":14,"logicalPage":27,"side":"right","pdfPage":14},{"no":161,"dist":218.27,"inter":0.58,"page":14,"logicalPage":27,"side":"right","pdfPage":14},{"no":162,"dist":218.44,"inter":0.17,"page":14,"logicalPage":27,"side":"right","pdfPage":14},{"no":163,"dist":218.7,"inter":0.26,"page":15,"logicalPage":28,"side":"left","pdfPage":15},{"no":164,"dist":219.31,"inter":0.61,"page":15,"logicalPage":28,"side":"left","pdfPage":15},{"no":165,"dist":219.5,"inter":0.19,"page":15,"logicalPage":28,"side":"left","pdfPage":15},{"no":166,"dist":219.88,"inter":0.38,"page":15,"logicalPage":28,"side":"left","pdfPage":15},{"no":167,"dist":220.5,"inter":0.62,"page":15,"logicalPage":28,"side":"left","pdfPage":15},{"no":168,"dist":224.05,"inter":3.55,"page":15,"logicalPage":28,"side":"left","pdfPage":15},{"no":169,"dist":224.71,"inter":0.66,"page":15,"logicalPage":29,"side":"right","pdfPage":15},{"no":170,"dist":229.77,"inter":5.06,"page":15,"logicalPage":29,"side":"right","pdfPage":15},{"no":171,"dist":230.51,"inter":0.74,"page":15,"logicalPage":29,"side":"right","pdfPage":15},{"no":172,"dist":233.49,"inter":2.98,"page":15,"logicalPage":29,"side":"right","pdfPage":15},{"no":173,"dist":234.15,"inter":0.66,"page":15,"logicalPage":29,"side":"right","pdfPage":15},{"no":174,"dist":239.86,"inter":5.71,"page":15,"logicalPage":29,"side":"right","pdfPage":15},{"no":175,"dist":240.62,"inter":0.76,"page":16,"logicalPage":30,"side":"left","pdfPage":16},{"no":176,"dist":243.96,"inter":3.34,"page":16,"logicalPage":30,"side":"left","pdfPage":16},{"no":177,"dist":244.88,"inter":0.92,"page":16,"logicalPage":30,"side":"left","pdfPage":16},{"no":178,"dist":248.64,"inter":3.76,"page":16,"logicalPage":30,"side":"left","pdfPage":16},{"no":179,"dist":250.86,"inter":2.22,"page":16,"logicalPage":30,"side":"left","pdfPage":16},{"no":180,"dist":250.99,"inter":0.13,"page":16,"logicalPage":30,"side":"left","pdfPage":16},{"no":181,"dist":252.01,"inter":1.02,"page":16,"logicalPage":31,"side":"right","pdfPage":16},{"no":182,"dist":252.91,"inter":0.9,"page":16,"logicalPage":31,"side":"right","pdfPage":16},{"no":183,"dist":253.97,"inter":1.06,"page":16,"logicalPage":31,"side":"right","pdfPage":16},{"no":184,"dist":254.96,"inter":0.99,"page":16,"logicalPage":31,"side":"right","pdfPage":16},{"no":185,"dist":255.88,"inter":0.92,"page":16,"logicalPage":31,"side":"right","pdfPage":16},{"no":186,"dist":259.66,"inter":3.78,"page":16,"logicalPage":31,"side":"right","pdfPage":16},{"no":187,"dist":264.44,"inter":4.78,"page":17,"logicalPage":32,"side":"left","pdfPage":17},{"no":188,"dist":264.83,"inter":0.39,"page":17,"logicalPage":32,"side":"left","pdfPage":17},{"no":189,"dist":269.98,"inter":5.15,"page":17,"logicalPage":32,"side":"left","pdfPage":17},{"no":190,"dist":272.45,"inter":2.47,"page":17,"logicalPage":32,"side":"left","pdfPage":17},{"no":191,"dist":281.49,"inter":9.04,"page":17,"logicalPage":32,"side":"left","pdfPage":17},{"no":192,"dist":287.1,"inter":5.61,"page":17,"logicalPage":32,"side":"left","pdfPage":17},{"no":193,"dist":292.6,"inter":5.5,"page":17,"logicalPage":33,"side":"right","pdfPage":17},{"no":194,"dist":292.6,"inter":0.0,"page":17,"logicalPage":33,"side":"right","pdfPage":17},{"no":195,"dist":292.81,"inter":0.21,"page":17,"logicalPage":33,"side":"right","pdfPage":17},{"no":196,"dist":293.4,"inter":0.59,"page":17,"logicalPage":33,"side":"right","pdfPage":17},{"no":197,"dist":293.87,"inter":0.47,"page":17,"logicalPage":33,"side":"right","pdfPage":17},{"no":198,"dist":300.67,"inter":6.8,"page":17,"logicalPage":33,"side":"right","pdfPage":17},{"no":199,"dist":305.03,"inter":4.36,"page":18,"logicalPage":34,"side":"left","pdfPage":18},{"no":200,"dist":307.26,"inter":2.23,"page":18,"logicalPage":34,"side":"left","pdfPage":18},{"no":201,"dist":307.42,"inter":0.16,"page":18,"logicalPage":34,"side":"left","pdfPage":18},{"no":202,"dist":310.62,"inter":3.2,"page":18,"logicalPage":34,"side":"left","pdfPage":18},{"no":203,"dist":310.91,"inter":0.29,"page":18,"logicalPage":34,"side":"left","pdfPage":18},{"no":204,"dist":311.83,"inter":0.92,"page":18,"logicalPage":34,"side":"left","pdfPage":18},{"no":205,"dist":314.25,"inter":2.42,"page":18,"logicalPage":35,"side":"right","pdfPage":18},{"no":206,"dist":318.75,"inter":4.5,"page":18,"logicalPage":35,"side":"right","pdfPage":18},{"no":207,"dist":319.86,"inter":1.11,"page":18,"logicalPage":35,"side":"right","pdfPage":18},{"no":208,"dist":322.03,"inter":2.17,"page":18,"logicalPage":35,"side":"right","pdfPage":18},{"no":209,"dist":325.41,"inter":3.38,"page":18,"logicalPage":35,"side":"right","pdfPage":18},{"no":210,"dist":326.26,"inter":0.85,"page":18,"logicalPage":35,"side":"right","pdfPage":18},{"no":211,"dist":326.79,"inter":0.53,"page":19,"logicalPage":36,"side":"left","pdfPage":19},{"no":212,"dist":326.91,"inter":0.12,"page":19,"logicalPage":36,"side":"left","pdfPage":19},{"no":213,"dist":327.84,"inter":0.93,"page":19,"logicalPage":36,"side":"left","pdfPage":19},{"no":214,"dist":328.56,"inter":0.72,"page":19,"logicalPage":36,"side":"left","pdfPage":19},{"no":215,"dist":328.81,"inter":0.25,"page":19,"logicalPage":36,"side":"left","pdfPage":19},{"no":216,"dist":329.25,"inter":0.44,"page":19,"logicalPage":36,"side":"left","pdfPage":19},{"no":217,"dist":330.62,"inter":1.37,"page":19,"logicalPage":37,"side":"right","pdfPage":19},{"no":218,"dist":330.72,"inter":0.1,"page":19,"logicalPage":37,"side":"right","pdfPage":19},{"no":219,"dist":330.83,"inter":0.11,"page":19,"logicalPage":37,"side":"right","pdfPage":19},{"no":220,"dist":331.45,"inter":0.62,"page":19,"logicalPage":37,"side":"right","pdfPage":19},{"no":221,"dist":331.94,"inter":0.49,"page":19,"logicalPage":37,"side":"right","pdfPage":19},{"no":222,"dist":332.44,"inter":0.5,"page":19,"logicalPage":37,"side":"right","pdfPage":19},{"no":223,"dist":333.73,"inter":1.29,"page":20,"logicalPage":38,"side":"left","pdfPage":20},{"no":224,"dist":336.67,"inter":2.94,"page":20,"logicalPage":38,"side":"left","pdfPage":20},{"no":225,"dist":337.57,"inter":0.9,"page":20,"logicalPage":38,"side":"left","pdfPage":20},{"no":226,"dist":338.7,"inter":1.13,"page":20,"logicalPage":38,"side":"left","pdfPage":20},{"no":227,"dist":340.76,"inter":2.06,"page":20,"logicalPage":38,"side":"left","pdfPage":20},{"no":228,"dist":341.54,"inter":0.78,"page":20,"logicalPage":38,"side":"left","pdfPage":20},{"no":229,"dist":343.25,"inter":1.71,"page":20,"logicalPage":39,"side":"right","pdfPage":20},{"no":230,"dist":345.7,"inter":2.45,"page":20,"logicalPage":39,"side":"right","pdfPage":20},{"no":231,"dist":350.38,"inter":4.68,"page":20,"logicalPage":39,"side":"right","pdfPage":20},{"no":232,"dist":360.69,"inter":10.31,"page":20,"logicalPage":39,"side":"right","pdfPage":20},{"no":233,"dist":362.52,"inter":1.83,"page":20,"logicalPage":39,"side":"right","pdfPage":20},{"no":234,"dist":365.19,"inter":2.67,"page":20,"logicalPage":39,"side":"right","pdfPage":20}];
+/* A5 KomaRen parser DEV: coordinate-based extraction via PDF.js text spans. */
+const A5_NUM_RE=/(?<![\d.])(\d+(?:\.\d+)?)(?![\d.])/g;
+const A5_INT_RE=/^\d+$/;
+function a5ItemBox(item,pageHeight){
+  const t=item.transform||[];
+  const x=Number(t[4])||0;
+  const d=Math.abs(Number(t[3])||0);
+  const f=Number(t[5])||0;
+  const yTop=pageHeight-(f+d);
+  return {text:String(item.str||'').replace(/\s+/g,' ').trim(),x,yTop,y:yTop+d/2,w:Number(item.width)||0,h:d};
+}
+function a5Nums(items){
+  const out=[];
+  for(const it of items){
+    const text=it.text;
+    if(!text)continue;
+    for(const m of text.matchAll(A5_NUM_RE)){
+      const token=m[1];
+      const start=m.index||0;
+      const end=start+m[0].length;
+      out.push({...it,text:token,rawText:text,before:text.slice(0,start).trim(),after:text.slice(end).trim(),number:Number(token),hasDecimal:token.includes('.')});
+    }
+  }
+  return out;
+}
+function a5Nearest(y,centers,tol){
+  let bi=-1,bd=Infinity;
+  for(let i=0;i<centers.length;i++){const d=Math.abs(y-centers[i]);if(d<bd){bd=d;bi=i;}}
+  return bd<=tol?bi:null;
+}
+function a5UniqueBySlot(candidates,label,pageNo){
+  const out={};
+  for(const x of candidates){
+    const slot=x.slot;
+    if(slot==null)continue;
+    if(!out[slot]){out[slot]=x;continue;}
+    const old=out[slot];
+    // Prefer a decimal candidate over an integer candidate. If both are
+    // decimal values, ambiguity is a hard parse error rather than guessing.
+    if(x.hasDecimal!==old.hasDecimal){if(x.hasDecimal)out[slot]=x;continue;}
+    throw new Error(`A5 page ${pageNo} row ${slot+1}: duplicate ${label}`);
+  }
+  return out;
+}
+async function parseA5Page(page,pageNo){
+  const vp=page.getViewport({scale:1,rotation:page.rotate||0});
+  const tc=await page.getTextContent({normalizeWhitespace:false,disableCombineTextItems:false});
+  const items=tc.items.map(x=>a5ItemBox(x,vp.height));
+  const nums=a5Nums(items);
+
+  // RB numbers are the strongest row anchors in the left margin.
+  const rb=nums.filter(x=>x.x<50 && A5_INT_RE.test(x.text) && x.y>90);
+  rb.sort((a,b)=>a.y-b.y);
+  if(rb.length!==6)return null;
+  const rbCenters=rb.map(x=>x.y);
+  for(let i=1;i<rb.length;i++){
+    if(rb[i].y-rb[i-1].y<40)throw new Error(`A5 page ${pageNo}: RB row spacing is implausible`);
+  }
+
+  // KM-INTER is in the inner-left column and aligns vertically with its RB row.
+  const interCandidates=[];
+  for(const x of nums){
+    if(x.x>=80 && x.x<170){
+      const slot=a5Nearest(x.y,rbCenters,12);
+      if(slot!==null)interCandidates.push({...x,slot});
+    }
+  }
+  const interBySlot=a5UniqueBySlot(interCandidates,'INTER',pageNo);
+  if(Object.keys(interBySlot).length!==6)throw new Error(`A5 page ${pageNo}: INTER ${Object.keys(interBySlot).length}/6`);
+
+  // KM-TOTAL is above the corresponding RB/INTER row. Comments can be in
+  // the same PDF span (e.g. "350.38 Pudding Point"), so a numeric prefix or
+  // embedded numeric token is accepted. The geometric relationship to the
+  // RB anchor is what identifies it as TOTAL.
+  const totalCenters=rbCenters.map(y=>y-41.0);
+  const totalCandidates=[];
+  for(const x of nums){
+    if(x.x<80 && x.y>35){
+      const slot=a5Nearest(x.y,totalCenters,16);
+      if(slot!==null){
+        // Never reuse the RB anchor itself as TOTAL.
+        if(Math.abs(x.y-rbCenters[slot])<12)continue;
+        totalCandidates.push({...x,slot});
+      }
+    }
+  }
+  const totalBySlot=a5UniqueBySlot(totalCandidates,'TOTAL',pageNo);
+
+  const rows=[];
+  for(let slot=0;slot<6;slot++){
+    const total=totalBySlot[slot];
+    const inter=interBySlot[slot];
+    // KomaRen A5's six roadbook rows occupy this stable table area. Keep the
+    // physical row-centre ratio in the parsed route so rendering can center
+    // the actual row without relying on RB text baseline.
+    const rowCenterRatio=(76.08+(slot+0.5)*(576.96-76.08)/6)/vp.height;
+    const r={
+      no:Number(rb[slot].text),
+      dist:total?Number(total.text):null,
+      inter:Number(inter.text),
+      page:pageNo-1,
+      logicalPage:pageNo-1,
+      side:'full',
+      pdfPage:pageNo,
+      row:slot+1,
+      rowCenterRatio,
+      total_source:total?'pdf':'derived'
+    };
+    if(total?.after)r.comment=total.after;
+    rows.push(r);
+  }
+  return rows;
+}
+async function parseA5Pdf(pdfDoc){
+  const rows=[];
+  const parsedPages=[];
+  for(let pageNo=2;pageNo<=pdfDoc.numPages;pageNo++){
+    const page=await pdfDoc.getPage(pageNo);
+    const parsed=await parseA5Page(page,pageNo);
+    if(!parsed)break;
+    parsedPages.push(pageNo);
+    rows.push(...parsed);
+  }
+  if(!rows.length)throw new Error('A5 parser: no roadbook pages found');
+
+  // Do not sort away page/row order before validating it. A roadbook must be
+  // sequential both within a page and across pages.
+  for(let i=0;i<rows.length;i++){
+    const expectedNo=i+1;
+    if(rows[i].no!==expectedNo)throw new Error(`A5 parser: RB sequence mismatch at row ${i+1} (got ${rows[i].no}, expected ${expectedNo})`);
+    if(rows[i].row!==((i%6)+1))throw new Error(`A5 parser: row position mismatch at RB ${rows[i].no}`);
+    if(rows[i].pdfPage!==2+Math.floor(i/6))throw new Error(`A5 parser: page mapping mismatch at RB ${rows[i].no}`);
+  }
+
+  const errors=[];let prev=0;
+  for(const r of rows){
+    if(!Number.isFinite(r.inter)||r.inter<0)throw new Error(`A5 parser: invalid INTER at RB ${r.no}`);
+    const expectedTotal=Number((prev+r.inter).toFixed(2));
+    if(r.dist==null){r.dist=expectedTotal;r.total_source='derived';}
+    else if(!Number.isFinite(r.dist)||r.dist<0)throw new Error(`A5 parser: invalid TOTAL at RB ${r.no}`);
+    else if(Math.abs(r.dist-expectedTotal)>0.011)errors.push({rb:r.no,expected:expectedTotal,pdfTotal:r.dist});
+    if(r.dist+1e-9<prev)throw new Error(`A5 parser: TOTAL decreased at RB ${r.no}`);
+    prev=r.dist;
+  }
+  if(errors.length)throw new Error('A5 parser: cumulative TOTAL mismatch at RB '+errors.map(x=>x.rb).join(','));
+
+  const meta={
+    format:'A5',source:'loaded PDF',pages_total:pdfDoc.numPages,
+    roadbook_pages:parsedPages.length,rows:rows.length,
+    first_total:rows[0].dist,last_total:rows.at(-1).dist,
+    derived_total_count:rows.filter(r=>r.total_source==='derived').length
+  };
+  return {route:rows,meta};
+}
+</script>
+<script>
+const A4_ROUTE=[{"no":1,"dist":0.0,"inter":0.0,"page":1,"logicalPage":1,"side":"right","pdfPage":1},{"no":2,"dist":2.65,"inter":2.65,"page":1,"logicalPage":1,"side":"right","pdfPage":1},{"no":3,"dist":4.48,"inter":1.83,"page":1,"logicalPage":1,"side":"right","pdfPage":1},{"no":4,"dist":8.06,"inter":3.58,"page":1,"logicalPage":1,"side":"right","pdfPage":1},{"no":5,"dist":14.61,"inter":6.55,"page":1,"logicalPage":1,"side":"right","pdfPage":1},{"no":6,"dist":17.83,"inter":3.22,"page":1,"logicalPage":1,"side":"right","pdfPage":1},{"no":7,"dist":18.78,"inter":0.95,"page":2,"logicalPage":2,"side":"left","pdfPage":2},{"no":8,"dist":19.12,"inter":0.34,"page":2,"logicalPage":2,"side":"left","pdfPage":2},{"no":9,"dist":19.52,"inter":0.4,"page":2,"logicalPage":2,"side":"left","pdfPage":2},{"no":10,"dist":20.05,"inter":0.53,"page":2,"logicalPage":2,"side":"left","pdfPage":2},{"no":11,"dist":20.67,"inter":0.62,"page":2,"logicalPage":2,"side":"left","pdfPage":2},{"no":12,"dist":20.77,"inter":0.1,"page":2,"logicalPage":2,"side":"left","pdfPage":2},{"no":13,"dist":22.24,"inter":1.47,"page":2,"logicalPage":3,"side":"right","pdfPage":2},{"no":14,"dist":22.68,"inter":0.44,"page":2,"logicalPage":3,"side":"right","pdfPage":2},{"no":15,"dist":23.07,"inter":0.39,"page":2,"logicalPage":3,"side":"right","pdfPage":2},{"no":16,"dist":32.05,"inter":8.98,"page":2,"logicalPage":3,"side":"right","pdfPage":2},{"no":17,"dist":33.0,"inter":0.95,"page":2,"logicalPage":3,"side":"right","pdfPage":2},{"no":18,"dist":34.85,"inter":1.85,"page":2,"logicalPage":3,"side":"right","pdfPage":2},{"no":19,"dist":35.2,"inter":0.35,"page":3,"logicalPage":4,"side":"left","pdfPage":3},{"no":20,"dist":36.39,"inter":1.19,"page":3,"logicalPage":4,"side":"left","pdfPage":3},{"no":21,"dist":39.03,"inter":2.64,"page":3,"logicalPage":4,"side":"left","pdfPage":3},{"no":22,"dist":39.36,"inter":0.33,"page":3,"logicalPage":4,"side":"left","pdfPage":3},{"no":23,"dist":42.57,"inter":3.21,"page":3,"logicalPage":4,"side":"left","pdfPage":3},{"no":24,"dist":43.26,"inter":0.69,"page":3,"logicalPage":4,"side":"left","pdfPage":3},{"no":25,"dist":43.58,"inter":0.32,"page":3,"logicalPage":5,"side":"right","pdfPage":3},{"no":26,"dist":45.03,"inter":1.45,"page":3,"logicalPage":5,"side":"right","pdfPage":3},{"no":27,"dist":45.74,"inter":0.71,"page":3,"logicalPage":5,"side":"right","pdfPage":3},{"no":28,"dist":46.36,"inter":0.62,"page":3,"logicalPage":5,"side":"right","pdfPage":3},{"no":29,"dist":46.47,"inter":0.11,"page":3,"logicalPage":5,"side":"right","pdfPage":3},{"no":30,"dist":46.86,"inter":0.39,"page":3,"logicalPage":5,"side":"right","pdfPage":3},{"no":31,"dist":47.35,"inter":0.49,"page":4,"logicalPage":6,"side":"left","pdfPage":4},{"no":32,"dist":48.02,"inter":0.67,"page":4,"logicalPage":6,"side":"left","pdfPage":4},{"no":33,"dist":49.02,"inter":1.0,"page":4,"logicalPage":6,"side":"left","pdfPage":4},{"no":34,"dist":49.34,"inter":0.32,"page":4,"logicalPage":6,"side":"left","pdfPage":4},{"no":35,"dist":49.92,"inter":0.58,"page":4,"logicalPage":6,"side":"left","pdfPage":4},{"no":36,"dist":50.04,"inter":0.12,"page":4,"logicalPage":6,"side":"left","pdfPage":4},{"no":37,"dist":50.38,"inter":0.34,"page":4,"logicalPage":7,"side":"right","pdfPage":4},{"no":38,"dist":50.96,"inter":0.58,"page":4,"logicalPage":7,"side":"right","pdfPage":4},{"no":39,"dist":52.55,"inter":1.59,"page":4,"logicalPage":7,"side":"right","pdfPage":4},{"no":40,"dist":53.93,"inter":1.38,"page":4,"logicalPage":7,"side":"right","pdfPage":4},{"no":41,"dist":54.9,"inter":0.97,"page":4,"logicalPage":7,"side":"right","pdfPage":4},{"no":42,"dist":55.77,"inter":0.87,"page":4,"logicalPage":7,"side":"right","pdfPage":4},{"no":43,"dist":55.87,"inter":0.1,"page":5,"logicalPage":8,"side":"left","pdfPage":5},{"no":44,"dist":56.21,"inter":0.34,"page":5,"logicalPage":8,"side":"left","pdfPage":5},{"no":45,"dist":58.37,"inter":2.16,"page":5,"logicalPage":8,"side":"left","pdfPage":5},{"no":46,"dist":58.48,"inter":0.11,"page":5,"logicalPage":8,"side":"left","pdfPage":5},{"no":47,"dist":59.55,"inter":1.07,"page":5,"logicalPage":8,"side":"left","pdfPage":5},{"no":48,"dist":60.62,"inter":1.07,"page":5,"logicalPage":8,"side":"left","pdfPage":5},{"no":49,"dist":60.78,"inter":0.16,"page":5,"logicalPage":9,"side":"right","pdfPage":5},{"no":50,"dist":60.88,"inter":0.1,"page":5,"logicalPage":9,"side":"right","pdfPage":5},{"no":51,"dist":61.33,"inter":0.45,"page":5,"logicalPage":9,"side":"right","pdfPage":5},{"no":52,"dist":61.45,"inter":0.12,"page":5,"logicalPage":9,"side":"right","pdfPage":5},{"no":53,"dist":62.14,"inter":0.69,"page":5,"logicalPage":9,"side":"right","pdfPage":5},{"no":54,"dist":62.63,"inter":0.49,"page":5,"logicalPage":9,"side":"right","pdfPage":5},{"no":55,"dist":63.44,"inter":0.81,"page":6,"logicalPage":10,"side":"left","pdfPage":6},{"no":56,"dist":64.34,"inter":0.9,"page":6,"logicalPage":10,"side":"left","pdfPage":6},{"no":57,"dist":64.67,"inter":0.33,"page":6,"logicalPage":10,"side":"left","pdfPage":6},{"no":58,"dist":65.24,"inter":0.57,"page":6,"logicalPage":10,"side":"left","pdfPage":6},{"no":59,"dist":67.2,"inter":1.96,"page":6,"logicalPage":10,"side":"left","pdfPage":6},{"no":60,"dist":69.32,"inter":2.12,"page":6,"logicalPage":10,"side":"left","pdfPage":6},{"no":61,"dist":70.63,"inter":1.31,"page":6,"logicalPage":11,"side":"right","pdfPage":6},{"no":62,"dist":71.41,"inter":0.78,"page":6,"logicalPage":11,"side":"right","pdfPage":6},{"no":63,"dist":71.88,"inter":0.47,"page":6,"logicalPage":11,"side":"right","pdfPage":6},{"no":64,"dist":72.21,"inter":0.33,"page":6,"logicalPage":11,"side":"right","pdfPage":6},{"no":65,"dist":73.04,"inter":0.83,"page":6,"logicalPage":11,"side":"right","pdfPage":6},{"no":66,"dist":73.31,"inter":0.27,"page":6,"logicalPage":11,"side":"right","pdfPage":6},{"no":67,"dist":73.89,"inter":0.58,"page":7,"logicalPage":12,"side":"left","pdfPage":7},{"no":68,"dist":74.27,"inter":0.38,"page":7,"logicalPage":12,"side":"left","pdfPage":7},{"no":69,"dist":77.03,"inter":2.76,"page":7,"logicalPage":12,"side":"left","pdfPage":7},{"no":70,"dist":79.98,"inter":2.95,"page":7,"logicalPage":12,"side":"left","pdfPage":7},{"no":71,"dist":80.76,"inter":0.78,"page":7,"logicalPage":12,"side":"left","pdfPage":7},{"no":72,"dist":81.28,"inter":0.52,"page":7,"logicalPage":12,"side":"left","pdfPage":7},{"no":73,"dist":82.68,"inter":1.4,"page":7,"logicalPage":13,"side":"right","pdfPage":7},{"no":74,"dist":83.24,"inter":0.56,"page":7,"logicalPage":13,"side":"right","pdfPage":7},{"no":75,"dist":85.62,"inter":2.38,"page":7,"logicalPage":13,"side":"right","pdfPage":7},{"no":76,"dist":86.57,"inter":0.95,"page":7,"logicalPage":13,"side":"right","pdfPage":7},{"no":77,"dist":89.01,"inter":2.44,"page":7,"logicalPage":13,"side":"right","pdfPage":7},{"no":78,"dist":90.87,"inter":1.86,"page":7,"logicalPage":13,"side":"right","pdfPage":7},{"no":79,"dist":91.61,"inter":0.74,"page":8,"logicalPage":14,"side":"left","pdfPage":8},{"no":80,"dist":91.99,"inter":0.38,"page":8,"logicalPage":14,"side":"left","pdfPage":8},{"no":81,"dist":92.46,"inter":0.47,"page":8,"logicalPage":14,"side":"left","pdfPage":8},{"no":82,"dist":92.94,"inter":0.48,"page":8,"logicalPage":14,"side":"left","pdfPage":8},{"no":83,"dist":93.43,"inter":0.49,"page":8,"logicalPage":14,"side":"left","pdfPage":8},{"no":84,"dist":93.67,"inter":0.24,"page":8,"logicalPage":14,"side":"left","pdfPage":8},{"no":85,"dist":94.56,"inter":0.89,"page":8,"logicalPage":15,"side":"right","pdfPage":8},{"no":86,"dist":95.09,"inter":0.53,"page":8,"logicalPage":15,"side":"right","pdfPage":8},{"no":87,"dist":95.94,"inter":0.85,"page":8,"logicalPage":15,"side":"right","pdfPage":8},{"no":88,"dist":96.05,"inter":0.11,"page":8,"logicalPage":15,"side":"right","pdfPage":8},{"no":89,"dist":97.59,"inter":1.54,"page":8,"logicalPage":15,"side":"right","pdfPage":8},{"no":90,"dist":99.25,"inter":1.66,"page":8,"logicalPage":15,"side":"right","pdfPage":8},{"no":91,"dist":100.88,"inter":1.63,"page":9,"logicalPage":16,"side":"left","pdfPage":9},{"no":92,"dist":101.7,"inter":0.82,"page":9,"logicalPage":16,"side":"left","pdfPage":9},{"no":93,"dist":102.01,"inter":0.31,"page":9,"logicalPage":16,"side":"left","pdfPage":9},{"no":94,"dist":104.17,"inter":2.16,"page":9,"logicalPage":16,"side":"left","pdfPage":9},{"no":95,"dist":104.3,"inter":0.13,"page":9,"logicalPage":16,"side":"left","pdfPage":9},{"no":96,"dist":104.6,"inter":0.3,"page":9,"logicalPage":16,"side":"left","pdfPage":9},{"no":97,"dist":104.87,"inter":0.27,"page":9,"logicalPage":17,"side":"right","pdfPage":9},{"no":98,"dist":104.98,"inter":0.11,"page":9,"logicalPage":17,"side":"right","pdfPage":9},{"no":99,"dist":105.11,"inter":0.13,"page":9,"logicalPage":17,"side":"right","pdfPage":9},{"no":100,"dist":105.33,"inter":0.22,"page":9,"logicalPage":17,"side":"right","pdfPage":9},{"no":101,"dist":105.43,"inter":0.1,"page":9,"logicalPage":17,"side":"right","pdfPage":9},{"no":102,"dist":105.71,"inter":0.28,"page":9,"logicalPage":17,"side":"right","pdfPage":9},{"no":103,"dist":107.16,"inter":1.45,"page":10,"logicalPage":18,"side":"left","pdfPage":10},{"no":104,"dist":107.3,"inter":0.14,"page":10,"logicalPage":18,"side":"left","pdfPage":10},{"no":105,"dist":110.34,"inter":3.04,"page":10,"logicalPage":18,"side":"left","pdfPage":10},{"no":106,"dist":112.51,"inter":2.17,"page":10,"logicalPage":18,"side":"left","pdfPage":10},{"no":107,"dist":114.75,"inter":2.24,"page":10,"logicalPage":18,"side":"left","pdfPage":10},{"no":108,"dist":117.08,"inter":2.33,"page":10,"logicalPage":18,"side":"left","pdfPage":10},{"no":109,"dist":117.95,"inter":0.87,"page":10,"logicalPage":19,"side":"right","pdfPage":10},{"no":110,"dist":118.26,"inter":0.31,"page":10,"logicalPage":19,"side":"right","pdfPage":10},{"no":111,"dist":121.23,"inter":2.97,"page":10,"logicalPage":19,"side":"right","pdfPage":10},{"no":112,"dist":123.66,"inter":2.43,"page":10,"logicalPage":19,"side":"right","pdfPage":10},{"no":113,"dist":126.17,"inter":2.51,"page":10,"logicalPage":19,"side":"right","pdfPage":10},{"no":114,"dist":126.63,"inter":0.46,"page":10,"logicalPage":19,"side":"right","pdfPage":10},{"no":115,"dist":127.75,"inter":1.12,"page":11,"logicalPage":20,"side":"left","pdfPage":11},{"no":116,"dist":128.54,"inter":0.79,"page":11,"logicalPage":20,"side":"left","pdfPage":11},{"no":117,"dist":128.9,"inter":0.36,"page":11,"logicalPage":20,"side":"left","pdfPage":11},{"no":118,"dist":130.73,"inter":1.83,"page":11,"logicalPage":20,"side":"left","pdfPage":11},{"no":119,"dist":131.13,"inter":0.4,"page":11,"logicalPage":20,"side":"left","pdfPage":11},{"no":120,"dist":131.68,"inter":0.55,"page":11,"logicalPage":20,"side":"left","pdfPage":11},{"no":121,"dist":132.29,"inter":0.61,"page":11,"logicalPage":21,"side":"right","pdfPage":11},{"no":122,"dist":132.86,"inter":0.57,"page":11,"logicalPage":21,"side":"right","pdfPage":11},{"no":123,"dist":134.59,"inter":1.73,"page":11,"logicalPage":21,"side":"right","pdfPage":11},{"no":124,"dist":135.12,"inter":0.53,"page":11,"logicalPage":21,"side":"right","pdfPage":11},{"no":125,"dist":137.68,"inter":2.56,"page":11,"logicalPage":21,"side":"right","pdfPage":11},{"no":126,"dist":140.17,"inter":2.49,"page":11,"logicalPage":21,"side":"right","pdfPage":11},{"no":127,"dist":145.87,"inter":5.7,"page":12,"logicalPage":22,"side":"left","pdfPage":12},{"no":128,"dist":146.47,"inter":0.6,"page":12,"logicalPage":22,"side":"left","pdfPage":12},{"no":129,"dist":150.48,"inter":4.01,"page":12,"logicalPage":22,"side":"left","pdfPage":12},{"no":130,"dist":151.11,"inter":0.63,"page":12,"logicalPage":22,"side":"left","pdfPage":12},{"no":131,"dist":151.58,"inter":0.47,"page":12,"logicalPage":22,"side":"left","pdfPage":12},{"no":132,"dist":153.48,"inter":1.9,"page":12,"logicalPage":22,"side":"left","pdfPage":12},{"no":133,"dist":162.42,"inter":8.94,"page":12,"logicalPage":23,"side":"right","pdfPage":12},{"no":134,"dist":164.69,"inter":2.27,"page":12,"logicalPage":23,"side":"right","pdfPage":12},{"no":135,"dist":165.0,"inter":0.31,"page":12,"logicalPage":23,"side":"right","pdfPage":12},{"no":136,"dist":165.61,"inter":0.61,"page":12,"logicalPage":23,"side":"right","pdfPage":12},{"no":137,"dist":166.82,"inter":1.21,"page":12,"logicalPage":23,"side":"right","pdfPage":12},{"no":138,"dist":168.81,"inter":1.99,"page":12,"logicalPage":23,"side":"right","pdfPage":12},{"no":139,"dist":169.62,"inter":0.81,"page":13,"logicalPage":24,"side":"left","pdfPage":13},{"no":140,"dist":174.0,"inter":4.38,"page":13,"logicalPage":24,"side":"left","pdfPage":13},{"no":141,"dist":182.52,"inter":8.52,"page":13,"logicalPage":24,"side":"left","pdfPage":13},{"no":142,"dist":186.48,"inter":3.96,"page":13,"logicalPage":24,"side":"left","pdfPage":13},{"no":143,"dist":186.88,"inter":0.4,"page":13,"logicalPage":24,"side":"left","pdfPage":13},{"no":144,"dist":188.18,"inter":1.3,"page":13,"logicalPage":24,"side":"left","pdfPage":13},{"no":145,"dist":189.34,"inter":1.16,"page":13,"logicalPage":25,"side":"right","pdfPage":13},{"no":146,"dist":194.35,"inter":5.01,"page":13,"logicalPage":25,"side":"right","pdfPage":13},{"no":147,"dist":195.5,"inter":1.15,"page":13,"logicalPage":25,"side":"right","pdfPage":13},{"no":148,"dist":196.66,"inter":1.16,"page":13,"logicalPage":25,"side":"right","pdfPage":13},{"no":149,"dist":206.26,"inter":9.6,"page":13,"logicalPage":25,"side":"right","pdfPage":13},{"no":150,"dist":207.66,"inter":1.4,"page":13,"logicalPage":25,"side":"right","pdfPage":13},{"no":151,"dist":210.02,"inter":2.36,"page":14,"logicalPage":26,"side":"left","pdfPage":14},{"no":152,"dist":211.81,"inter":1.79,"page":14,"logicalPage":26,"side":"left","pdfPage":14},{"no":153,"dist":212.79,"inter":0.98,"page":14,"logicalPage":26,"side":"left","pdfPage":14},{"no":154,"dist":214.83,"inter":2.04,"page":14,"logicalPage":26,"side":"left","pdfPage":14},{"no":155,"dist":215.47,"inter":0.64,"page":14,"logicalPage":26,"side":"left","pdfPage":14},{"no":156,"dist":215.99,"inter":0.52,"page":14,"logicalPage":26,"side":"left","pdfPage":14},{"no":157,"dist":216.86,"inter":0.87,"page":14,"logicalPage":27,"side":"right","pdfPage":14},{"no":158,"dist":217.23,"inter":0.37,"page":14,"logicalPage":27,"side":"right","pdfPage":14},{"no":159,"dist":217.35,"inter":0.12,"page":14,"logicalPage":27,"side":"right","pdfPage":14},{"no":160,"dist":217.69,"inter":0.34,"page":14,"logicalPage":27,"side":"right","pdfPage":14},{"no":161,"dist":218.27,"inter":0.58,"page":14,"logicalPage":27,"side":"right","pdfPage":14},{"no":162,"dist":218.44,"inter":0.17,"page":14,"logicalPage":27,"side":"right","pdfPage":14},{"no":163,"dist":218.7,"inter":0.26,"page":15,"logicalPage":28,"side":"left","pdfPage":15},{"no":164,"dist":219.31,"inter":0.61,"page":15,"logicalPage":28,"side":"left","pdfPage":15},{"no":165,"dist":219.5,"inter":0.19,"page":15,"logicalPage":28,"side":"left","pdfPage":15},{"no":166,"dist":219.88,"inter":0.38,"page":15,"logicalPage":28,"side":"left","pdfPage":15},{"no":167,"dist":220.5,"inter":0.62,"page":15,"logicalPage":28,"side":"left","pdfPage":15},{"no":168,"dist":224.05,"inter":3.55,"page":15,"logicalPage":28,"side":"left","pdfPage":15},{"no":169,"dist":224.71,"inter":0.66,"page":15,"logicalPage":29,"side":"right","pdfPage":15},{"no":170,"dist":229.77,"inter":5.06,"page":15,"logicalPage":29,"side":"right","pdfPage":15},{"no":171,"dist":230.51,"inter":0.74,"page":15,"logicalPage":29,"side":"right","pdfPage":15},{"no":172,"dist":233.49,"inter":2.98,"page":15,"logicalPage":29,"side":"right","pdfPage":15},{"no":173,"dist":234.15,"inter":0.66,"page":15,"logicalPage":29,"side":"right","pdfPage":15},{"no":174,"dist":239.86,"inter":5.71,"page":15,"logicalPage":29,"side":"right","pdfPage":15},{"no":175,"dist":240.62,"inter":0.76,"page":16,"logicalPage":30,"side":"left","pdfPage":16},{"no":176,"dist":243.96,"inter":3.34,"page":16,"logicalPage":30,"side":"left","pdfPage":16},{"no":177,"dist":244.88,"inter":0.92,"page":16,"logicalPage":30,"side":"left","pdfPage":16},{"no":178,"dist":248.64,"inter":3.76,"page":16,"logicalPage":30,"side":"left","pdfPage":16},{"no":179,"dist":250.86,"inter":2.22,"page":16,"logicalPage":30,"side":"left","pdfPage":16},{"no":180,"dist":250.99,"inter":0.13,"page":16,"logicalPage":30,"side":"left","pdfPage":16},{"no":181,"dist":252.01,"inter":1.02,"page":16,"logicalPage":31,"side":"right","pdfPage":16},{"no":182,"dist":252.91,"inter":0.9,"page":16,"logicalPage":31,"side":"right","pdfPage":16},{"no":183,"dist":253.97,"inter":1.06,"page":16,"logicalPage":31,"side":"right","pdfPage":16},{"no":184,"dist":254.96,"inter":0.99,"page":16,"logicalPage":31,"side":"right","pdfPage":16},{"no":185,"dist":255.88,"inter":0.92,"page":16,"logicalPage":31,"side":"right","pdfPage":16},{"no":186,"dist":259.66,"inter":3.78,"page":16,"logicalPage":31,"side":"right","pdfPage":16},{"no":187,"dist":264.44,"inter":4.78,"page":17,"logicalPage":32,"side":"left","pdfPage":17},{"no":188,"dist":264.83,"inter":0.39,"page":17,"logicalPage":32,"side":"left","pdfPage":17},{"no":189,"dist":269.98,"inter":5.15,"page":17,"logicalPage":32,"side":"left","pdfPage":17},{"no":190,"dist":272.45,"inter":2.47,"page":17,"logicalPage":32,"side":"left","pdfPage":17},{"no":191,"dist":281.49,"inter":9.04,"page":17,"logicalPage":32,"side":"left","pdfPage":17},{"no":192,"dist":287.1,"inter":5.61,"page":17,"logicalPage":32,"side":"left","pdfPage":17},{"no":193,"dist":292.6,"inter":5.5,"page":17,"logicalPage":33,"side":"right","pdfPage":17},{"no":194,"dist":292.6,"inter":0.0,"page":17,"logicalPage":33,"side":"right","pdfPage":17},{"no":195,"dist":292.81,"inter":0.21,"page":17,"logicalPage":33,"side":"right","pdfPage":17},{"no":196,"dist":293.4,"inter":0.59,"page":17,"logicalPage":33,"side":"right","pdfPage":17},{"no":197,"dist":293.87,"inter":0.47,"page":17,"logicalPage":33,"side":"right","pdfPage":17},{"no":198,"dist":300.67,"inter":6.8,"page":17,"logicalPage":33,"side":"right","pdfPage":17},{"no":199,"dist":305.03,"inter":4.36,"page":18,"logicalPage":34,"side":"left","pdfPage":18},{"no":200,"dist":307.26,"inter":2.23,"page":18,"logicalPage":34,"side":"left","pdfPage":18},{"no":201,"dist":307.42,"inter":0.16,"page":18,"logicalPage":34,"side":"left","pdfPage":18},{"no":202,"dist":310.62,"inter":3.2,"page":18,"logicalPage":34,"side":"left","pdfPage":18},{"no":203,"dist":310.91,"inter":0.29,"page":18,"logicalPage":34,"side":"left","pdfPage":18},{"no":204,"dist":311.83,"inter":0.92,"page":18,"logicalPage":34,"side":"left","pdfPage":18},{"no":205,"dist":314.25,"inter":2.42,"page":18,"logicalPage":35,"side":"right","pdfPage":18},{"no":206,"dist":318.75,"inter":4.5,"page":18,"logicalPage":35,"side":"right","pdfPage":18},{"no":207,"dist":319.86,"inter":1.11,"page":18,"logicalPage":35,"side":"right","pdfPage":18},{"no":208,"dist":322.03,"inter":2.17,"page":18,"logicalPage":35,"side":"right","pdfPage":18},{"no":209,"dist":325.41,"inter":3.38,"page":18,"logicalPage":35,"side":"right","pdfPage":18},{"no":210,"dist":326.26,"inter":0.85,"page":18,"logicalPage":35,"side":"right","pdfPage":18},{"no":211,"dist":326.79,"inter":0.53,"page":19,"logicalPage":36,"side":"left","pdfPage":19},{"no":212,"dist":326.91,"inter":0.12,"page":19,"logicalPage":36,"side":"left","pdfPage":19},{"no":213,"dist":327.84,"inter":0.93,"page":19,"logicalPage":36,"side":"left","pdfPage":19},{"no":214,"dist":328.56,"inter":0.72,"page":19,"logicalPage":36,"side":"left","pdfPage":19},{"no":215,"dist":328.81,"inter":0.25,"page":19,"logicalPage":36,"side":"left","pdfPage":19},{"no":216,"dist":329.25,"inter":0.44,"page":19,"logicalPage":36,"side":"left","pdfPage":19},{"no":217,"dist":330.62,"inter":1.37,"page":19,"logicalPage":37,"side":"right","pdfPage":19},{"no":218,"dist":330.72,"inter":0.1,"page":19,"logicalPage":37,"side":"right","pdfPage":19},{"no":219,"dist":330.83,"inter":0.11,"page":19,"logicalPage":37,"side":"right","pdfPage":19},{"no":220,"dist":331.45,"inter":0.62,"page":19,"logicalPage":37,"side":"right","pdfPage":19},{"no":221,"dist":331.94,"inter":0.49,"page":19,"logicalPage":37,"side":"right","pdfPage":19},{"no":222,"dist":332.44,"inter":0.5,"page":19,"logicalPage":37,"side":"right","pdfPage":19},{"no":223,"dist":333.73,"inter":1.29,"page":20,"logicalPage":38,"side":"left","pdfPage":20},{"no":224,"dist":336.67,"inter":2.94,"page":20,"logicalPage":38,"side":"left","pdfPage":20},{"no":225,"dist":337.57,"inter":0.9,"page":20,"logicalPage":38,"side":"left","pdfPage":20},{"no":226,"dist":338.7,"inter":1.13,"page":20,"logicalPage":38,"side":"left","pdfPage":20},{"no":227,"dist":340.76,"inter":2.06,"page":20,"logicalPage":38,"side":"left","pdfPage":20},{"no":228,"dist":341.54,"inter":0.78,"page":20,"logicalPage":38,"side":"left","pdfPage":20},{"no":229,"dist":343.25,"inter":1.71,"page":20,"logicalPage":39,"side":"right","pdfPage":20},{"no":230,"dist":345.7,"inter":2.45,"page":20,"logicalPage":39,"side":"right","pdfPage":20},{"no":231,"dist":350.38,"inter":4.68,"page":20,"logicalPage":39,"side":"right","pdfPage":20},{"no":232,"dist":360.69,"inter":10.31,"page":20,"logicalPage":39,"side":"right","pdfPage":20},{"no":233,"dist":362.52,"inter":1.83,"page":20,"logicalPage":39,"side":"right","pdfPage":20},{"no":234,"dist":365.19,"inter":2.67,"page":20,"logicalPage":39,"side":"right","pdfPage":20}];
+let RALLY_FORMAT="A4";
+let ROUTE=A4_ROUTE;
+let ROUTE_META={format:"A4",source:"KOMAREN_Classic2026.pdf",pages_total:20,roadbook_pages:39,rows:A4_ROUTE.length,derived_total_count:0};
 const $=id=>document.getElementById(id), clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 let pdf=null,page=1,logicalPage=1,logicalCount=39,zoom=1,renderedZoom=1,fitScale=1,panX=0,panY=0;
 let gpsDistance=0,totalZeroBase=0,totalOffset=0,legBase=0,legOffset=0,lastTs=null,timerStart=null,elapsedMs=0,running=false,stageStarted=false,autoNext=true,rb=0;
 const AUTO_NEXT_TRIGGER_M=0;
-const SESSION_KEY='matsu-rallycon-session-v036';
-const APP_VERSION='0.6.50';
+const SESSION_KEY='matsu-rallycon-session-v0651-a5dev';
+const APP_VERSION='0.6.64-AUTO-RC';
+const A5_DEV_LABEL='A4/A5 PDF AUTO: A5 KomaRen parser';
 const LEGACY_SESSION_VERSIONS=new Set(['0.6.38','0.6.39','0.6.40','0.6.41','0.6.42','0.6.43','0.6.44','0.6.45','0.6.46','0.6.47','0.6.48','0.6.49']);
 let wakeLock=null, suppressSessionSave=false;
 let pointers=new Map(),pinchStartDist=0,pinchStartZoom=1,gestureMoved=false;
@@ -137,29 +297,66 @@ let targetCenterToken=0;
 const ROADBOOK_ROW_CENTER_X_PT=[481.595,398.39,315.925,233.46,151.205,68.7];
 function syncLegToTarget(){const t=getTotalKm();const target=Number(ROUTE[rb]?.dist)||0;const desired=Math.max(0,t-target);legOffset=0;legBase=gpsDistance-desired}
 function setRB(i,doAuto=true){const prevRb=rb;rb=clamp(i,0,ROUTE.length-1);const e=ROUTE[rb];if(rb>prevRb&&stageStarted)syncLegToTarget();$('rbNo').textContent=e.no;$('target').textContent=fmtKm(e.dist);const token=++targetCenterToken;const renderPromise=syncLogical(false);Promise.resolve(renderPromise).then(()=>{if(token===targetCenterToken)centerTargetInView()});display(doAuto)}
-function logicalFromRB(){return rb<=5?1:Math.floor((ROUTE[rb].no-7)/6)+2}
-function mapping(lp){if(lp===1)return {pdf:1,side:'right'};return {pdf:Math.floor(lp/2)+1,side:lp%2===0?'left':'right'}}
-function targetRowIndex(){return rb<6?rb:(rb-6)%6}
+function logicalFromRB(){return Math.max(1,Number(ROUTE[rb]?.logicalPage)||1)}
+function mapping(lp){if(RALLY_FORMAT==='A5'){const i=clamp((Number(lp)||1)-1,0,Math.max(0,ROUTE.length-1));const e=ROUTE[Math.min(i*6,ROUTE.length-1)]||ROUTE[0];return {pdf:Number(e?.pdfPage)||Math.max(2,(Number(lp)||1)+1),side:'full'}}if(lp===1)return {pdf:1,side:'right'};return {pdf:Math.floor(lp/2)+1,side:lp%2===0?'left':'right'}}
+function targetRowIndex(){return Math.max(0,Number(ROUTE[rb]?.row||1)-1)}
 function centerTargetInView(){
  const st=$('stage'),c=$('pdfCanvas');
  if(!st||!c||!c.clientHeight)return;
- const baseHeight=595.21997;
+ const stageRect=st.getBoundingClientRect();
+ if(RALLY_FORMAT==='A5'){
+   // A5: measure the ACTUAL transformed canvas rectangle, then shift by the
+   // measured error. This is deliberately geometry-based so CSS transform
+   // origin, DPR and browser scaling cannot introduce a fixed offset.
+   // A5 KomaRen has six equal roadbook rows between the table's fixed
+   // top/bottom boundaries.  The RB number is rotated/positioned near the
+   // lower part of each row, so its text bbox is NOT the row centre.
+   // Use the actual table geometry instead of the RB text position.
+   const TABLE_TOP_PT=76.08, TABLE_BOTTOM_PT=576.96;
+   const slot=targetRowIndex();
+   const rowRatio=(TABLE_TOP_PT + (slot+0.5)*(TABLE_BOTTOM_PT-TABLE_TOP_PT)/6) / 595.32;
+   const parsedRatio=Number(ROUTE[rb]?.rowCenterRatio);
+   const ratio=(Number.isFinite(parsedRatio)&&parsedRatio>0&&parsedRatio<1) ? parsedRatio : rowRatio;
+   const rect=c.getBoundingClientRect();
+   const targetScreenY=rect.top+rect.height*ratio;
+   const stageCenterY=stageRect.top+stageRect.height/2;
+   const desiredShift=stageCenterY-targetScreenY;
+   if(Math.abs(desiredShift)>0.25){panY+=desiredShift;applyPan();}
+   return;
+ }
+ const baseHeight=595.32;
  const yPt=baseHeight-ROADBOOK_ROW_CENTER_X_PT[targetRowIndex()];
  const targetY=yPt/baseHeight*c.clientHeight;
- const k=zoom/Math.max(.001,renderedZoom);
  const targetRect=c.getBoundingClientRect();
- const stageRect=st.getBoundingClientRect();
+ const k=zoom/Math.max(.001,renderedZoom);
  const targetScreenY=targetRect.top+targetY*k;
  const desiredShift=stageRect.top+stageRect.height/2-targetScreenY;
  if(Math.abs(desiredShift)<0.5)return;
  panY+=desiredShift;
  applyPan();
 }
-function panBounds(){const st=$('stage'),c=$('pdfCanvas'),k=zoom/Math.max(.001,renderedZoom),w=c.clientWidth*k,h=c.clientHeight*k;return{x:Math.max(0,(w-st.clientWidth)/2),y:Math.max(0,h-st.clientHeight)}}
-function clampPan(){const b=panBounds();panX=clamp(panX,-b.x,b.x);panY=clamp(panY,-b.y,0)}
+function panBounds(){
+ const st=$('stage'),c=$('pdfCanvas'),k=zoom/Math.max(.001,renderedZoom);
+ const W=c.clientWidth,H=c.clientHeight,w=W*k,h=H*k;
+ // canvasWrap is top-aligned in the stage but scaled around its center.
+ // Therefore the no-blank limits are asymmetric once k != 1.
+ const minX=st.clientWidth-(W+w)/2;
+ const maxX=(w-W)/2;
+ const minY=st.clientHeight-(H+h)/2;
+ const maxY=(h-H)/2;
+ return{x:Math.max(0,(w-st.clientWidth)/2),y:Math.max(0,h-st.clientHeight),minX,maxX,minY,maxY};
+}
+function clampPan(){
+ const b=panBounds();
+ panX=clamp(panX,b.minX,b.maxX);
+ // canvasWrap is transform-origin:center center. Keep the rendered page
+ // edge-to-edge inside the stage at every zoom level; do not allow blank space.
+ panY=clamp(panY,b.minY,b.maxY);
+}
 function applyPan(){clampPan();const k=zoom/Math.max(.001,renderedZoom);$('canvasWrap').style.transform=`translate3d(${panX}px,${panY}px,0) scale(${k})`}
 function setZoom(z,fx=null,fy=null){const old=zoom;zoom=clamp(z,.5,4);if(fx!=null&&fy!=null&&old!==zoom){const st=$('stage'),cx=fx-st.clientWidth/2,cy=fy-st.clientHeight/2;panX=cx-(cx-panX)*(zoom/old);panY=cy-(cy-panY)*(zoom/old)}if(zoom<=1){panX=0;panY=0}applyPan();}
-function logicalCountForDoc(){return pdf?pdf.numPages*2-1:39}
+function logicalCountForDocForFormat(doc,format){return doc?(format==='A5'?Math.max(1,ROUTE_META?.roadbook_pages||Math.floor(ROUTE.length/6)):doc.numPages*2-1):39}
+function logicalCountForDoc(){return pdf?(RALLY_FORMAT==='A5'?Math.max(1,ROUTE_META?.roadbook_pages||Math.floor(ROUTE.length/6)):pdf.numPages*2-1):39}
 function syncLogical(resetPan=true){const lp=logicalFromRB();if(lp!==logicalPage){logicalPage=lp;page=mapping(lp).pdf;if(resetPan){panX=0;panY=0}return renderPage()}return Promise.resolve()}
 async function renderPage(){
  if(!pdf)return;
@@ -168,8 +365,9 @@ async function renderPage(){
  const base=p.getViewport({scale:1,rotation:p.rotate||0});
  const stage=$('stage');
  const availW=Math.max(120,stage.clientWidth-6);
- const halfBaseW=base.width/2;
- fitScale=availW/halfBaseW;
+ const availH=Math.max(120,stage.clientHeight-6);
+ const baseW=base.width, baseH=base.height;
+ fitScale=RALLY_FORMAT==='A5' ? (availW/baseW) : availW/(baseW/2);
  const fullScale=fitScale;
  const fullVp=p.getViewport({scale:fullScale,rotation:p.rotate||0});
  const off=document.createElement('canvas');
@@ -179,21 +377,62 @@ async function renderPage(){
  const octx=off.getContext('2d');
  octx.setTransform(scaleD,0,0,scaleD,0,0);
  await p.render({canvasContext:octx,viewport:fullVp}).promise;
- const halfW=Math.floor(off.width/2), fullH=off.height;
  const c=$('pdfCanvas');
- c.width=halfW;
- c.height=fullH;
- c.style.width=(halfW/scaleD)+'px';
- c.style.height=(fullH/scaleD)+'px';
- const ctx=c.getContext('2d');
- ctx.setTransform(1,0,0,1,0,0);
- ctx.clearRect(0,0,halfW,fullH);
- const sx=m.side==='left'?0:(off.width-halfW);
- ctx.drawImage(off,sx,0,halfW,fullH,0,0,halfW,fullH);
+ const fullH=off.height;
+ if(RALLY_FORMAT==='A5'){
+   c.width=off.width; c.height=off.height;
+   c.style.width=(off.width/scaleD)+'px'; c.style.height=(off.height/scaleD)+'px';
+   const ctx=c.getContext('2d'); ctx.setTransform(1,0,0,1,0,0); ctx.clearRect(0,0,off.width,off.height);
+   ctx.drawImage(off,0,0);
+ }else{
+   const halfW=Math.floor(off.width/2);
+   c.width=halfW; c.height=fullH;
+   c.style.width=(halfW/scaleD)+'px'; c.style.height=(fullH/scaleD)+'px';
+   const ctx=c.getContext('2d'); ctx.setTransform(1,0,0,1,0,0); ctx.clearRect(0,0,halfW,fullH);
+   const sx=m.side==='left'?0:(off.width-halfW);
+   ctx.drawImage(off,sx,0,halfW,fullH,0,0,halfW,fullH);
+ }
  renderedZoom=zoom;panX=0;panY=0;applyPan();
  ;
 }
-async function loadBytes(buf,name,preserveSession=false){pdf=await pdfjsLib.getDocument({data:buf}).promise;logicalCount=logicalCountForDoc();logicalPage=1;page=1;rb=0;stageStarted=false;running=false;timerStart=null;elapsedMs=0;gpsLast=null;gpsDistance=0;totalZeroBase=0;totalOffset=0;legBase=0;legOffset=0;zoom=1;if(!preserveSession)clearSession();await releaseWakeLock();await renderPage();$('startBtn').textContent='START';$('time').textContent='00:00:00';setRB(0,false);setStatus('READY');}
+async function detectPdfFormat(doc){
+  const p=await doc.getPage(1);
+  const raw=p.getViewport({scale:1,rotation:0});
+  const shortSide=Math.min(raw.width,raw.height), longSide=Math.max(raw.width,raw.height);
+  const isA5=Math.abs(shortSide-419.53)<12 && Math.abs(longSide-595.28)<12;
+  const isA4=Math.abs(shortSide-595.28)<12 && Math.abs(longSide-841.89)<18;
+  if(isA5)return 'A5';
+  if(isA4)return 'A4';
+  throw new Error(`未対応PDFサイズ: ${raw.width.toFixed(1)} x ${raw.height.toFixed(1)} pt`);
+}
+async function loadBytes(buf,name,preserveSession=false){
+  let doc;
+  try{doc=await pdfjsLib.getDocument({data:buf}).promise;}catch(err){setStatus('PDF LOAD ERROR: '+(err?.message||err));console.error(err);return false;}
+  try{
+    const detected=await detectPdfFormat(doc);
+    if(detected==='A5'){
+      const parsed=await parseA5Pdf(doc);
+      RALLY_FORMAT='A5';
+      ROUTE=parsed.route;
+      ROUTE_META={...parsed.meta,source:name};
+      logicalCount=ROUTE_META.roadbook_pages;
+      setStatus(`A5 AUTO PARSED / RB ${ROUTE.length} / ${fmtKm(ROUTE.at(-1)?.dist||0)} km`);
+    }else{
+      RALLY_FORMAT='A4';
+      ROUTE=A4_ROUTE;
+      ROUTE_META={format:'A4',source:name,pages_total:doc.numPages,roadbook_pages:doc.numPages*2-1,rows:A4_ROUTE.length,derived_total_count:0};
+      logicalCount=logicalCountForDocForFormat(doc,'A4');
+      setStatus(`A4 AUTO / RB ${ROUTE.length} / ${fmtKm(ROUTE.at(-1)?.dist||0)} km`);
+    }
+  }catch(err){setStatus('PDF PARSE ERROR: '+(err?.message||err));console.error(err);return false;}
+  pdf=doc;
+  logicalPage=1;page=1;rb=0;stageStarted=false;running=false;timerStart=null;elapsedMs=0;gpsLast=null;gpsDistance=0;totalZeroBase=0;totalOffset=0;legBase=0;legOffset=0;zoom=1;panX=0;panY=0;
+  if(!preserveSession)clearSession();
+  await releaseWakeLock();
+  await renderPage();
+  $('startBtn').textContent='START';$('time').textContent='00:00:00';setRB(0,false);
+  return true;
+}
 function moveLogical(d){logicalPage=clamp(logicalPage+d,1,logicalCount);page=mapping(logicalPage).pdf;zoom=1;panX=0;panY=0;renderPage()}
 function moveRB(d,doAuto=true){const next=clamp(rb+d,0,ROUTE.length-1);setRB(next,doAuto)}
 $('loadBtn').onclick=()=>$('pdfFile').click();$('pdfFile').onchange=async e=>{const f=e.target.files[0];if(f)loadBytes(await f.arrayBuffer(),f.name,false)};
@@ -542,5 +781,5 @@ document.addEventListener('visibilitychange',()=>{
 });
 window.addEventListener('pageshow',()=>{if(running)resumeFromBackground()});
 window.addEventListener('pagehide',saveSession);
-const defaultPdfCandidates=['KOMAREN_Classic2026.pdf','./KOMAREN_Classic2026.pdf','demo/KOMAREN_Classic2026.pdf'];(async()=>{for(const u of defaultPdfCandidates){try{const r=await fetch(u);if(r.ok){const b=await r.arrayBuffer();suppressSessionSave=true;await loadBytes(b,'KOMAREN_Classic2026.pdf',true);const restored=restoreSession();suppressSessionSave=false;if(restored){await renderPage();setRB(rb,false);$('startBtn').textContent='START';$('time').textContent=new Date(Math.floor(elapsedMs/1000)*1000).toISOString().slice(11,19);setStatus('RESTORED / PAUSE')}else{setStatus('READY')}return}}catch(e){suppressSessionSave=false}}setStatus('LOAD PDF でPDFを選択してください')})();
+const defaultPdfCandidates=['KOMAREN_Classic2026.pdf','./KOMAREN_Classic2026.pdf','demo/KOMAREN_Classic2026.pdf'];(async()=>{for(const u of defaultPdfCandidates){try{const r=await fetch(u);if(r.ok){const b=await r.arrayBuffer();suppressSessionSave=true;const loaded=await loadBytes(b,'KOMAREN_Classic2026.pdf',true);const restored=loaded&&restoreSession();suppressSessionSave=false;if(restored){await renderPage();setRB(rb,false);$('startBtn').textContent='START';$('time').textContent=new Date(Math.floor(elapsedMs/1000)*1000).toISOString().slice(11,19);setStatus('RESTORED / PAUSE')}else{setStatus('READY')}return}}catch(e){suppressSessionSave=false}}setStatus('LOAD PDF でPDFを選択してください')})();
 </script></body></html>
