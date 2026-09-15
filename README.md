@@ -1,6 +1,14 @@
-# Matsu RallyCon v0.7
+# Matsu RallyCon v0.7.1 DEV
 
 Koma-zuka (roadbook) rally navigation web app.
+
+## v0.7.1 DEV
+
+### Numeric display refinement
+- TOTAL / LEG / SPEED / TARGET / NEXT are centered.
+- LEG / SPEED / NEXT numeric values use one unified, slightly larger display size.
+- No functional behavior or overall dashboard layout was changed.
+- This remains a DEV build pending real-world visibility confirmation.
 
 ## v0.7
 

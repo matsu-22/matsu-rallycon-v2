@@ -1,2 +1,2 @@
 Matsu RallyCon v0.7.1 DEV
-TOTAL / LEG / SPEED / TARGET / NEXT centered for real-world visibility testing; all other v0.7 behavior unchanged.
+TOTAL / LEG / SPEED / TARGET / NEXT centered; LEG / SPEED / NEXT numeric values unified and slightly enlarged for real-world visibility testing.
