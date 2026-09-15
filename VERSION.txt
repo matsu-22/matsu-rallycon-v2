@@ -1,2 +1,2 @@
-Matsu RallyCon v0.7.2 GPS DEV
-GPS distance correction: 50%–150% in 1% steps; applies only to newly accumulated GPS distance and persists in session.
+Matsu RallyCon v0.7.2 GPS DEV2
+GPS distance correction 50-150% in 1% steps; GPS button long-press opens correction settings, short press keeps GPS ON/OFF

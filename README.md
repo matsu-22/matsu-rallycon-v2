@@ -1,21 +1,28 @@
-# Matsu RallyCon v0.7.2 GPS DEV
+# Matsu RallyCon v0.7.2 GPS DEV2
 
-Development build based on v0.7.1.
+v0.7.1をベースにGPS距離補正機能を追加したDEV2版。
 
-## Change in this DEV build
-- Adds GPS distance correction from **50% to 150%** in **1% steps**.
-- Default is **100%**.
-- The correction is applied only to GPS distance accumulated **after the rate is changed**.
-- Previously accumulated TOTAL/LEG distance is not recalculated when the rate changes.
-- The correction rate is saved/restored with the rally session.
-- GPS raw distance remains separate from corrected rally distance.
-- GPS quality, loss/recovery, jump rejection, and speed calculations are unchanged.
+## GPS距離補正
+- 初期値 100%
+- 50～150%
+- 1%刻み
+- GPS距離の積算にのみ補正率を適用
+- 補正率変更前のTOTAL/LEGは変更しない
+- セッション保存・復元に対応
+- START長押しのラリーリセットで100%へ戻る
 
-## Existing v0.7.1 behavior preserved
-- A4/A5 PDF auto-detection
-- A5 KomaRen auto-parse
-- Rally navigation core and current UI
-- Embedded A4 startup PDF
-- Classic2026: 234 RB / 365.19 km
+## 操作
+- GPS短押し：GPS ON/OFF（従来どおり）
+- GPS長押し：約0.7秒：GPS距離補正設定を開く
+- 設定画面：−1% / ＋1% / 閉じる
+- 設定画面外をタップしても閉じる
+- 通常画面にはGPS補正設定を常時表示しない
 
-This is a DEV build for real-device testing. Do not treat it as a production release until verified.
+## 保持している主要機能
+- A4/A5 PDF自動判定
+- A5コマ図自動パース
+- GPS精度判定、GPS LOST/復帰処理
+- TOTAL / LEG / TARGET / NEXT / AUTO NEXT
+- セッション保存・復元
+- START長押しリセット
+- A4 Classic2026 234 RB / 365.19 km
