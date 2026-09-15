@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="ja"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<title>Matsu RallyCon v0.7</title>
+<title>Matsu RallyCon v0.7.1 DEV</title>
 <link rel="manifest" href="manifest.webmanifest">
 <style>
 :root{--bg:#0d1117;--panel:#161b22;--line:#30363d;--text:#f0f6fc;--muted:#8b949e;--accent:#58a6ff;--warn:#f2cc60}
@@ -34,21 +34,22 @@ button{font:inherit;color:inherit;background:#21262d;border:1px solid #484f58;bo
 .rbhead{grid-template-columns:.60fr 1.40fr}
 .rbhead .rbbox:first-child{container-type:inline-size;padding-left:5px;padding-right:5px}
 .rbhead .rbbox:first-child .rbval{font-size:clamp(16px,35cqw,24px);letter-spacing:-.2px}.rbhead .rbbox:first-child .rbval.threeDigit{font-size:15px;letter-spacing:-.5px}
-/* v0.6.50: keep every dashboard number fully inside its frame; LEG is right-aligned */
+/* v0.7.1 DEV: center all primary dashboard distance/speed numbers for real-world visibility test. */
 .card:first-child,.card:nth-child(2){container-type:inline-size}
 .totalValue.threeDigit{font-size:clamp(34px,13.5cqw,47px);letter-spacing:-1px;text-align:center;width:100%}
-.card:nth-child(2) .value{font-size:clamp(32px,5.7vh,43px);text-align:right;letter-spacing:-.5px;width:100%;padding-right:2px}
+.card:nth-child(2) .value{font-size:clamp(32px,5.7vh,43px);text-align:center;letter-spacing:-.5px;width:100%;padding-right:0}
 .rbhead .rbbox{overflow:hidden}
 .rbhead .rbbox .rbval{min-width:0;max-width:100%;overflow:hidden;text-overflow:clip;font-variant-numeric:tabular-nums}
 .rbhead .rbbox:first-child .rbval{font-size:clamp(15px,27cqw,21px);letter-spacing:-.55px;text-align:center;width:100%;padding:0}
 .rbhead .rbbox:first-child .rbval.threeDigit{font-size:13px;letter-spacing:-.8px;display:block;overflow:visible;line-height:1.05;white-space:nowrap}
 .rbhead .rbbox:nth-child(2) .rbval{font-size:clamp(20px,5.0cqw,25px);letter-spacing:-.8px;text-align:center;width:100%;padding:0}
-.nextbox .rbval{font-variant-numeric:tabular-nums;letter-spacing:-.5px}
+.nextbox .rbval{font-variant-numeric:tabular-nums;letter-spacing:-.5px;text-align:center;width:100%}
+.card .value{text-align:center;width:100%}
 .timebox .rbval{font-variant-numeric:tabular-nums;letter-spacing:-.3px}
 @media (max-width:1100px){.card:nth-child(2) .value{font-size:clamp(29px,5.0vh,38px)}}
 </style></head><body>
 <div id="app">
-<header class="top"><div class="brand">Matsu RallyCon v0.7</div><div class="clock"><span id="clockDate" class="clockDate"></span><span id="clockTime" class="clockTime">--:--</span></div><div id="status" class="status">準備中</div><button id="gpsBtn">GPS</button><button id="compassBtn">CAP</button></header>
+<header class="top"><div class="brand">Matsu RallyCon v0.7.1 DEV</div><div class="clock"><span id="clockDate" class="clockDate"></span><span id="clockTime" class="clockTime">--:--</span></div><div id="status" class="status">準備中</div><button id="gpsBtn">GPS</button><button id="compassBtn">CAP</button></header>
 <main class="main">
 <section class="panel left">
 <div class="card"><div class="label">TOTAL km</div><div id="total" class="value totalValue">0.00</div><div class="corr"><button id="totalMinus">−10m</button><button id="totalZero">0</button><button id="totalPlus">＋10m</button></div></div>

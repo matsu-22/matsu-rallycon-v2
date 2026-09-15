@@ -1,2 +1,2 @@
-Matsu RallyCon v0.7
-A4/A5 PDF auto-detect, A5 KomaRen auto-parse, verified A4/A5 switching and PDF target-centering
+Matsu RallyCon v0.7.1 DEV
+TOTAL / LEG / SPEED / TARGET / NEXT centered for real-world visibility testing; all other v0.7 behavior unchanged.
