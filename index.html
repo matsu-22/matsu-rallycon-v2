@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="ja"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<title>Matsu RallyCon v0.8.0 UNIVERSAL PDF</title>
+<title>Matsu RallyCon v0.8.3 UNIVERSAL PDF</title>
 <link rel="manifest" href="manifest.webmanifest">
 <style>
 :root{--bg:#0d1117;--panel:#161b22;--line:#30363d;--text:#f0f6fc;--muted:#8b949e;--accent:#58a6ff;--warn:#f2cc60}
@@ -49,7 +49,7 @@ button{font:inherit;color:inherit;background:#21262d;border:1px solid #484f58;bo
 @media (max-width:1100px){.card:nth-child(2) .value,.card.compact .value,.nextbox .rbval{font-size:clamp(34px,5.8vh,46px)}}
 </style></head><body>
 <div id="app">
-<header class="top"><div class="brand">Matsu RallyCon v0.8.2 UNIVERSAL PDF</div><div class="clock"><span id="clockTime" class="clockTime">--:--</span></div><div id="status" class="status">準備中</div><button id="gpsBtn">GPS</button><button id="compassBtn">CAP</button></header>
+<header class="top"><div class="brand">Matsu RallyCon v0.8.3 UNIVERSAL PDF</div><div class="clock"><span id="clockTime" class="clockTime">--:--</span></div><div id="status" class="status">準備中</div><button id="gpsBtn">GPS</button><button id="compassBtn">CAP</button></header>
 <main class="main">
 <section class="panel left">
 <div class="card"><div class="label">TOTAL km</div><div id="total" class="value totalValue">0.00</div><div class="corr"><button id="totalMinus">−10m</button><button id="totalZero">0</button><button id="totalPlus">＋10m</button></div></div>
@@ -233,12 +233,12 @@ let RALLY_FORMAT="A4";
 let ROUTE=A4_ROUTE;
 let ROUTE_META={format:"A4",source:"KOMAREN_Classic2026.pdf",pages_total:20,roadbook_pages:39,rows:A4_ROUTE.length,derived_total_count:0};
 const $=id=>document.getElementById(id), clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
-let pdf=null,page=1,logicalPage=1,logicalCount=39,zoom=1,renderedZoom=1,fitScale=1,panX=0,panY=0,pdfStepRate=100.0;
+let pdf=null,page=1,logicalPage=1,logicalCount=39,zoom=1,renderedZoom=1,fitScale=1,panX=0,panY=0,pdfStepRate=100.0,pdfViewLayout='single',pdfViewPages=[];
 let pendingPdfBuffer=null,pendingPdfName='';
 let gpsDistance=0,gpsRawDistance=0,totalZeroBase=0,totalOffset=0,legBase=0,legOffset=0,lastTs=null,timerStart=null,elapsedMs=0,running=false,stageStarted=false,autoNext=true,rb=0;
 const AUTO_NEXT_TRIGGER_M=0;
 const SESSION_KEY='matsu-rallycon-session-v0651-a5dev';
-const APP_VERSION='0.8.2-UNIVERSAL-PDF';
+const APP_VERSION='0.8.3-UNIVERSAL-PDF';
 const A5_DEV_LABEL='A4/A5 AUTO + UNIVERSAL PDF DISPLAY: A5 KomaRen parser + fallback PDF viewer';
 const LEGACY_SESSION_VERSIONS=new Set(['0.6.38','0.6.39','0.6.40','0.6.41','0.6.42','0.6.43','0.6.44','0.6.45','0.6.46','0.6.47','0.6.48','0.6.49','0.7.1','0.7.2-GPS-DEV','0.7.2-GPS-DEV2','0.7.3-LONG-PDF','0.7.5-UNIVERSAL-PDF','0.7.6-UNIVERSAL-PDF','0.7.7-UNIVERSAL-PDF','0.7.8-UNIVERSAL-PDF','0.7.9-UNIVERSAL-PDF','0.8.0-UNIVERSAL-PDF','0.8.1-UNIVERSAL-PDF']);
 let wakeLock=null, suppressSessionSave=false;
@@ -305,7 +305,7 @@ const ROADBOOK_ROW_CENTER_X_PT=[481.595,398.39,315.925,233.46,151.205,68.7];
 function syncLegToTarget(){const t=getTotalKm();const target=Number(ROUTE[rb]?.dist)||0;const desired=Math.max(0,t-target);legOffset=0;legBase=gpsDistance-desired}
 function setRB(i,doAuto=true){const prevRb=rb;rb=clamp(i,0,ROUTE.length-1);const e=ROUTE[rb];if(rb>prevRb&&stageStarted)syncLegToTarget();$('rbNo').textContent=e.no;$('target').textContent=fmtKm(e.dist);const token=++targetCenterToken;const renderPromise=syncLogical(false);Promise.resolve(renderPromise).then(()=>{if(token===targetCenterToken)centerTargetInView()});display(doAuto)}
 function logicalFromRB(){return Math.max(1,Number(ROUTE[rb]?.logicalPage)||1)}
-function mapping(lp){if(RALLY_FORMAT==='A5'){const i=clamp((Number(lp)||1)-1,0,Math.max(0,ROUTE.length-1));const e=ROUTE[Math.min(i*6,ROUTE.length-1)]||ROUTE[0];return {pdf:Number(e?.pdfPage)||Math.max(2,(Number(lp)||1)+1),side:'full'}}if(RALLY_FORMAT==='LONGPDF'||RALLY_FORMAT==='PDFVIEW')return {pdf:clamp(Number(lp)||1,1,pdf?.numPages||1),side:'full'};if(lp===1)return {pdf:1,side:'right'};return {pdf:Math.floor(lp/2)+1,side:lp%2===0?'left':'right'}}
+function mapping(lp){if(RALLY_FORMAT==='A5'){const i=clamp((Number(lp)||1)-1,0,Math.max(0,ROUTE.length-1));const e=ROUTE[Math.min(i*6,ROUTE.length-1)]||ROUTE[0];return {pdf:Number(e?.pdfPage)||Math.max(2,(Number(lp)||1)+1),side:'full'}}if(RALLY_FORMAT==='LONGPDF')return {pdf:clamp(Number(lp)||1,1,pdf?.numPages||1),side:'full'};if(RALLY_FORMAT==='PDFVIEW'){if(pdfViewLayout==='twoUp'&&pdfViewPages.length){return pdfViewPages[clamp((Number(lp)||1)-1,0,pdfViewPages.length-1)]}return {pdf:clamp(Number(lp)||1,1,pdf?.numPages||1),side:'full'}}if(lp===1)return {pdf:1,side:'right'};return {pdf:Math.floor(lp/2)+1,side:lp%2===0?'left':'right'}}
 function targetRowIndex(){if(RALLY_FORMAT==='A5')return Math.max(0,Number(ROUTE[rb]?.row||1)-1);return rb<6?rb:(rb-6)%6}
 function centerTargetInView(){
  const st=$('stage'),c=$('pdfCanvas');
@@ -363,8 +363,8 @@ function clampPan(){
 }
 function applyPan(){clampPan();const k=zoom/Math.max(.001,renderedZoom);$('canvasWrap').style.transform=`translate3d(${panX}px,${panY}px,0) scale(${k})`}
 function setZoom(z,fx=null,fy=null){const old=zoom;zoom=clamp(z,.5,4);if(fx!=null&&fy!=null&&old!==zoom){const st=$('stage'),cx=fx-st.clientWidth/2,cy=fy-st.clientHeight/2;panX=cx-(cx-panX)*(zoom/old);panY=cy-(cy-panY)*(zoom/old)}if(zoom<=1){panX=0;panY=0}applyPan();}
-function logicalCountForDocForFormat(doc,format){return doc?(format==='A5'?Math.max(1,ROUTE_META?.roadbook_pages||Math.floor(ROUTE.length/6)):(format==='LONGPDF'||format==='PDFVIEW')?doc.numPages:doc.numPages*2-1):39}
-function logicalCountForDoc(){return pdf?(RALLY_FORMAT==='A5'?Math.max(1,ROUTE_META?.roadbook_pages||Math.floor(ROUTE.length/6)):(RALLY_FORMAT==='LONGPDF'||RALLY_FORMAT==='PDFVIEW')?pdf.numPages:pdf.numPages*2-1):39}
+function logicalCountForDocForFormat(doc,format){return doc?(format==='A5'?Math.max(1,ROUTE_META?.roadbook_pages||Math.floor(ROUTE.length/6)):(format==='LONGPDF')?doc.numPages:(format==='PDFVIEW')?(pdfViewLayout==='twoUp'?pdfViewPages.length:doc.numPages):doc.numPages*2-1):39}
+function logicalCountForDoc(){return pdf?(RALLY_FORMAT==='A5'?Math.max(1,ROUTE_META?.roadbook_pages||Math.floor(ROUTE.length/6)):(RALLY_FORMAT==='LONGPDF')?pdf.numPages:(RALLY_FORMAT==='PDFVIEW')?(pdfViewLayout==='twoUp'?pdfViewPages.length:pdf.numPages):pdf.numPages*2-1):39}
 function syncLogical(resetPan=true){const lp=logicalFromRB();if(lp!==logicalPage){logicalPage=lp;page=mapping(lp).pdf;if(resetPan){panX=0;panY=0}return renderPage()}return Promise.resolve()}
 async function renderPage(){
  if(!pdf)return;
@@ -375,7 +375,8 @@ async function renderPage(){
  const availW=Math.max(120,stage.clientWidth-6);
  const availH=Math.max(120,stage.clientHeight-6);
  const baseW=base.width, baseH=base.height;
- fitScale=(RALLY_FORMAT==='A5'||RALLY_FORMAT==='LONGPDF'||RALLY_FORMAT==='PDFVIEW') ? (availW/baseW) : availW/(baseW/2);
+ const pdfViewTwoUp=RALLY_FORMAT==='PDFVIEW'&&pdfViewLayout==='twoUp';
+ fitScale=(RALLY_FORMAT==='A5'||RALLY_FORMAT==='LONGPDF'||(RALLY_FORMAT==='PDFVIEW'&&!pdfViewTwoUp)) ? (availW/baseW) : availW/(baseW/2);
  const fullScale=fitScale;
  const fullVp=p.getViewport({scale:fullScale,rotation:p.rotate||0});
  const off=document.createElement('canvas');
@@ -392,7 +393,7 @@ async function renderPage(){
  await p.render({canvasContext:octx,viewport:fullVp}).promise;
  const c=$('pdfCanvas');
  const fullH=off.height;
- if(RALLY_FORMAT==='A5'||RALLY_FORMAT==='LONGPDF'||RALLY_FORMAT==='PDFVIEW'){
+ if(RALLY_FORMAT==='A5'||RALLY_FORMAT==='LONGPDF'||(RALLY_FORMAT==='PDFVIEW'&&!pdfViewTwoUp)){
    c.width=off.width; c.height=off.height;
    c.style.width=(off.width/scaleD)+'px'; c.style.height=(off.height/scaleD)+'px';
    const ctx=c.getContext('2d'); ctx.setTransform(1,0,0,1,0,0); ctx.clearRect(0,0,off.width,off.height);
@@ -407,6 +408,39 @@ async function renderPage(){
  }
  renderedZoom=zoom;panX=0;panY=0;applyPan();
  ;
+}
+async function detectPdfTwoUpLayout(doc){
+  if(!doc||doc.numPages<2)return {twoUp:false,pages:[]};
+  const p1=await doc.getPage(1);
+  const raw=p1.getViewport({scale:1,rotation:0});
+  const shortSide=Math.min(raw.width,raw.height),longSide=Math.max(raw.width,raw.height);
+  const isLandscapeA4=Math.abs(shortSide-595.28)<12&&Math.abs(longSide-841.89)<18;
+  if(!isLandscapeA4)return {twoUp:false,pages:[]};
+  const sideInfo=[];
+  const n=Math.min(doc.numPages,3);
+  for(let i=1;i<=n;i++){
+    const pg=await doc.getPage(i);
+    const vp=pg.getViewport({scale:1,rotation:0});
+    const items=(await pg.getTextContent()).items||[];
+    let left='',right='';
+    const mid=vp.width/2;
+    for(const it of items){
+      const x=Number(it.transform?.[4])||0;
+      const txt=String(it.str||'').trim();
+      if(!txt)continue;
+      if(x<mid)left+=' '+txt; else right+=' '+txt;
+    }
+    const score=t=>((t.match(/\d+\.\d+/g)||[]).length)+(t.includes('KM-Total')?8:0)+(t.includes('Designation')?4:0)+(t.includes('東京横断ツーリング')?3:0);
+    sideInfo.push({left,right,ls:score(left),rs:score(right)});
+  }
+  const both=sideInfo.filter(x=>x.ls>=5&&x.rs>=5).length;
+  const firstRightOnly=sideInfo[0]?.ls<5&&sideInfo[0]?.rs>=8;
+  if(!(both>=1&&sideInfo.length>=2))return {twoUp:false,pages:[]};
+  const pages=[];
+  if(firstRightOnly)pages.push({pdf:1,side:'right'});
+  else {pages.push({pdf:1,side:'left'},{pdf:1,side:'right'});}
+  for(let i=2;i<=doc.numPages;i++){pages.push({pdf:i,side:'left'},{pdf:i,side:'right'});}
+  return {twoUp:true,pages};
 }
 async function detectPdfFormat(doc,name=''){
   const p=await doc.getPage(1);
@@ -438,10 +472,12 @@ async function detectPdfFormat(doc,name=''){
   return 'PDFVIEW';
 }
 async function loadBytes(buf,name,preserveSession=false,mode='AUTO'){
+  pdfViewLayout='single';pdfViewPages=[];
   let doc;
   try{doc=await pdfjsLib.getDocument({data:buf}).promise;}catch(err){setStatus('PDF LOAD ERROR: '+(err?.message||err));console.error(err);return false;}
   try{
     const detected=mode==='PDFVIEW'?'PDFVIEW':await detectPdfFormat(doc,name);
+    const twoUpInfo=(detected==='PDFVIEW'||detected==='LONGPDF')?await detectPdfTwoUpLayout(doc):{twoUp:false,pages:[]};
     if(mode==='KOMA'){
       const p=await doc.getPage(1);
       const raw=p.getViewport({scale:1,rotation:0});
@@ -473,18 +509,22 @@ async function loadBytes(buf,name,preserveSession=false,mode='AUTO'){
         }
         // In AUTO mode, an unsupported A5 layout falls back to display-only.
         RALLY_FORMAT='PDFVIEW';
+        pdfViewLayout=twoUpInfo.twoUp?'twoUp':'single';
+        pdfViewPages=twoUpInfo.pages;
         ROUTE=[{no:1,dist:0,inter:0,page:1,logicalPage:1,side:'full',pdfPage:1,row:1,rowCenterRatio:0.5,total_source:'none'}];
         ROUTE_META={format:'PDFVIEW',source:name,pages_total:doc.numPages,roadbook_pages:doc.numPages,rows:0,derived_total_count:0,parseFallback:'A5 parser rejected layout'};
-        logicalCount=doc.numPages;
-        setStatus(`PDF DISPLAY / ${doc.numPages} page / 距離パースなし`);
+        logicalCount=pdfViewLayout==='twoUp'?pdfViewPages.length:doc.numPages;
+        setStatus(`PDF DISPLAY / ${pdfViewLayout==='twoUp'?pdfViewPages.length+'面 / 2面表示':doc.numPages+' page'} / 距離パースなし`);
         console.warn('A5 parser rejected layout; using PDF display fallback.',a5err);
       }
     }else if(detected==='LONGPDF'||detected==='PDFVIEW'){
       RALLY_FORMAT=detected;
+      pdfViewLayout=detected==='PDFVIEW'&&twoUpInfo.twoUp?'twoUp':'single';
+      pdfViewPages=twoUpInfo.pages;
       ROUTE=[{no:1,dist:0,inter:0,page:1,logicalPage:1,side:'full',pdfPage:1,row:1,rowCenterRatio:0.5,total_source:'none'}];
       ROUTE_META={format:detected,source:name,pages_total:doc.numPages,roadbook_pages:doc.numPages,rows:0,derived_total_count:0};
-      logicalCount=doc.numPages;
-      setStatus(`${detected==='LONGPDF'?'LONG PDF':'PDF DISPLAY'} / ${doc.numPages} page / 距離パースなし`);
+      logicalCount=(detected==='PDFVIEW'&&pdfViewLayout==='twoUp')?pdfViewPages.length:doc.numPages;
+      setStatus(`${detected==='LONGPDF'?'LONG PDF':'PDF DISPLAY'} / ${detected==='PDFVIEW'&&pdfViewLayout==='twoUp'?pdfViewPages.length+'面 / 2面表示':doc.numPages+' page'} / 距離パースなし`);
     }else{
       RALLY_FORMAT='A4';
       ROUTE=A4_ROUTE;
