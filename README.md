@@ -1,7 +1,8 @@
-# Matsu RallyCon v0.7.8 UNIVERSAL PDF
+# Matsu RallyCon v0.7.9 UNIVERSAL PDF
 
-v0.7.7実走確認版ベース。
+v0.7.8ベース。
 - 時刻のみ（HH:MM）を中央表示、日付削除
 - 特殊PDF送り量30.0～200.0%、0.1%刻み
+- PDF送り量の±長押しは保持時間に応じて0.1→0.2→0.5→1.0→2.0%/回へ段階的に高速化
 - NEXT/BACKでコマ送り、スワイプは任意位置へ自由移動
 - A4/A5解析、GPS機能、GPS補正長押し等を維持

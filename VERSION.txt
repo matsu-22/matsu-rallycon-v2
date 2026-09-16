@@ -1,3 +1,3 @@
-Matsu RallyCon v0.7.8 UNIVERSAL PDF
+Matsu RallyCon v0.7.9 UNIVERSAL PDF
 
-v0.7.7実走確認版をベースに、日付なし中央時刻表示と特殊PDF送り量0.1%刻みを追加。
+v0.7.8ベース。特殊PDFの送り量長押し速度を保持時間に応じて段階的に高速化。
