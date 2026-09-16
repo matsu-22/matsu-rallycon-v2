@@ -1,4 +1,5 @@
-Matsu RallyCon v0.8.8 UNIVERSAL PDF
+Matsu RallyCon
+Version: v0.8.9 UNIVERSAL PDF
 
-PDF表示モードに「上半分タップ＝NEXT／下半分タップ＝BACK」を追加。
-スワイプ・ピンチズーム・ダブルタップズームは従来動作を維持。
+Bluetooth MediaSession remote prototype:
+NEXT / BACK media commands are bridged to the existing RallyCon NEXT / BACK navigation.
