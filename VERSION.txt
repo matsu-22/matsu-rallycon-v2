@@ -1,2 +1,5 @@
-Matsu RallyCon v0.7.2 GPS DEV2
-GPS distance correction 50-150% in 1% steps; GPS button long-press opens correction settings, short press keeps GPS ON/OFF
+Matsu RallyCon v0.7.5 UNIVERSAL PDF
+
+GPS距離補正の％上下ボタンに長押し連続変更を追加。
+通常タップは従来どおり±1%。長押しすると連続して±1%ずつ変更し、一定時間後はさらに高速化。
+v0.7.4 UNIVERSAL PDFの特殊PDFフォールバック機能と既存GPS機能を維持。
