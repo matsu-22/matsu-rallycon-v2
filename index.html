@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="ja"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<title>Matsu RallyCon v0.8.7 UNIVERSAL PDF</title>
+<title>Matsu RallyCon v0.8.8 UNIVERSAL PDF</title>
 <link rel="manifest" href="manifest.webmanifest">
 <style>
 :root{--bg:#0d1117;--panel:#161b22;--line:#30363d;--text:#f0f6fc;--muted:#8b949e;--accent:#58a6ff;--warn:#f2cc60}
@@ -49,7 +49,7 @@ button{font:inherit;color:inherit;background:#21262d;border:1px solid #484f58;bo
 @media (max-width:1100px){.card:nth-child(2) .value,.card.compact .value,.nextbox .rbval{font-size:clamp(34px,5.8vh,46px)}}
 </style></head><body>
 <div id="app">
-<header class="top"><div class="brand">Matsu RallyCon v0.8.7 UNIVERSAL PDF</div><div class="clock"><span id="clockTime" class="clockTime">--:--</span></div><div id="status" class="status">準備中</div><button id="gpsBtn">GPS</button><button id="compassBtn">CAP</button></header>
+<header class="top"><div class="brand">Matsu RallyCon v0.8.8 UNIVERSAL PDF</div><div class="clock"><span id="clockTime" class="clockTime">--:--</span></div><div id="status" class="status">準備中</div><button id="gpsBtn">GPS</button><button id="compassBtn">CAP</button></header>
 <main class="main">
 <section class="panel left">
 <div class="card"><div class="label">TOTAL km</div><div id="total" class="value totalValue">0.00</div><div class="corr"><button id="totalMinus">−10m</button><button id="totalZero">0</button><button id="totalPlus">＋10m</button></div></div>
@@ -238,7 +238,7 @@ let pendingPdfBuffer=null,pendingPdfName='';
 let gpsDistance=0,gpsRawDistance=0,totalZeroBase=0,totalOffset=0,legBase=0,legOffset=0,lastTs=null,timerStart=null,elapsedMs=0,running=false,stageStarted=false,autoNext=true,rb=0;
 const AUTO_NEXT_TRIGGER_M=0;
 const SESSION_KEY='matsu-rallycon-session-v0651-a5dev';
-const APP_VERSION='0.8.7-UNIVERSAL-PDF';
+const APP_VERSION='0.8.8-UNIVERSAL-PDF';
 const A5_DEV_LABEL='A4/A5 AUTO + UNIVERSAL PDF DISPLAY: A5 KomaRen parser + fallback PDF viewer';
 const LEGACY_SESSION_VERSIONS=new Set(['0.6.38','0.6.39','0.6.40','0.6.41','0.6.42','0.6.43','0.6.44','0.6.45','0.6.46','0.6.47','0.6.48','0.6.49','0.7.1','0.7.2-GPS-DEV','0.7.2-GPS-DEV2','0.7.3-LONG-PDF','0.7.5-UNIVERSAL-PDF','0.7.6-UNIVERSAL-PDF','0.7.7-UNIVERSAL-PDF','0.7.8-UNIVERSAL-PDF','0.7.9-UNIVERSAL-PDF','0.8.0-UNIVERSAL-PDF','0.8.1-UNIVERSAL-PDF']);
 let wakeLock=null, suppressSessionSave=false;
@@ -1009,8 +1009,42 @@ $('compassBtn').onclick=async()=>{
 };
 window.addEventListener('orientationchange',()=>{if(compassOn)setStatus('CAP ON')});
 const stage=$('stage');
+// PDF tap navigation is deliberately isolated from the existing gesture code.
+// A tap is recognized only when the pointer barely moves; swipes and pinches
+// therefore remain ordinary PDF navigation. A short delay also lets a second
+// tap arrive first, preserving the existing double-tap zoom behavior.
+let pdfTapTimer=null,pdfTapCandidate=null,pdfLastTapTime=0,pdfLastTapX=0,pdfLastTapY=0,pdfTapIsDouble=false;
+function cancelPdfTapTimer(){if(pdfTapTimer){clearTimeout(pdfTapTimer);pdfTapTimer=null}}
+function schedulePdfTap(x,y){
+  if(!isFallbackPdf())return;
+  const now=performance.now();
+  const isDouble=(now-pdfLastTapTime<300&&Math.hypot(x-pdfLastTapX,y-pdfLastTapY)<28);
+  if(isDouble){cancelPdfTapTimer();pdfTapIsDouble=true;pdfLastTapTime=0;return}
+  pdfLastTapTime=now;pdfLastTapX=x;pdfLastTapY=y;pdfTapIsDouble=false;
+  cancelPdfTapTimer();
+  pdfTapTimer=setTimeout(()=>{
+    pdfTapTimer=null;
+    if(pdfTapIsDouble||!isFallbackPdf())return;
+    const rect=stage.getBoundingClientRect();
+    const localY=y-rect.top;
+    const direction=localY<rect.height/2?-1:1;
+    pdfMoveDisplayUnit(direction);
+    pdfLastTapTime=0;
+  },320);
+}
 stage.addEventListener('pointerdown',e=>{
   if(e.target.closest('button'))return;
+  if(isFallbackPdf()&&pointers.size===0){
+    const now=performance.now();
+    if(now-pdfLastTapTime<300&&Math.hypot(e.clientX-pdfLastTapX,e.clientY-pdfLastTapY)<28){
+      cancelPdfTapTimer();pdfTapIsDouble=true;pdfLastTapTime=0;
+    }else{
+      pdfTapIsDouble=false;
+    }
+    pdfTapCandidate={pointerId:e.pointerId,x:e.clientX,y:e.clientY,moved:false};
+  }else if(isFallbackPdf()){
+    cancelPdfTapTimer();pdfTapCandidate=null;pdfTapIsDouble=false;
+  }
   stage.setPointerCapture?.(e.pointerId);
   pointers.set(e.pointerId,{x:e.clientX,y:e.clientY,startX:e.clientX,startY:e.clientY});
   gestureMoved=false;
@@ -1019,6 +1053,9 @@ stage.addEventListener('pointerdown',e=>{
 stage.addEventListener('pointermove',e=>{
   const prev=pointers.get(e.pointerId); if(!prev)return;
   const item={...prev,x:e.clientX,y:e.clientY}; pointers.set(e.pointerId,item); gestureMoved=true;
+  if(pdfTapCandidate&&pdfTapCandidate.pointerId===e.pointerId&&Math.hypot(e.clientX-pdfTapCandidate.x,e.clientY-pdfTapCandidate.y)>8){
+    pdfTapCandidate.moved=true;cancelPdfTapTimer();
+  }
   if(pointers.size===1){
     // Fallback PDFs always retain normal free panning by swipe.
     // NEXT / BACK buttons are the dedicated one-step controls.
@@ -1030,11 +1067,15 @@ stage.addEventListener('pointermove',e=>{
   }
 });
 function end(e){
+  const candidate=pdfTapCandidate&&pdfTapCandidate.pointerId===e.pointerId?pdfTapCandidate:null;
+  if(candidate&&!candidate.moved&&pointers.size===1&&!pdfTapIsDouble&&isFallbackPdf())schedulePdfTap(e.clientX,e.clientY);
+  if(candidate)pdfTapCandidate=null;
   pointers.delete(e.pointerId);if(pointers.size<2)pinchStartDist=0
 }
-stage.addEventListener('pointerup',end);stage.addEventListener('pointercancel',end);
+function cancelEnd(e){cancelPdfTapTimer();pdfTapCandidate=null;pdfTapIsDouble=false;pointers.delete(e.pointerId);if(pointers.size<2)pinchStartDist=0}
+stage.addEventListener('pointerup',end);stage.addEventListener('pointercancel',cancelEnd);
 stage.addEventListener('wheel',e=>{e.preventDefault();setZoom(zoom*(e.deltaY<0?1.15:.87),e.clientX,e.clientY)},{passive:false});
-stage.addEventListener('dblclick',e=>{setZoom(zoom>1?1:2,e.clientX,e.clientY)});
+stage.addEventListener('dblclick',e=>{cancelPdfTapTimer();pdfTapIsDouble=false;pdfLastTapTime=0;setZoom(zoom>1?1:2,e.clientX,e.clientY)});
 function updateClock(){
   const d=new Date();
   $('clockTime').textContent=`${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
