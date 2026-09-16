@@ -1,4 +1,4 @@
-# Matsu RallyCon v0.8.6 UNIVERSAL PDF
+# Matsu RallyCon v0.8.7 UNIVERSAL PDF
 
 v0.8.5をベースに、PDFコマ送り量の直接入力機能を追加した版。
 
