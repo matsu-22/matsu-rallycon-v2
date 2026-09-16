@@ -233,12 +233,12 @@ let RALLY_FORMAT="A4";
 let ROUTE=A4_ROUTE;
 let ROUTE_META={format:"A4",source:"KOMAREN_Classic2026.pdf",pages_total:20,roadbook_pages:39,rows:A4_ROUTE.length,derived_total_count:0};
 const $=id=>document.getElementById(id), clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
-let pdf=null,page=1,logicalPage=1,logicalCount=39,zoom=1,renderedZoom=1,fitScale=1,panX=0,panY=0,pdfStepRate=100.0,pdfViewLayout='single',pdfViewPages=[];
+let pdf=null,page=1,logicalPage=1,logicalCount=39,zoom=1,renderedZoom=1,fitScale=1,panX=0,panY=0,pdfStepRate=100.0,pdfViewLayout='single',pdfViewPages=[],pdfPanHistory=new Map();
 let pendingPdfBuffer=null,pendingPdfName='';
 let gpsDistance=0,gpsRawDistance=0,totalZeroBase=0,totalOffset=0,legBase=0,legOffset=0,lastTs=null,timerStart=null,elapsedMs=0,running=false,stageStarted=false,autoNext=true,rb=0;
 const AUTO_NEXT_TRIGGER_M=0;
 const SESSION_KEY='matsu-rallycon-session-v0651-a5dev';
-const APP_VERSION='0.8.4-UNIVERSAL-PDF';
+const APP_VERSION='0.8.5-UNIVERSAL-PDF';
 const A5_DEV_LABEL='A4/A5 AUTO + UNIVERSAL PDF DISPLAY: A5 KomaRen parser + fallback PDF viewer';
 const LEGACY_SESSION_VERSIONS=new Set(['0.6.38','0.6.39','0.6.40','0.6.41','0.6.42','0.6.43','0.6.44','0.6.45','0.6.46','0.6.47','0.6.48','0.6.49','0.7.1','0.7.2-GPS-DEV','0.7.2-GPS-DEV2','0.7.3-LONG-PDF','0.7.5-UNIVERSAL-PDF','0.7.6-UNIVERSAL-PDF','0.7.7-UNIVERSAL-PDF','0.7.8-UNIVERSAL-PDF','0.7.9-UNIVERSAL-PDF','0.8.0-UNIVERSAL-PDF','0.8.1-UNIVERSAL-PDF']);
 let wakeLock=null, suppressSessionSave=false;
@@ -365,6 +365,7 @@ function applyPan(){clampPan();const k=zoom/Math.max(.001,renderedZoom);$('canva
 function setZoom(z,fx=null,fy=null){const old=zoom;zoom=clamp(z,.5,4);if(fx!=null&&fy!=null&&old!==zoom){const st=$('stage'),cx=fx-st.clientWidth/2,cy=fy-st.clientHeight/2;panX=cx-(cx-panX)*(zoom/old);panY=cy-(cy-panY)*(zoom/old)}if(zoom<=1){panX=0;panY=0}applyPan();}
 function logicalCountForDocForFormat(doc,format){return doc?(format==='A5'?Math.max(1,ROUTE_META?.roadbook_pages||Math.floor(ROUTE.length/6)):(format==='LONGPDF')?doc.numPages:(format==='PDFVIEW')?(pdfViewLayout==='twoUp'?pdfViewPages.length:doc.numPages):doc.numPages*2-1):39}
 function logicalCountForDoc(){return pdf?(RALLY_FORMAT==='A5'?Math.max(1,ROUTE_META?.roadbook_pages||Math.floor(ROUTE.length/6)):(RALLY_FORMAT==='LONGPDF')?pdf.numPages:(RALLY_FORMAT==='PDFVIEW')?(pdfViewLayout==='twoUp'?pdfViewPages.length:pdf.numPages):pdf.numPages*2-1):39}
+function rememberPdfPan(){if(isFallbackPdf()&&logicalPage>=1)pdfPanHistory.set(logicalPage,panY)}
 function syncLogical(resetPan=true){const lp=logicalFromRB();if(lp!==logicalPage){logicalPage=lp;page=mapping(lp).pdf;if(resetPan){panX=0;panY=0}return renderPage()}return Promise.resolve()}
 async function renderPage(){
  if(!pdf)return;
@@ -534,6 +535,7 @@ async function loadBytes(buf,name,preserveSession=false,mode='AUTO'){
     }
   }catch(err){setStatus('PDF PARSE ERROR: '+(err?.message||err));console.error(err);return false;}
   pdf=doc;
+  pdfPanHistory=new Map();
   logicalPage=1;page=1;rb=0;stageStarted=false;running=false;timerStart=null;elapsedMs=0;gpsLast=null;gpsDistance=0;gpsRawDistance=0;gpsDistanceRate=1;gpsCorrectionRate=100;$('gpsCorrValue').textContent='100%';totalZeroBase=0;totalOffset=0;legBase=0;legOffset=0;zoom=1;panX=0;panY=0;pdfStepRate=100;
   if(!preserveSession)clearSession();
   await releaseWakeLock();
@@ -541,7 +543,18 @@ async function loadBytes(buf,name,preserveSession=false,mode='AUTO'){
   $('startBtn').textContent='START';$('time').textContent='00:00:00';setRB(0,false);
   return true;
 }
-function moveLogical(d){logicalPage=clamp(logicalPage+d,1,logicalCount);page=mapping(logicalPage).pdf;zoom=1;panX=0;panY=0;renderPage()}
+async function moveLogical(d,restorePdfPan=false){
+  const target=clamp(logicalPage+d,1,logicalCount);
+  if(target===logicalPage)return false;
+  if(isFallbackPdf())rememberPdfPan();
+  logicalPage=target;page=mapping(logicalPage).pdf;zoom=1;panX=0;panY=0;
+  await renderPage();
+  if(restorePdfPan&&isFallbackPdf()&&pdfPanHistory.has(logicalPage)){
+    panY=pdfPanHistory.get(logicalPage);
+    applyPan();
+  }
+  return true;
+}
 function moveRB(d,doAuto=true){const next=clamp(rb+d,0,ROUTE.length-1);setRB(next,doAuto)}
 function openPdfLoadModal(name){$('pdfLoadName').textContent=name||'';const m=$('pdfLoadModal');m.classList.add('open');m.setAttribute('aria-hidden','false')}
 function closePdfLoadModal(){const m=$('pdfLoadModal');m.classList.remove('open');m.setAttribute('aria-hidden','true');pendingPdfBuffer=null;pendingPdfName=''}
@@ -562,12 +575,16 @@ function pdfScrollStep(direction){
 }
 function pdfMoveDisplayUnit(direction){
   if(!isFallbackPdf())return false;
-  const beforeLogical=logicalPage;
   const moved=pdfScrollStep(direction);
-  if(moved)return true;
-  const target=clamp(logicalPage+(direction<0?1:-1),1,logicalCount);
+  if(moved){rememberPdfPan();return true}
+  const delta=direction<0?1:-1;
+  const target=clamp(logicalPage+delta,1,logicalCount);
   if(target===logicalPage)return false;
-  moveLogical(direction<0?1:-1);
+  // When crossing a page/display-unit boundary, remember the exact position
+  // reached on the page we are leaving. Returning across the boundary restores
+  // that position instead of jumping to the previous page's top.
+  rememberPdfPan();
+  moveLogical(delta,true);
   return true;
 }
 $('backBtn').onclick=()=>{if(isFallbackPdf())pdfMoveDisplayUnit(1);else moveRB(-1)};
@@ -990,7 +1007,7 @@ stage.addEventListener('pointermove',e=>{
   if(pointers.size===1){
     // Fallback PDFs always retain normal free panning by swipe.
     // NEXT / BACK buttons are the dedicated one-step controls.
-    panX+=e.clientX-stage._lastX;panY+=e.clientY-stage._lastY;stage._lastX=e.clientX;stage._lastY=e.clientY;applyPan()
+    panX+=e.clientX-stage._lastX;panY+=e.clientY-stage._lastY;stage._lastX=e.clientX;stage._lastY=e.clientY;applyPan();rememberPdfPan()
   }else if(pointers.size===2){
     const a=[...pointers.values()];const d=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);
     if(!pinchStartDist){pinchStartDist=d;pinchStartZoom=zoom}
