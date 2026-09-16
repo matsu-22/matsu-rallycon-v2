@@ -1,5 +1,3 @@
 Matsu RallyCon
-Version: v0.8.9 UNIVERSAL PDF
-
-Bluetooth MediaSession remote prototype:
-NEXT / BACK media commands are bridged to the existing RallyCon NEXT / BACK navigation.
+v0.8.11
+UNIVERSAL PDF + Bluetooth左右TOTAL補正
