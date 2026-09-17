@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="ja"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<title>Matsu RallyCon v0.8.24 UNIVERSAL PDF + A5 RALLY VIEW</title>
+<title>Matsu RallyCon v0.8.28 UNIVERSAL PDF + A5 RALLY VIEW</title>
 <link rel="manifest" href="manifest.webmanifest">
 <style>
 :root{--bg:#0d1117;--panel:#161b22;--line:#30363d;--text:#f0f6fc;--muted:#8b949e;--accent:#58a6ff;--warn:#f2cc60}
@@ -70,7 +70,7 @@ button{font:inherit;color:inherit;background:#21262d;border:1px solid #484f58;bo
 @media (orientation:portrait){.portraitRallyView.active .portraitRallyStack{padding-bottom:calc(26px + env(safe-area-inset-bottom))}}
 </style></head><body>
 <div id="app">
-<header class="top"><div class="brand">Matsu RallyCon <span class="brandVersion">v0.8.24 UNIVERSAL PDF + A5 RALLY VIEW</span></div><div class="clock"><span id="clockTime" class="clockTime">--:--</span></div><div id="status" class="status">準備中</div><button id="gpsBtn">GPS</button><button id="compassBtn">CAP</button></header>
+<header class="top"><div class="brand">Matsu RallyCon <span class="brandVersion">v0.8.28 UNIVERSAL PDF + A5 RALLY VIEW</span></div><div class="clock"><span id="clockTime" class="clockTime">--:--</span></div><div id="status" class="status">準備中</div><button id="gpsBtn">GPS</button><button id="compassBtn">CAP</button></header>
 <main class="main">
 <section class="panel left">
 <div class="card"><div class="label">TOTAL km</div><div id="total" class="value totalValue">0.00</div><div class="corr"><button id="totalMinus">−10m</button><button id="totalZero">0</button><button id="totalPlus">＋10m</button></div></div>
@@ -266,11 +266,12 @@ let ROUTE=A4_ROUTE;
 let ROUTE_META={format:"A4",source:"KOMAREN_Classic2026.pdf",pages_total:20,roadbook_pages:39,rows:A4_ROUTE.length,derived_total_count:0};
 const $=id=>document.getElementById(id), clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 let pdf=null,page=1,logicalPage=1,logicalCount=39,zoom=1,renderedZoom=1,fitScale=1,panX=0,panY=0,pdfStepRate=100.0,portraitPdfStepCorrection=100.0,pdfViewLayout='single',pdfViewPages=[],pdfPanHistory=new Map();
+let pdfContinuousTimer=null,pdfContinuousRAF=null,pdfContinuousDirection=0,pdfContinuousStartedAt=0,pdfContinuousLastTs=0,pdfContinuousTriggered=false,pdfContinuousSuppressClick=false,pdfContinuousPageChanging=false;
 let pendingPdfBuffer=null,pendingPdfName='';
 let gpsDistance=0,gpsRawDistance=0,totalZeroBase=0,totalOffset=0,legBase=0,legOffset=0,lastTs=null,timerStart=null,elapsedMs=0,running=false,stageStarted=false,autoNext=true,rb=0;
 const AUTO_NEXT_TRIGGER_M=0;
 const SESSION_KEY='matsu-rallycon-session-v0651-a5dev';
-const APP_VERSION='0.8.24-UNIVERSAL-PDF-A5-RALLY-VIEW';
+const APP_VERSION='0.8.28-UNIVERSAL-PDF-A5-RALLY-VIEW';
 const A5_DEV_LABEL='A4/A5 AUTO + UNIVERSAL PDF DISPLAY: A5 KomaRen parser + fallback PDF viewer';
 const LEGACY_SESSION_VERSIONS=new Set(['0.6.38','0.6.39','0.6.40','0.6.41','0.6.42','0.6.43','0.6.44','0.6.45','0.6.46','0.6.47','0.6.48','0.6.49','0.7.1','0.7.2-GPS-DEV','0.7.2-GPS-DEV2','0.7.3-LONG-PDF','0.7.5-UNIVERSAL-PDF','0.7.6-UNIVERSAL-PDF','0.7.7-UNIVERSAL-PDF','0.7.8-UNIVERSAL-PDF','0.7.9-UNIVERSAL-PDF','0.8.0-UNIVERSAL-PDF','0.8.1-UNIVERSAL-PDF']);
 let wakeLock=null, suppressSessionSave=false;
@@ -589,6 +590,22 @@ async function moveLogical(d,restorePdfPan=false){
   }
   return true;
 }
+async function moveLogicalContinuous(d){
+  const target=clamp(logicalPage+d,1,logicalCount);
+  if(target===logicalPage)return false;
+  if(isFallbackPdf())rememberPdfPan();
+  logicalPage=target;page=mapping(logicalPage).pdf;zoom=1;panX=0;panY=0;
+  await renderPage();
+  // Continuous map-winder behavior: when NEXT crosses to the next page,
+  // enter at that page's top; when BACK crosses to the previous page,
+  // enter at that page's bottom so the motion feels continuous instead of
+  // jumping to the previous page's top.
+  const b=panBounds();
+  panY=d>0?b.maxY:b.minY;
+  applyPan();
+  rememberPdfPan();
+  return true;
+}
 function moveRB(d,doAuto=true){const next=clamp(rb+d,0,ROUTE.length-1);setRB(next,doAuto)}
 function openPdfLoadModal(name){$('pdfLoadName').textContent=name||'';const m=$('pdfLoadModal');m.classList.add('open');m.setAttribute('aria-hidden','false')}
 function closePdfLoadModal(){const m=$('pdfLoadModal');m.classList.remove('open');m.setAttribute('aria-hidden','true');pendingPdfBuffer=null;pendingPdfName=''}
@@ -631,15 +648,124 @@ $('nextBtn').onclick=()=>{
 };
 $('autoBtn').onclick=()=>{autoNext=!autoNext;$('autoBtn').textContent='AUTO: '+(autoNext?'ON':'OFF')};
 let pdfStepHoldTimer=null,pdfStepHoldTriggered=false,pdfStepSuppressClick=false;
+function isPdfContinuousEligible(){
+  // Prototype v0.8.25: continuous “map-winder” scrolling is limited to
+  // fallback PDF display mode. Recognized KomaRen navigation remains untouched.
+  return isFallbackPdf() && stageStarted && running;
+}
+function continuousPdfSpeed(elapsedMs){
+  // v0.8.27: slow the prototype down another step for a gentler electric
+  // map-holder feel. Keep the same gradual acceleration shape.
+  const t=Math.min(1,Math.max(0,elapsedMs)/1500);
+  return 55 + 105*t; // px/s: 55 -> 160
+}
+function stopPdfContinuousScroll(){
+  if(pdfContinuousTimer){clearTimeout(pdfContinuousTimer);pdfContinuousTimer=null}
+  if(pdfContinuousRAF){cancelAnimationFrame(pdfContinuousRAF);pdfContinuousRAF=null}
+  pdfContinuousDirection=0;pdfContinuousStartedAt=0;pdfContinuousLastTs=0;pdfContinuousPageChanging=false;
+}
+function applyPdfContinuousFrame(ts){
+  if(!pdfContinuousDirection||!isPdfContinuousEligible()){stopPdfContinuousScroll();return}
+  if(!pdfContinuousLastTs)pdfContinuousLastTs=ts;
+  const dt=Math.min(.05,Math.max(0,(ts-pdfContinuousLastTs)/1000));
+  pdfContinuousLastTs=ts;
+  const speed=continuousPdfSpeed(ts-pdfContinuousStartedAt);
+  const d=pdfContinuousDirection*speed*dt;
+  if(isPortraitFallback()&&portraitFallbackReady){
+    const st=$('portraitRallyScroll');
+    if(st){
+      const before=st.scrollTop;
+      st.scrollTop=Math.max(0,Math.min(st.scrollHeight-st.clientHeight,before+d));
+      // Connected portrait pages form one continuous strip; no logical-page jump is needed.
+    }
+  }else{
+    // Landscape fallback PDFs scroll inside the existing stage/canvas.
+    // NEXT moves the page upward (panY decreases); BACK moves it downward.
+    // When BACK crosses a page boundary, enter the previous page at its
+    // bottom edge. This prevents the previous-page TOP jump seen in v0.8.27
+    // and keeps the electric map-holder feeling continuous.
+    if(!pdfContinuousPageChanging){
+      const before=panY;
+      const requested=-d;
+      panY+=requested;
+      applyPan();
+      const actual=panY-before;
+      const hitEdge=Math.abs(actual-requested)>0.01;
+      if(hitEdge){
+        const pageDelta=pdfContinuousDirection>0?1:-1;
+        const target=clamp(logicalPage+pageDelta,1,logicalCount);
+        if(target!==logicalPage){
+          pdfContinuousPageChanging=true;
+          moveLogicalContinuous(pageDelta).catch(err=>console.error('continuous PDF page change failed',err)).finally(()=>{pdfContinuousPageChanging=false});
+        }
+      }else rememberPdfPan();
+    }
+  }
+  pdfContinuousRAF=requestAnimationFrame(applyPdfContinuousFrame);
+}
+function startPdfContinuousScroll(direction){
+  if(!isPdfContinuousEligible())return false;
+  stopPdfContinuousScroll();
+  pdfContinuousDirection=direction;
+  pdfContinuousTriggered=true;
+  pdfContinuousSuppressClick=true;
+  pdfContinuousStartedAt=performance.now();
+  pdfContinuousLastTs=0;
+  pdfContinuousRAF=requestAnimationFrame(applyPdfContinuousFrame);
+  setStatus('PDF 巻き取り '+(direction>0?'NEXT':'BACK'));
+  return true;
+}
 $('nextBtn').addEventListener('contextmenu',e=>e.preventDefault());
-$('nextBtn').addEventListener('pointerdown',e=>{if(!isFallbackPdf())return;e.preventDefault();pdfStepHoldTriggered=false;pdfStepSuppressClick=false;clearTimeout(pdfStepHoldTimer);try{$('nextBtn').setPointerCapture?.(e.pointerId)}catch(err){};pdfStepHoldTimer=setTimeout(()=>{pdfStepHoldTriggered=true;pdfStepSuppressClick=true;openPdfStepModal()},700)});
-$('nextBtn').addEventListener('pointerup',e=>{if(!isFallbackPdf())return;e.preventDefault();clearTimeout(pdfStepHoldTimer);if(pdfStepHoldTriggered)e.stopPropagation()});
-$('nextBtn').addEventListener('pointercancel',()=>{clearTimeout(pdfStepHoldTimer);pdfStepHoldTriggered=false;pdfStepSuppressClick=false});
-const _nextClickHandler=$('nextBtn').onclick;
+function armPdfStepOrContinuous(btn,direction){
+  // Bind once at startup; the PDF mode may be selected later by the load modal.
+  btn.addEventListener('pointerdown',e=>{
+    if(!isFallbackPdf())return;
+    e.preventDefault();
+    pdfStepHoldTriggered=false;pdfStepSuppressClick=false;
+    stopPdfContinuousScroll();
+    try{btn.setPointerCapture?.(e.pointerId)}catch(err){}
+    if(stageStarted&&running){
+      // During a run, long press is the electric map-holder motion.
+      pdfStepHoldTimer=setTimeout(()=>{
+        pdfStepHoldTriggered=true;
+        startPdfContinuousScroll(direction);
+      },450);
+    }else{
+      // Before START, preserve the existing 0.7 s settings long press.
+      pdfStepHoldTimer=setTimeout(()=>{
+        pdfStepHoldTriggered=true;
+        pdfStepSuppressClick=true;
+        openPdfStepModal();
+      },700);
+    }
+  });
+  btn.addEventListener('pointerup',e=>{
+    if(!isFallbackPdf())return;
+    e.preventDefault();
+    clearTimeout(pdfStepHoldTimer);pdfStepHoldTimer=null;
+    if(pdfContinuousDirection){stopPdfContinuousScroll();e.stopPropagation();setTimeout(()=>{pdfContinuousSuppressClick=false},0)}
+    if(pdfStepHoldTriggered)e.stopPropagation();
+  });
+  btn.addEventListener('pointercancel',()=>{
+    clearTimeout(pdfStepHoldTimer);pdfStepHoldTimer=null;
+    stopPdfContinuousScroll();pdfStepHoldTriggered=false;pdfStepSuppressClick=false;
+  });
+  btn.addEventListener('lostpointercapture',()=>{
+    clearTimeout(pdfStepHoldTimer);pdfStepHoldTimer=null;
+    stopPdfContinuousScroll();pdfStepHoldTriggered=false;pdfStepSuppressClick=false;
+  });
+}
+armPdfStepOrContinuous($('backBtn'),-1);
+armPdfStepOrContinuous($('nextBtn'),1);
 $('nextBtn').onclick=()=>{
-  if(pdfStepSuppressClick){pdfStepSuppressClick=false;pdfStepHoldTriggered=false;return}
+  if(pdfStepSuppressClick||pdfContinuousSuppressClick){pdfStepSuppressClick=false;pdfContinuousSuppressClick=false;pdfStepHoldTriggered=false;return}
   if(isPortraitFallback()&&portraitFallbackReady){portraitFallbackScrollStep(1);return}
   if(isFallbackPdf())pdfMoveDisplayUnit(-1);else moveRB(1)
+};
+$('backBtn').onclick=()=>{
+  if(pdfStepSuppressClick||pdfContinuousSuppressClick){pdfStepSuppressClick=false;pdfContinuousSuppressClick=false;pdfStepHoldTriggered=false;return}
+  if(isPortraitFallback()&&portraitFallbackReady){portraitFallbackScrollStep(-1);return}
+  if(isFallbackPdf())pdfMoveDisplayUnit(1);else moveRB(-1)
 };
 function adjustTotal(delta){totalOffset+=delta;display();checkAutoNext()}
 function zeroTotal(){totalZeroBase=gpsDistance;totalOffset=0;display();checkAutoNext()}
