@@ -1,3 +1,4 @@
 Matsu RallyCon
-v0.8.28
-UNIVERSAL PDF + A5 RALLY VIEW / 電動マップホルダー風連続スクロール
+v0.8.29
+UNIVERSAL PDF + A5 RALLY VIEW
+横画面・縦画面の常時バージョン表示を非表示化
