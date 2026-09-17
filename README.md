@@ -1,25 +1,36 @@
-# Matsu RallyCon v0.8.11
+# Matsu RallyCon v0.8.13
 
-UNIVERSAL PDF版 + Bluetooth左右TOTAL補正
+UNIVERSAL PDF + GPS LOST復帰補正
 
-## 今回の変更
-- v0.8.11でBluetoothリモコン左右の動作を変更。
-- リモコン右（NEXT）→ TOTAL ＋10m。
-- リモコン左（BACK）→ TOTAL −10m。
-- リモコン左右ではPDFスライド／RB NEXT/BACKを行わず、画面上のTOTAL「＋10m／−10m」と同じ補正処理を実行。
-- v0.8.9～v0.8.10で実機確認済みのBluetooth NEXT/BACK受信基盤を継続利用し、v0.8.11で左右の割り当てをTOTAL補正へ変更。
-- iPhone SafariのMediaSessionを利用し、BluetoothメディアリモコンのNEXT/BACK受信をTOTAL補正へ接続。
-- リモコン右（NEXT）→ TOTAL ＋10m、リモコン左（BACK）→ TOTAL −10m。
-- PDFのスライド移動、認識済みロードブックのNEXT/BACKは、画面上のNEXT/BACK操作を使用。
-- v0.8.8のPDFタップNEXT/BACK、スワイプ、ピンチ、ダブルタップズーム、ページ境界位置復元を維持。
-
-## 実機確認
-- v0.8.10まで：ユーザー所有のBluetoothメディアリモコン＋iPhoneでNEXT/BACK受信を確認済み。
-- v0.8.11：左右＝TOTAL ±10mへの変更はコード／静的検証済み。iPhone実機での変更後テストは未実施。
-
-## 現時点の制限
-- VOL+/VOL−はiOSのシステム側の音量／カメラ操作として扱われ、Safari Webページへの入力として確認できないため、v0.8.11でも割り当てない。
-- FULL native iOS appではなく、既存のWebアプリを維持したMediaSession方式。
+## v0.8.13変更点
+- GPSがLOSTした時点の最後の正常GPS座標を「LOST基準点」として保持。
+- GPS LOST中は距離を推定加算しない。
+- GPS復帰時、LOST基準点から最初の正常復帰座標までの直線距離を1回だけ加算。
+- 復帰後は、その復帰座標を新しいGPS基準点として通常の距離計算へ戻る。
+- 復帰までが10分を超える場合は安全のため距離補正を行わず、復帰座標へ再アンカー。
+- GPS復帰時の異常なジャンプ（推定180km/h超）は距離加算せず、LOST状態を維持。
+- GPSのSPEED表示が0になること自体はGPS LOST判定に使用しない。GPS測位の有効性とSPEED表示を分離。
+- バックグラウンド復帰・GPS ON/OFF・START/STOP・ラリーリセット時にもLOST基準点を適切に初期化。
 
 ## 既存機能
-GPS、TOTAL/LEG、AUTO NEXT、セッション保存、START長押しリセット、A4/A5コマ図、A4 2-up PDF、未知PDFフォールバック、PDFコマ送り量設定などは従来どおり。
+- TOTAL / LEG / SPEED / TIME
+- GPS ON/OFF、GPS距離補正50～150%
+- TOTAL / LEG直接入力・±10m補正
+- AUTO NEXT
+- セッション保存・復元
+- A5コマ練解析
+- A4コマ図解析
+- 未知形式PDFのPDF表示モード
+- PDF固定送り量20～200%、0.1%刻み、直接入力
+- PDFスワイプ・ピンチ・ダブルタップ・ページ位置復元
+- 埋め込みA4 PDF
+
+## v0.8.13検証
+- HTML内のJavaScript 3ブロックを抽出し `node --check` で構文確認。
+- v0.8.12との差分を確認し、GPS LOST/復帰処理以外の意図しない変更がないことを確認。
+- GPS状態遷移の独立テストで、正常→LOST→復帰時の1回だけの距離補正、LOST中の距離停止、異常ジャンプ、10分超の再アンカーを確認。
+- ZIP整合性確認済み。
+- iPhone実走テストはこの版では未実施。実走ではトンネル等での挙動を確認してください。
+
+## 注意
+GPS復帰時の補正距離は、最後の正常GPS地点と復帰地点の直線距離です。トンネル内で道路が大きく曲がる場合など、実際の走行距離との差が残る可能性があります。
