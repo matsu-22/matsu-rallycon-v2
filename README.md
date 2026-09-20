@@ -1,3 +1,19 @@
+# Matsu RallyCon v0.8.43
+UNIVERSAL PDF + A5 RALLY VIEW / 逆走リカバリーモード
+
+## v0.8.43 REV表示の最終配置調整
+- v0.8.42を基準に、右下のAUTO/REV操作列だけを5px上へ移動。下部フッターとの干渉を避ける。
+- REV戻り距離の表示位置・サイズはv0.8.42を維持。
+- REV開始直後の戻り距離表示を「−0.00」ではなく「0.00」とし、0.005km未満は0.00表示。実際に戻った場合は「−0.01」のように表示する。
+- 逆走距離計算、TOTAL減算、AUTO NEXT停止、RB/コマ図の自動復帰なし、GPS処理は変更しない。
+- A5中央表示位置、PDF、その他の既存UI・操作は変更しない。
+
+### v0.8.43 検証
+- v0.8.42を基準に、REV表示更新式、REV/AUTO配置CSS、title/APP_VERSION/VERSION.txt/READMEのバージョン表記のみ変更。
+- 埋め込みA5 PDFデータがv0.8.42と一致することを確認。
+- 逆走処理本体（距離計算・TOTAL減算・AUTO NEXT停止・GPS処理）の差分がないことを確認。
+- JavaScript構文チェック、ZIP整合性、ファイル構成を確認。
+
 # Matsu RallyCon v0.8.42
 UNIVERSAL PDF + A5 RALLY VIEW / 逆走リカバリーモード
 
