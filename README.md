@@ -1,3 +1,18 @@
+# Matsu RallyCon v0.8.39
+UNIVERSAL PDF + A5 RALLY VIEW / 電動マップホルダー風連続スクロール試作
+
+## v0.8.39 A5コマ練：中央下寄せのパン上限を修正
+- v0.8.38の表示位置設定（全コマ10px下、1コマ目のみ追加5px下）は変更しない。
+- `panBounds()` 側にも同じ下方向補正量を反映し、`clampPan()` によって補正量が削られないよう修正。
+- 1コマ目は合計15px下、2～6コマ目は10px下を実際に許容する。
+- PDF、距離解析、RB判定、NEXT/BACK、AUTO NEXT、GPS、その他UIは変更しない。
+
+### v0.8.39 検証
+- v0.8.38との差分はA5 `panBounds()` の下方向補正許容処理とバージョン表記のみ。
+- `centerTargetInView()` の表示位置ロジックは変更なし。
+- 埋め込みPDFデータは不変。
+- HTML / VERSION.txt / READMEのバージョンをv0.8.39へ統一。
+
 # Matsu RallyCon v0.8.38
 UNIVERSAL PDF + A5 RALLY VIEW / 電動マップホルダー風連続スクロール試作
 
