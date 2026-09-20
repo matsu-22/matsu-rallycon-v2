@@ -1,5 +1,24 @@
-# Matsu RallyCon v0.8.39
-UNIVERSAL PDF + A5 RALLY VIEW / 電動マップホルダー風連続スクロール試作
+# Matsu RallyCon v0.8.40
+UNIVERSAL PDF + A5 RALLY VIEW / 逆走リカバリーモード
+
+## v0.8.40 逆走モード（REV）
+- v0.8.39を基準に、通常走行時のGPS距離計算・コマ進行を維持。
+- 走行中かつGPS ONのときだけREVを手動でON/OFFできる。
+- REV ON中は、GPSで実際に移動した距離を補正率適用後にTOTALから減算する。
+- REV ON中の減算距離を「REV 戻り距離」として別表示する。
+- コマ図のRBは自動では戻さない。AUTO NEXTもREV中は停止する。
+- ライダーが実際に戻った地点を確認した後、既存のBACK操作で必要なコマへ戻す。
+- REV OFF後は、その時点のTOTALから通常のGPS距離加算へ復帰する。
+- REVを使用しない通常走行では、従来のGPS距離処理・AUTO NEXT・コマ図進行に影響しない。
+
+### v0.8.40 検証
+- v0.8.39をベースに逆走処理を独立追加。A5中央表示、PDF解析、PDF表示、NEXT/BACK、GPS補正、通常AUTO NEXTの既存ロジックは変更しない。
+- REV中のGPS通常区間とGPS LOST復帰区間の両方で距離を減算する処理を確認。
+- REV中はAUTO NEXTが動作しないことを確認。
+- REV OFF時に通常加算へ復帰することを確認。
+- 埋め込みPDFは変更しない。
+- HTML / VERSION.txt / READMEのバージョンをv0.8.40へ統一。
+
 
 ## v0.8.39 A5コマ練：中央下寄せのパン上限を修正
 - v0.8.38の表示位置設定（全コマ10px下、1コマ目のみ追加5px下）は変更しない。
