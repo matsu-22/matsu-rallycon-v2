@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="ja"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<title>Matsu RallyCon v0.8.36 UNIVERSAL PDF + A5 RALLY VIEW</title>
+<title>Matsu RallyCon v0.8.37 UNIVERSAL PDF + A5 RALLY VIEW</title>
 <link rel="manifest" href="manifest.webmanifest">
 <style>
 :root{--bg:#0d1117;--panel:#161b22;--line:#30363d;--text:#f0f6fc;--muted:#8b949e;--accent:#58a6ff;--warn:#f2cc60}
@@ -383,7 +383,10 @@ function centerTargetInView(){
    const rect=c.getBoundingClientRect();
    const targetScreenY=rect.top+rect.height*ratio;
    const stageCenterY=stageRect.top+stageRect.height/2;
-   const desiredShift=stageCenterY-targetScreenY;
+   // v0.8.37: place the active A5 roadbook row slightly below the exact
+   // vertical center for a more natural riding-view position.
+   const CENTER_DOWN_PX=10;
+   const desiredShift=(stageCenterY+CENTER_DOWN_PX)-targetScreenY;
    if(Math.abs(desiredShift)>0.25){panY+=desiredShift;applyPan();}
    return;
  }

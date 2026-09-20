@@ -1,3 +1,18 @@
+# Matsu RallyCon v0.8.37
+UNIVERSAL PDF + A5 RALLY VIEW / 電動マップホルダー風連続スクロール試作
+
+## v0.8.37 A5コマ練：中央表示を少し下へ調整
+- v0.8.36を完全な基準として、A5コマ練の現在RB中央表示位置だけを調整。
+- 現在RBの基準位置を画面中央から **10px下** へ移動。
+- PDF、倍率、距離解析、RB判定、NEXT/BACK、AUTO NEXT、GPS、PDF表示モード、連続スクロール等は変更しない。
+- v0.8.36で追加したページ端の中央化許容処理も維持。
+
+### v0.8.37 検証
+- v0.8.36からの変更をA5 `centerTargetInView()` の表示Y位置1箇所に限定。
+- HTML / VERSION.txt / READMEのバージョン表記をv0.8.37へ更新。
+- JavaScript構文チェックを実施。
+- ZIP再作成後に内容と差分を確認。
+
 # Matsu RallyCon v0.8.36
 UNIVERSAL PDF + A5 RALLY VIEW / 電動マップホルダー風連続スクロール試作
 
