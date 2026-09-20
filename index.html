@@ -33,11 +33,10 @@ button{font:inherit;color:inherit;background:#21262d;border:1px solid #484f58;bo
 
 /* v0.6.18: right navigation fully visible above footer */
 .right{grid-template-rows:auto auto auto minmax(0,1fr) auto;gap:5px;padding-bottom:3px}
-.nav{gap:5px}
-.nav button{height:34px}
-.auto{height:42px}
-.nav button{height:36px}
-.auto{height:42px}
+.nav{gap:5px;grid-template-columns:minmax(0,1fr) 78px}
+.nav button{height:42px}
+.auto{grid-column:auto;height:42px}
+.reverseBtn{height:42px}
 
 /* v0.6.29: preserve 60% PDF area; reclaim only internal side-panel space */
 .panel{padding:5px}
@@ -293,7 +292,7 @@ let gpsDistance=0,gpsRawDistance=0,totalZeroBase=0,totalOffset=0,legBase=0,legOf
 let reverseMode=false,reverseDistanceKm=0;
 const AUTO_NEXT_TRIGGER_M=0;
 const SESSION_KEY='matsu-rallycon-session-v0651-a5dev';
-const APP_VERSION='0.8.40-UNIVERSAL-PDF-A5-RALLY-VIEW';
+const APP_VERSION='0.8.41-UNIVERSAL-PDF-A5-RALLY-VIEW';
 const A5_DEV_LABEL='A4/A5 AUTO + UNIVERSAL PDF DISPLAY: A5 KomaRen parser + fallback PDF viewer';
 const LEGACY_SESSION_VERSIONS=new Set(['0.6.38','0.6.39','0.6.40','0.6.41','0.6.42','0.6.43','0.6.44','0.6.45','0.6.46','0.6.47','0.6.48','0.6.49','0.7.1','0.7.2-GPS-DEV','0.7.2-GPS-DEV2','0.7.3-LONG-PDF','0.7.5-UNIVERSAL-PDF','0.7.6-UNIVERSAL-PDF','0.7.7-UNIVERSAL-PDF','0.7.8-UNIVERSAL-PDF','0.7.9-UNIVERSAL-PDF','0.8.0-UNIVERSAL-PDF','0.8.1-UNIVERSAL-PDF']);
 let wakeLock=null, suppressSessionSave=false;

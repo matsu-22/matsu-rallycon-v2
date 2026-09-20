@@ -1,3 +1,19 @@
+# Matsu RallyCon v0.8.41
+UNIVERSAL PDF + A5 RALLY VIEW / 逆走リカバリーモード
+
+## v0.8.41 REVボタン配置調整
+- v0.8.40の逆走機能・GPS処理・TOTAL/REV戻り距離・RB/コマ図・AUTO NEXTの動作は変更しない。
+- 右側パネル下部のAUTOとREVを同一行に横並び配置。
+- AUTOを主ボタンとして広く確保し、REVは頻繁に使わない補助機能として幅78pxに限定。
+- REVが下部フッターに隠れないよう、右側パネル内のナビゲーション領域だけを調整。
+- 横画面の既存レイアウト、A5中央表示、PDF、GPS、その他の操作は変更しない。
+
+### v0.8.41 検証
+- v0.8.40のindex.htmlを基準に、REV/AUTO配置用CSSとバージョン表記のみ変更。
+- 逆走処理のJavaScript本体は変更しない。
+- 埋め込みPDFデータは変更しない。
+- HTML / VERSION.txt / READMEのバージョンをv0.8.41へ統一。
+
 # Matsu RallyCon v0.8.40
 UNIVERSAL PDF + A5 RALLY VIEW / 逆走リカバリーモード
 
