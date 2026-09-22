@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="ja"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<title>Matsu RallyCon v0.8.44 UNIVERSAL PDF + A5 RALLY VIEW</title>
+<title>Matsu RallyCon v0.8.45 UNIVERSAL PDF + A5 RALLY VIEW</title>
 <link rel="manifest" href="manifest.webmanifest">
 <style>
 :root{--bg:#0d1117;--panel:#161b22;--line:#30363d;--text:#f0f6fc;--muted:#8b949e;--accent:#58a6ff;--warn:#f2cc60}
@@ -90,7 +90,7 @@ button{font:inherit;color:inherit;background:#21262d;border:1px solid #484f58;bo
 @media (orientation:portrait){.portraitRallyView.active .portraitRallyStack{padding-bottom:calc(26px + env(safe-area-inset-bottom))}}
 </style></head><body>
 <div id="app">
-<header class="top"><div class="brand">Matsu RallyCon <span class="brandVersion">v0.8.44 UNIVERSAL PDF + A5 RALLY VIEW</span></div><div class="clock"><span id="clockTime" class="clockTime">--:--</span></div><div id="status" class="status">準備中</div><button id="gpsBtn">GPS</button><button id="compassBtn">CAP</button></header>
+<header class="top"><div class="brand">Matsu RallyCon <span class="brandVersion">v0.8.45 UNIVERSAL PDF + A5 RALLY VIEW</span></div><div class="clock"><span id="clockTime" class="clockTime">--:--</span></div><div id="status" class="status">準備中</div><button id="gpsBtn">GPS</button><button id="compassBtn">CAP</button></header>
 <main class="main">
 <section class="panel left">
 <div class="card"><div class="label">TOTAL km</div><div id="total" class="value totalValue">0.00</div><div class="corr"><button id="totalMinus">−10m</button><button id="totalZero">0</button><button id="totalPlus">＋10m</button></div></div>
@@ -292,7 +292,7 @@ let gpsDistance=0,gpsRawDistance=0,totalZeroBase=0,totalOffset=0,legBase=0,legOf
 let reverseMode=false,reverseDistanceKm=0;
 const AUTO_NEXT_TRIGGER_M=0;
 const SESSION_KEY='matsu-rallycon-session-v0651-a5dev';
-const APP_VERSION='0.8.44-UNIVERSAL-PDF-A5-RALLY-VIEW';
+const APP_VERSION='0.8.45-UNIVERSAL-PDF-A5-RALLY-VIEW';
 const A5_DEV_LABEL='A4/A5 AUTO + UNIVERSAL PDF DISPLAY: A5 KomaRen parser + fallback PDF viewer';
 const LEGACY_SESSION_VERSIONS=new Set(['0.6.38','0.6.39','0.6.40','0.6.41','0.6.42','0.6.43','0.6.44','0.6.45','0.6.46','0.6.47','0.6.48','0.6.49','0.7.1','0.7.2-GPS-DEV','0.7.2-GPS-DEV2','0.7.3-LONG-PDF','0.7.5-UNIVERSAL-PDF','0.7.6-UNIVERSAL-PDF','0.7.7-UNIVERSAL-PDF','0.7.8-UNIVERSAL-PDF','0.7.9-UNIVERSAL-PDF','0.8.0-UNIVERSAL-PDF','0.8.1-UNIVERSAL-PDF']);
 let wakeLock=null, suppressSessionSave=false;
@@ -920,49 +920,66 @@ bindHoldInput('total',setTotalDirect);
 bindHoldInput('leg',setLegDirect);
 bindHoldReset('totalZero',zeroTotal,700,true);
 bindHoldReset('legZero',zeroLeg,700,false);
-// v0.8.44: portrait TOTAL distance frame is the only touch area for
-// distance correction in portrait mode.  Left/right tap = -/+10 m.
-// Long press on the numeric TOTAL value = immediate reset, no confirmation.
+// v0.8.45: portrait TOTAL distance frame remains the only touch area for
+// distance correction. Left/right zones = -/+10 m per tap and continuous
+// adjustment while held. The center zone is reserved for long-press reset.
+// Keeping the reset zone centered prevents overlap with the +/- touch zones.
 // The handler is isolated to the HUD frame so PDF touch/scroll is untouched.
 (function bindPortraitTotalDistance(){
-  const box=$('portraitTotalBox'), value=$('portraitTotal');
-  if(!box||!value)return;
-  let timer=null, holding=false, suppressTap=false, startX=0, pointerId=null;
+  const box=$('portraitTotalBox');
+  if(!box)return;
+  const ADJUST_HOLD_MS=550;
+  const RESET_HOLD_MS=700;
+  const REPEAT_MS=300;
+  const CENTER_RATIO=0.40; // center 40% = reset zone; left/right 30% each
+  let timer=null,interval=null,zone='',holding=false,suppressTap=false,holdStarted=0,pointerId=null;
   const stop=()=>{
-    clearTimeout(timer);timer=null;
-    pointerId=null;
+    clearTimeout(timer);clearInterval(interval);
+    timer=null;interval=null;holdStarted=0;pointerId=null;
+  };
+  const zoneAt=(clientX)=>{
+    const rect=box.getBoundingClientRect();
+    const x=Math.max(0,Math.min(rect.width,clientX-rect.left));
+    const centerStart=rect.width*(1-CENTER_RATIO)/2;
+    const centerEnd=rect.width*(1+CENTER_RATIO)/2;
+    if(x<centerStart)return'left';
+    if(x>centerEnd)return'right';
+    return'center';
   };
   box.addEventListener('contextmenu',e=>e.preventDefault());
   box.addEventListener('pointerdown',e=>{
     if(!window.matchMedia?.('(orientation: portrait)').matches)return;
     e.preventDefault();e.stopPropagation();
-    holding=false;suppressTap=false;startX=e.clientX;pointerId=e.pointerId;
+    stop();holding=false;suppressTap=false;zone=zoneAt(e.clientX);pointerId=e.pointerId;
     try{box.setPointerCapture?.(e.pointerId)}catch(err){}
-    // Only the numeric TOTAL itself arms the reset long-press.
-    if(e.target===value || value.contains(e.target)){
-      timer=setTimeout(()=>{
-        holding=true;suppressTap=true;
+    const holdMs=zone==='center'?RESET_HOLD_MS:ADJUST_HOLD_MS;
+    timer=setTimeout(()=>{
+      holding=true;suppressTap=true;holdStarted=performance.now();
+      if(zone==='center'){
         zeroTotal();
-      },700);
-    }
+        return;
+      }
+      const direction=zone==='left'?-1:1;
+      interval=setInterval(()=>adjustTotal(direction*holdAdjustStep(performance.now()-holdStarted)),REPEAT_MS);
+    },holdMs);
   });
   box.addEventListener('pointerup',e=>{
     if(!window.matchMedia?.('(orientation: portrait)').matches)return;
     e.preventDefault();e.stopPropagation();
-    const wasHolding=holding;
+    const wasHolding=holding,currentZone=zone;
     stop();
-    if(wasHolding){holding=false;return}
-    if(suppressTap){suppressTap=false;return}
-    const rect=box.getBoundingClientRect();
-    const delta=e.clientX < rect.left + rect.width/2 ? -0.01 : 0.01;
-    adjustTotal(delta);
+    if(wasHolding){holding=false;zone='';return}
+    if(suppressTap){suppressTap=false;zone='';return}
+    if(currentZone==='left')adjustTotal(-0.01);
+    else if(currentZone==='right')adjustTotal(0.01);
+    zone='';
   });
   box.addEventListener('pointercancel',e=>{
     e.preventDefault();e.stopPropagation();
-    stop();holding=false;suppressTap=false;
+    stop();holding=false;suppressTap=false;zone='';
   });
   box.addEventListener('lostpointercapture',()=>{
-    stop();holding=false;suppressTap=false;
+    stop();holding=false;suppressTap=false;zone='';
   });
 })();
 
