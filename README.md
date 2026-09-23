@@ -1,7 +1,7 @@
-# Matsu RallyCon v0.8.45
+# Matsu RallyCon v0.8.46
 UNIVERSAL PDF + A5 RALLY VIEW / 逆走リカバリーモード
 
-## v0.8.45 縦画面TOTAL距離操作の連続調整
+## v0.8.46 縦画面TOTAL距離操作の連続調整
 - v0.8.44を基準に、縦画面TOTAL距離表示枠のタッチ操作だけを調整。
 - 縦画面：TOTAL距離表示枠の左30%でタップすると−10m。
 - 縦画面：TOTAL距離表示枠の右30%でタップすると＋10m。
@@ -11,11 +11,11 @@ UNIVERSAL PDF + A5 RALLY VIEW / 逆走リカバリーモード
 - 縦画面の距離操作はTOTAL距離表示枠に限定し、PDF表示・スクロール操作には干渉しない。
 - 横画面のTOTAL/LEGリセット操作、GPS、REV、AUTO NEXT、コマ図/RB、PDF解析・表示、A5表示位置など既存機能は変更しない。
 
-### v0.8.45 検証
+### v0.8.46 検証
 - v0.8.44のindex.htmlを変更元として、縦画面TOTAL距離操作ブロックとバージョン表記以外を変更していないことを正規化比較で確認。
 - 変更前のv0.8.44 index.htmlへ差分を戻した場合、SHA-256が `fe8913536b182de7e1387d1c51870957eb60aff526a871d2b8bfe3e0eefad467` と完全一致。
 - JavaScript全3ブロックの構文チェックを確認。
-- VERSION.txt / README / HTMLのバージョンをv0.8.45へ統一。
+- VERSION.txt / README / HTMLのバージョンをv0.8.46へ統一。
 - 埋め込みPDF等の既存データは変更対象外。
 
 UNIVERSAL PDF + A5 RALLY VIEW / 逆走リカバリーモード
@@ -295,3 +295,11 @@ A5コマ練の連続スクロールは今回まだ対象外。既存のA5コマ�
 ・対象コード差分を確認
 ・JavaScript構文チェックを実施
 ・実機でのPDF読み込み確認は未実施
+
+
+## v0.8.46 BACKGROUND STATE RESTORE
+- Keeps rally state persistent when the Web app is backgrounded and later resumed.
+- Saves/restores PDF viewport state (zoom/pan and portrait fallback scroll position).
+- Accepts the v0.8.45 session format for migration.
+- Does not add background GPS processing.
+- Existing TOTAL/LEG/GPS/PDF/SmartRemote behavior is otherwise unchanged.
