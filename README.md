@@ -1,3 +1,31 @@
+# Matsu RallyCon v0.8.47 GPS BACKGROUND DIAGNOSTIC TEST
+
+## 目的
+- v0.8.46を完全な基準版として、iPhone Safari/WebKitのバックグラウンド→復帰時にGPSコールバックがどう動くかを観測する診断版。
+- GPS距離計算、GPS LOST判定、復帰距離補正、TOTAL/LEG計算そのものは変更しない。
+- 通常画面には診断UIを表示せず、上部STATUS表示を5回タップすると診断画面を開く。
+
+## 記録内容
+- visibilitychange / pageshow / pagehide
+- GPS watchPosition の開始・再ARM
+- watchPositionのGPSコールバック時刻、緯度、経度、accuracy、speed、前回コールバックからの間隔
+- 復帰時 getCurrentPosition の要求・成功・失敗
+- その時点のGPS状態、TOTAL、GPSサンプル数
+
+## テスト
+1. 通常走行でGPS ON・START。
+2. TOTALと走行状態を確認。
+3. iPhoneをバックグラウンドへ移行。
+4. 一定時間走行/移動。
+5. RallyConへ復帰。
+6. STATUSを5回タップして診断画面を開く。
+7. VISIBILITY → FOREGROUND → RESUME_FROM_BACKGROUND → GET_CURRENT_POSITION → GPS_CALLBACK の順序と時刻間隔を確認。
+
+## 注意
+- 本版は原因特定用であり、完成版ではない。
+- バックグラウンド中に取得されなかったGPS距離を推測・補完する処理は追加していない。
+- v0.8.46は変更せず、必ず別版として扱う。
+
 # Matsu RallyCon v0.8.46
 UNIVERSAL PDF + A5 RALLY VIEW / 逆走リカバリーモード
 
