@@ -292,7 +292,7 @@ let gpsDistance=0,gpsRawDistance=0,totalZeroBase=0,totalOffset=0,legBase=0,legOf
 let reverseMode=false,reverseDistanceKm=0;
 const AUTO_NEXT_TRIGGER_M=0;
 const SESSION_KEY='matsu-rallycon-session-v0651-a5dev';
-const APP_VERSION='0.8.46-BACKGROUND-STATE-RESTORE';
+const APP_VERSION='0.8.48-GPS-RESUME-WAKELOCK-TEST';
 const A5_DEV_LABEL='A4/A5 AUTO + UNIVERSAL PDF DISPLAY: A5 KomaRen parser + fallback PDF viewer';
 const LEGACY_SESSION_VERSIONS=new Set(['0.6.38','0.6.39','0.6.40','0.6.41','0.6.42','0.6.43','0.6.44','0.6.45','0.6.46','0.6.47','0.6.48','0.6.49','0.7.1','0.7.2-GPS-DEV','0.7.2-GPS-DEV2','0.7.3-LONG-PDF','0.7.5-UNIVERSAL-PDF','0.7.6-UNIVERSAL-PDF','0.7.7-UNIVERSAL-PDF','0.7.8-UNIVERSAL-PDF','0.7.9-UNIVERSAL-PDF','0.8.0-UNIVERSAL-PDF','0.8.1-UNIVERSAL-PDF']);
 let wakeLock=null, suppressSessionSave=false, restoredPortraitScrollTop=0;
@@ -358,7 +358,24 @@ async function resetRally(){
     clearSession();
   }
 }
-async function requestWakeLock(){try{if(!('wakeLock' in navigator)||wakeLock)return;wakeLock=await navigator.wakeLock.request('screen');wakeLock.addEventListener?.('release',()=>{wakeLock=null})}catch(e){wakeLock=null}}
+async function requestWakeLock(){
+  gpsDiagLog('WAKELOCK_REQUEST');
+  try{
+    if(!('wakeLock' in navigator)){gpsDiagLog('WAKELOCK_UNAVAILABLE');return}
+    if(wakeLock){gpsDiagLog('WAKELOCK_ALREADY_HELD');return}
+    const started=performance.now();
+    const requestPromise=navigator.wakeLock.request('screen');
+    wakeLock=await Promise.race([
+      requestPromise,
+      new Promise((_,reject)=>setTimeout(()=>reject(new Error('wakeLock timeout')),3000))
+    ]);
+    wakeLock.addEventListener?.('release',()=>{wakeLock=null;gpsDiagLog('WAKELOCK_RELEASED')});
+    gpsDiagLog('WAKELOCK_OK',`wait=${((performance.now()-started)/1000).toFixed(1)}s`);
+  }catch(e){
+    wakeLock=null;
+    gpsDiagLog('WAKELOCK_ERROR',String(e?.message||e));
+  }
+}
 async function releaseWakeLock(){try{await wakeLock?.release()}catch(e){}wakeLock=null}
 let targetCenterToken=0;
 const ROADBOOK_ROW_CENTER_X_PT=[481.595,398.39,315.925,233.46,151.205,68.7];
@@ -1819,7 +1836,10 @@ function restorePdfViewportState(){
 async function resumeFromBackground(){
   if(!running)return;
   gpsDiagLog('RESUME_FROM_BACKGROUND');
-  await requestWakeLock();
+  // Do not wait for Screen Wake Lock before requesting a fresh GPS fix.
+  // On iPhone/Safari the wake-lock promise can be delayed after a background interval;
+  // blocking here would delay the GPS recovery path.
+  requestWakeLock();
   resumeFixPending=true;
   restorePdfViewportState();
   recenterTargetAfterLayout();
@@ -1828,7 +1848,7 @@ async function resumeFromBackground(){
     gpsDiagLog('GET_CURRENT_POSITION_REQUEST');
     navigator.geolocation.getCurrentPosition(
       pos=>{gpsDiagLog('GET_CURRENT_POSITION_OK',`lat=${Number(pos.coords.latitude).toFixed(6)} lon=${Number(pos.coords.longitude).toFixed(6)} acc=${Number(pos.coords.accuracy).toFixed(1)}`);resumeFixPending=false;handleGpsPosition(pos);restorePdfViewportState();recenterTargetAfterLayout();},
-      ()=>{resumeFixPending=false;markGpsLost();restorePdfViewportState();recenterTargetAfterLayout();},
+      err=>{gpsDiagLog('GET_CURRENT_POSITION_ERROR',`code=${err?.code??'-'} msg=${String(err?.message||'')}`);resumeFixPending=false;markGpsLost();restorePdfViewportState();recenterTargetAfterLayout();},
       {enableHighAccuracy:true,maximumAge:0,timeout:10000}
     );
   }else{
