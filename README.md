@@ -1,21 +1,30 @@
-# Matsu RallyCon v0.8.48 GPS RESUME / WAKELOCK TEST
+# Matsu RallyCon v0.8.49 GPS RESUME ROBUST
 
 ## Purpose
-Based directly on the verified v0.8.47 diagnostic R2 build. This test isolates the iPhone foreground-resume path.
+Production candidate focused only on GPS recovery after iPhone/Safari foreground return. Built directly from v0.8.46 golden master.
 
-### Change in this version
-- Screen Wake Lock is requested asynchronously on resume instead of being awaited before GPS recovery.
-- Wake Lock request/result/error is logged. A 3-second diagnostic timeout prevents it from blocking the GPS path.
-- `getCurrentPosition()` request is issued immediately after resume. GPS error code/message is now logged.
-- Existing GPS distance calculation, LOST/recovery rules, PDF, UI, remote controls, and embedded PDF data are otherwise unchanged.
+## Changes
+- Removed the `await requestWakeLock()` dependency from `resumeFromBackground()`. Wake Lock is requested asynchronously and cannot delay GPS recovery.
+- On foreground resume while GPS is enabled, immediately marks GPS LOST so the first valid post-resume fix is handled by the existing LOST→recovery path.
+- Keeps `watchPosition` as the primary recovery path. `getCurrentPosition()` is only a helper and never blocks the watch.
+- Added a short resume de-duplication guard because `visibilitychange` and `pageshow` can both trigger around the same return.
+- Added a resume token so a late `getCurrentPosition()` result from an older resume cannot overwrite a newer recovery state.
 
-### Test
-1. GPS ON and START.
-2. Confirm TOTAL is running.
-3. Put iPhone in background for about 60-90 seconds.
-4. Return to RallyCon.
-5. Open diagnostics by tapping the top `Matsu RallyCon` title 5 times.
-6. Check whether `GET_CURRENT_POSITION_REQUEST` appears immediately after `RESUME_FROM_BACKGROUND`, and whether `GET_CURRENT_POSITION_OK` or `GET_CURRENT_POSITION_ERROR` follows.
-7. Also check `WAKELOCK_*` entries.
+## Intentionally unchanged
+- GPS distance calculation, correction rate, accuracy threshold, speed-jump rejection, and straight-line recovery calculation.
+- TOTAL / LEG / TARGET / NEXT / SPEED display.
+- PDF loading, embedded A5 PDF, viewport restore, rally navigation, AUTO, SmartRemote mappings.
+- Session save/restore data structure.
+- No estimated background distance is added.
 
-This is still a diagnostic/test build. Do not treat it as the production baseline until the resume behavior is verified.
+## Important finding carried forward
+Real iPhone/Safari tests showed normal ~1 s foreground callbacks, stopped callbacks in background, and delayed/inconsistent GPS callbacks after foreground return. v0.8.48 also showed that `getCurrentPosition()` can return immediately in some resumes but may remain pending while `watchPosition()` later resumes. Therefore no recovery path depends on `getCurrentPosition()` completing.
+
+## Page lifecycle note
+v0.8.46 contains both `visibilitychange` and `pageshow/pagehide` handlers. A diagnostic run also observed PAGEHIDE→BOOT→PAGESHOW(persisted=false), indicating a full page recreation/reload rather than a simple visibility transition. This candidate does not alter session restore semantics; that separate lifecycle behavior should be tested independently to avoid mixing two causes.
+
+## Verification
+- Built from the exact v0.8.46 index.html, not from a diagnostic build.
+- Embedded A5 PDF SHA-256: f1432c1e575478146e2b6035e2c23eb96b2686f13755a1b6589ac61ede207a39
+- v0.8.46 and v0.8.49 embedded PDF hashes are identical.
+- JS syntax checked with Node.js.
