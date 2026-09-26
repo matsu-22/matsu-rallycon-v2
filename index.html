@@ -292,7 +292,7 @@ let gpsDistance=0,gpsRawDistance=0,totalZeroBase=0,totalOffset=0,legBase=0,legOf
 let reverseMode=false,reverseDistanceKm=0;
 const AUTO_NEXT_TRIGGER_M=0;
 const SESSION_KEY='matsu-rallycon-session-v0651-a5dev';
-const APP_VERSION='0.8.49-GPS-RESUME-ROBUST';
+const APP_VERSION='0.8.50-PAGE-LIFECYCLE-DIAGNOSTIC';
 const A5_DEV_LABEL='A4/A5 AUTO + UNIVERSAL PDF DISPLAY: A5 KomaRen parser + fallback PDF viewer';
 const LEGACY_SESSION_VERSIONS=new Set(['0.6.38','0.6.39','0.6.40','0.6.41','0.6.42','0.6.43','0.6.44','0.6.45','0.6.46','0.6.47','0.6.48','0.6.49','0.7.1','0.7.2-GPS-DEV','0.7.2-GPS-DEV2','0.7.3-LONG-PDF','0.7.5-UNIVERSAL-PDF','0.7.6-UNIVERSAL-PDF','0.7.7-UNIVERSAL-PDF','0.7.8-UNIVERSAL-PDF','0.7.9-UNIVERSAL-PDF','0.8.0-UNIVERSAL-PDF','0.8.1-UNIVERSAL-PDF']);
 let wakeLock=null, suppressSessionSave=false, restoredPortraitScrollTop=0;
@@ -1907,5 +1907,76 @@ function embeddedA5Bytes(){
     console.error(e);
     setStatus('DEFAULT LOAD ERROR: '+(e?.message||e));
   }
+})();
+</script><script>
+/* v0.8.50 page-lifecycle diagnostic: no normal GPS/PDF/UI behavior changes. */
+(function(){
+  const KEY='matsu-rallycon-page-lifecycle-log-v1';
+  const MAX=80;
+  let taps=0, tapTimer=0;
+  function safeState(){
+    try{
+      return {
+        stageStarted:!!stageStarted,
+        running:!!running,
+        gpsUserEnabled:!!gpsUserEnabled,
+        gpsWatchActive:gpsWatchId!==null,
+        gpsLost:!!gpsLost,
+        gpsDistance:Number(gpsDistance)||0,
+        rb:Number(rb)||0,
+        logicalPage:Number(logicalPage)||0,
+        elapsedMs:Number(elapsedMs)||0
+      };
+    }catch(e){return {error:String(e)}}
+  }
+  function append(type,extra){
+    try{
+      const raw=localStorage.getItem(KEY);
+      const arr=raw?JSON.parse(raw):[];
+      arr.push({at:new Date().toISOString(),type,extra:extra||{},state:safeState()});
+      while(arr.length>MAX)arr.shift();
+      localStorage.setItem(KEY,JSON.stringify(arr));
+    }catch(e){}
+  }
+  function getLogs(){
+    try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){return[]}
+  }
+  function clearLogs(){try{localStorage.removeItem(KEY)}catch(e){}}
+  function show(){
+    let box=document.getElementById('lifecycleDiag');
+    if(!box){
+      box=document.createElement('div');
+      box.id='lifecycleDiag';
+      box.style.cssText='position:fixed;inset:20px;z-index:99999;background:#10151d;color:#fff;border:2px solid #657080;border-radius:14px;padding:14px;font:13px/1.4 monospace;display:flex;flex-direction:column;gap:8px;box-shadow:0 10px 40px rgba(0,0,0,.5);';
+      box.innerHTML='<div style="font:700 18px sans-serif">PAGE LIFECYCLE DIAGNOSTIC v0.8.50</div><div id="lifecycleSummary"></div><pre id="lifecycleLog" style="flex:1;overflow:auto;margin:0;white-space:pre-wrap"></pre><div style="display:flex;gap:8px"><button id="lifecycleClear" style="padding:10px">LOG CLEAR</button><button id="lifecycleClose" style="padding:10px">CLOSE</button></div>';
+      document.body.appendChild(box);
+      box.querySelector('#lifecycleClear').onclick=function(){clearLogs();render()};
+      box.querySelector('#lifecycleClose').onclick=function(){box.remove()};
+    }
+    function render(){
+      const nav=performance.getEntriesByType&&performance.getEntriesByType('navigation')[0];
+      const summary={navigationType:nav?.type||'unknown',referrer:document.referrer||'',visibility:document.visibilityState,sessionPresent:!!localStorage.getItem('matsu-rallycon-session-v0651-a5dev'),currentState:safeState()};
+      box.querySelector('#lifecycleSummary').textContent=JSON.stringify(summary,null,2);
+      box.querySelector('#lifecycleLog').textContent=getLogs().map((x,i)=>`${i+1}. ${x.at} ${x.type}\n   extra=${JSON.stringify(x.extra)}\n   state=${JSON.stringify(x.state)}`).join('\n');
+    }
+    render();
+  }
+  function tap(){
+    taps++;clearTimeout(tapTimer);tapTimer=setTimeout(()=>taps=0,1500);
+    if(taps>=5){taps=0;show()}
+  }
+  const brand=document.querySelector('.brand');
+  if(brand)brand.addEventListener('click',tap);
+
+  append('BOOT',{navigationType:(performance.getEntriesByType&&performance.getEntriesByType('navigation')[0]?.type)||'unknown',persisted:false});
+  window.addEventListener('pageshow',e=>append('PAGESHOW',{persisted:!!e.persisted,visibility:document.visibilityState}));
+  window.addEventListener('pagehide',e=>append('PAGEHIDE',{persisted:!!e.persisted,visibility:document.visibilityState}));
+  document.addEventListener('visibilitychange',()=>append('VISIBILITY',{state:document.visibilityState}));
+  window.addEventListener('beforeunload',()=>append('BEFOREUNLOAD',{}));
+  setTimeout(()=>{
+    let restored=false;
+    try{restored=!!localStorage.getItem('matsu-rallycon-session-v0651-a5dev')}catch(e){}
+    append('SESSION_PRESENT_AFTER_BOOT',{present:restored});
+  },0);
 })();
 </script></body></html>
