@@ -1,16 +1,19 @@
-# Matsu RallyCon v0.8.51 — KomaRen Kanto 2026 PDF replacement
+Matsu RallyCon v0.8.52 — KOMAREN KANTO 2026 KM-TOTAL FIX
 
-## Change
-- Replaced only the embedded/default A5 roadbook PDF with `【コマ図（A5）】コマ練関東2026.pdf`.
-- Updated the visible app/version labels to v0.8.51 so the delivered build is identifiable.
+基準：v0.8.51_KOMAREN_KANTO_2026_PDF_REPLACED
 
-## Intentionally unchanged
-- GPS distance calculation and v0.8.49 GPS resume logic.
-- v0.8.50 page-lifecycle diagnostic behavior and its persisted log.
-- TOTAL / LEG / TARGET / NEXT / SPEED, PDF viewport restore, rally navigation, AUTO, SmartRemote, and session save/restore logic.
-- The newly embedded PDF is the only replaced payload; no route parsing or GPS logic was intentionally changed.
+変更内容
+- 内蔵A5 PDF「コマ練関東2026」のRB85〜RB102で、元PDF上に「#####」と表示されていたKM-TOTALを累積距離で補完。
+- RB84のKM-TOTAL 218.69 kmを起点に、元PDFのKM-INTER値を順に加算し、KM-TOTAL欄に数値を表示。
+- PDFは23ページを維持。RB85〜RB102以外のページ内容は意図的に変更していません。
+- アプリのGPS計算、距離補正、セッション復元、ボタン配置、SmartRemote操作などの処理ロジックは変更していません。
 
-## Validation
-- Embedded PDF bytes checked against the supplied PDF by SHA-256.
-- JavaScript syntax checks should be run on all script blocks before use.
-- This is based on v0.8.50 PAGE LIFECYCLE DIAGNOSTIC and remains a diagnostic/test build, not a claim that background GPS limitations are fixed.
+検証
+- PDFページ数：23ページ
+- RB85〜RB102の18箇所すべてで「#####」を置換
+- 置換後PDFから各KM-TOTAL数値をテキスト抽出できることを確認
+- ZIP内は index.html と README.md
+- JavaScript構文検査は作成後に実施
+
+注意
+- 本版は内蔵PDFのKM-TOTAL表示修正版です。実機で起動PDF表示とRB85〜RB102のNEXT/BACK移動を確認してください。
