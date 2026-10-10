@@ -1,20 +1,16 @@
-# Matsu RallyCon v0.8.50 PAGE LIFECYCLE DIAGNOSTIC
+# Matsu RallyCon v0.8.51 — KomaRen Kanto 2026 PDF replacement
 
-## Purpose
-Diagnostic-only build based directly on v0.8.49 GPS RESUME ROBUST. It investigates the observed PAGEHIDE -> BOOT -> PAGESHOW(persisted=false) sequence and session persistence after page recreation.
-
-## Diagnostic behavior
-- Normal app UI and GPS/PDF behavior are unchanged.
-- Tap the top “Matsu RallyCon” brand 5 times to open the diagnostic panel.
-- The panel reads a lifecycle log stored in localStorage.
-- Logs BOOT, pageshow/pagehide persisted state, visibilitychange, beforeunload, navigation type, and whether the rally session exists after boot.
-- The diagnostic log is intentionally persisted so a later BOOT can reveal what was recorded before the page was recreated.
+## Change
+- Replaced only the embedded/default A5 roadbook PDF with `【コマ図（A5）】コマ練関東2026.pdf`.
+- Updated the visible app/version labels to v0.8.51 so the delivered build is identifiable.
 
 ## Intentionally unchanged
 - GPS distance calculation and v0.8.49 GPS resume logic.
-- TOTAL / LEG / TARGET / NEXT / SPEED.
-- PDF, embedded A5 PDF, viewport restore, rally navigation, AUTO, SmartRemote.
-- Existing session save/restore implementation.
+- v0.8.50 page-lifecycle diagnostic behavior and its persisted log.
+- TOTAL / LEG / TARGET / NEXT / SPEED, PDF viewport restore, rally navigation, AUTO, SmartRemote, and session save/restore logic.
+- The newly embedded PDF is the only replaced payload; no route parsing or GPS logic was intentionally changed.
 
-## Test target
-Determine whether the observed BOOT is a normal page recreation with a surviving localStorage session, and whether the session is restored to the expected paused state. This build does not attempt to fix the lifecycle issue.
+## Validation
+- Embedded PDF bytes checked against the supplied PDF by SHA-256.
+- JavaScript syntax checks should be run on all script blocks before use.
+- This is based on v0.8.50 PAGE LIFECYCLE DIAGNOSTIC and remains a diagnostic/test build, not a claim that background GPS limitations are fixed.
