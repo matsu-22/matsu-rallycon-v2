@@ -1,19 +1,20 @@
-Matsu RallyCon v0.8.52 — KOMAREN KANTO 2026 KM-TOTAL FIX
+Matsu RallyCon v0.8.54 — KOMAREN KANTO 2026 A5 HIGHLIGHT / DISTANCE FONT FIX
 
-基準：v0.8.51_KOMAREN_KANTO_2026_PDF_REPLACED
+基準：Matsu RallyCon v0.8.53 KOMAREN KANTO A5 HIGHLIGHT
 
 変更内容
-- 内蔵A5 PDF「コマ練関東2026」のRB85〜RB102で、元PDF上に「#####」と表示されていたKM-TOTALを累積距離で補完。
-- RB84のKM-TOTAL 218.69 kmを起点に、元PDFのKM-INTER値を順に加算し、KM-TOTAL欄に数値を表示。
-- PDFは23ページを維持。RB85〜RB102以外のページ内容は意図的に変更していません。
-- アプリのGPS計算、距離補正、セッション復元、ボタン配置、SmartRemote操作などの処理ロジックは変更していません。
+- 内蔵A5 PDFを「コマ練関東2026_A5_蛍光ライン手修正版_距離表示フォント調整.pdf」に差し替え。
+- 85〜102番を含むKM-TOTAL距離表示のフォントを調整した23ページ版を使用。
+- 蛍光ブルーライン、道路図、矢印、注記、KM-INTER、コマ番号は今回変更していません。
+- GPS計算、距離補正、セッション復元、ボタン配置、SmartRemote操作、PDF表示・解析ロジックは変更していません。
+- v0.8.53までの保存セッション互換設定を維持。
 
 検証
-- PDFページ数：23ページ
-- RB85〜RB102の18箇所すべてで「#####」を置換
-- 置換後PDFから各KM-TOTAL数値をテキスト抽出できることを確認
-- ZIP内は index.html と README.md
-- JavaScript構文検査は作成後に実施
+- 元PDF：23ページ、A5サイズ。
+- 元PDFのテキスト抽出で「####」が0件であることを確認。
+- 内蔵PDF Base64を今回の元PDFに置換。
+- ZIP内ファイルは index.html と README.md。
+- JavaScript構文検査は生成後に別途実施。
 
 注意
-- 本版は内蔵PDFのKM-TOTAL表示修正版です。実機で起動PDF表示とRB85〜RB102のNEXT/BACK移動を確認してください。
+- 実機で起動時の内蔵PDF、85〜102番のKM-TOTAL表示、NEXT/BACK、ページ切替、セッション復元を最終確認してください。
