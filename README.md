@@ -1,26 +1,18 @@
-Matsu RallyCon v0.8.54 — KOMAREN KANTO 2026 A5 HIGHLIGHT
+Matsu RallyCon v0.8.55 — GPS Correction 0.1% + TOTAL/RB Sync
 
-基準：Matsu RallyCon v0.8.52 KOMAREN KANTO 2026 TOTAL FIX
+基準：ユーザー指定の GitHub ZIP（matsu-rallycon-v2-main）
 
 変更内容
-- 内蔵A5 PDFを、全ページに進行ルートの蛍光ブルーラインを追加した版へ差し替え。
-- 対象PDF：コマ練関東2026 A5／23ページ。
-- 85〜102番を含む全ルート図に反映。道路の線に沿い、矢印の三角部分は塗らない方針。
-- KM-TOTAL／KM-INTER、コマ番号、注記、元の道路図のテキストは変更していません。
-- アプリのGPS計算、距離補正、セッション復元、ボタン配置、SmartRemote操作、PDF表示・解析ロジックは変更していません。
-- v0.8.52で保存されたセッションも復元できるよう、旧バージョンを互換リストに追加。
+- GPS距離補正を50.0〜150.0%の範囲で0.1%刻みに変更。モーダル表示、連続押し、セッション復元表示も小数1桁に統一。
+- TOTALを減らしたとき、TOTAL距離より先にある最初のターゲットコマへRB表示を戻すように変更。
+- アプリのタイトル、APP_VERSION、VERSION.txt、README、Web App Manifestの名前とバージョンをv0.8.55へ統一。
+- セッション保存キーと旧バージョン互換リストは維持。既存セッション復元への不要な影響を避けるため。
+- 内蔵PDFおよび既存のPDF表示、GPS距離積算、NEXT/BACK、AUTO NEXT、SmartRemoteの処理は今回の変更対象外。
 
 検証
-- PDF：23ページ、A5サイズ。
-- 差し替え前の修正済みA5 PDFと、差し替え後PDFのテキスト抽出結果は全23ページで一致。
-- 蛍光ライン：全128コマ欄に反映（通常トレース117、個別補正11）。
-- ZIP内は index.html と README.md。
-- JavaScript構文検査を実施。
+- JavaScript構文検査（node --check）を実施。
+- ZIP整合性検査を実施。
+- 変更差分を確認。
 
 注意
-- 読み込み版での最終確認として、起動時の内蔵PDF表示、85〜102番の距離表示、NEXT/BACK移動、他ページのライン位置を実機で確認してください。
-
-
-PDF差し替え（v0.8.54）
-- ユーザー提供のA5 PDFをバイト単位でそのまま内蔵PDFへ差し替え。PDF自体は加工していません。
-- アプリの処理ロジックは変更していません。
+- 実機でのGPS走行・TOTAL減算・NEXT/BACK・AUTO NEXT・SmartRemote・セッション復元の最終確認は別途必要です。

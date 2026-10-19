@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="ja"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<title>Matsu RallyCon v0.8.54 KOMAREN KANTO A5 HIGHLIGHT</title>
+<title>Matsu RallyCon v0.8.55 GPS CORRECTION + TOTAL/RB SYNC</title>
 <link rel="manifest" href="manifest.webmanifest">
 <style>
 :root{--bg:#0d1117;--panel:#161b22;--line:#30363d;--text:#f0f6fc;--muted:#8b949e;--accent:#58a6ff;--warn:#f2cc60}
@@ -90,7 +90,7 @@ button{font:inherit;color:inherit;background:#21262d;border:1px solid #484f58;bo
 @media (orientation:portrait){.portraitRallyView.active .portraitRallyStack{padding-bottom:calc(26px + env(safe-area-inset-bottom))}}
 </style></head><body>
 <div id="app">
-<header class="top"><div class="brand">Matsu RallyCon <span class="brandVersion">v0.8.52 KOMAREN KANTO TOTAL FIX</span></div><div class="clock"><span id="clockTime" class="clockTime">--:--</span></div><div id="status" class="status">準備中</div><button id="gpsBtn">GPS</button><button id="compassBtn">CAP</button></header>
+<header class="top"><div class="brand">Matsu RallyCon <span class="brandVersion">v0.8.55 GPS CORRECTION + TOTAL/RB SYNC</span></div><div class="clock"><span id="clockTime" class="clockTime">--:--</span></div><div id="status" class="status">準備中</div><button id="gpsBtn">GPS</button><button id="compassBtn">CAP</button></header>
 <main class="main">
 <section class="panel left">
 <div class="card"><div class="label">TOTAL km</div><div id="total" class="value totalValue">0.00</div><div class="corr"><button id="totalMinus">−10m</button><button id="totalZero">0</button><button id="totalPlus">＋10m</button></div></div>
@@ -119,7 +119,7 @@ button{font:inherit;color:inherit;background:#21262d;border:1px solid #484f58;bo
 <div class="rightSpacer"><div class="rbbox gpsCorrBox"><div class="rbnum">GPS距離補正</div><div class="gpsCorr"><button id="gpsCorrMinus">−</button><div id="gpsCorrValue" class="rbval">100%</div><button id="gpsCorrPlus">＋</button></div></div></div>
 <div class="nav"><div id="reverseInfo" class="rbbox reverseInfo"><span class="rbnum">REV 戻り距離</span><span id="reverseDistance" class="rbval">−0.00</span></div><button id="autoBtn" class="auto">AUTO: ON</button><button id="reverseBtn" class="reverseBtn">REV</button></div>
 </aside></main>
-<div id="gpsCorrModal" class="gpsCorrModal" aria-hidden="true"><div class="gpsCorrDialog"><div class="gpsCorrTitle">GPS距離補正</div><div id="gpsCorrModalValue" class="gpsCorrModalValue">100%</div><div class="gpsCorrModalControls"><button id="gpsCorrModalMinus">−1%</button><button id="gpsCorrModalPlus">＋1%</button></div><button id="gpsCorrClose" class="gpsCorrClose">閉じる</button></div></div><div id="pdfStepModal" class="pdfStepModal" aria-hidden="true"><div class="pdfStepDialog"><div class="pdfStepTitle">PDFコマ送り量</div><div id="pdfStepModalValue" class="pdfStepValue" title="長押しで数値入力">100.0%</div><div class="pdfStepControls"><button id="pdfStepModalMinus">−0.1%</button><button id="pdfStepModalPlus">＋0.1%</button></div><div class="pdfStepHint">NEXT：次へ　BACK：前へ<br>1回の送り量＝現在の表示エリア高さ × 設定倍率<br>スワイプ：PDFを任意の位置へ自由に移動</div><div class="portraitPdfStepBox"><div class="portraitPdfStepTitle">縦RALLY VIEW 送り補正 <span>(縦画面のPDF表示モードのみ)</span></div><div id="portraitPdfStepCorrectionValue" class="portraitPdfStepValue">100.0%</div><div class="portraitPdfStepControls"><button id="portraitPdfStepCorrectionMinus">−0.1%</button><button id="portraitPdfStepCorrectionPlus">＋0.1%</button></div><div class="portraitPdfStepHint">表示値20.0%のまま、実際の縦送り幅だけ微調整します。<br>80.0～110.0%・0.1%刻み / 長押しで連続調整</div></div><button id="pdfStepClose" class="pdfStepClose">閉じる</button></div></div><div id="pdfStepInputModal" class="pdfStepInputModal" aria-hidden="true"><div class="pdfStepInputDialog"><div class="pdfStepInputTitle">PDFコマ送り量を直接入力</div><input id="pdfStepInput" class="pdfStepInput" type="number" inputmode="decimal" min="20" max="200" step="0.1" autocomplete="off" aria-label="PDFコマ送り量"><div class="pdfStepInputHint">20.0～200.0%・0.1%刻み<br>例：87.3</div><div class="pdfStepInputControls"><button id="pdfStepInputApply">設定</button><button id="pdfStepInputCancel">キャンセル</button></div></div></div><div id="pdfLoadModal" class="pdfLoadModal" aria-hidden="true"><div class="pdfLoadDialog"><div class="pdfLoadTitle">PDF読み込みモード</div><div id="pdfLoadName" class="pdfLoadName"></div><div class="pdfLoadOptions"><button id="pdfLoadAuto">自動判定</button><button id="pdfLoadKoma">コマ練モード</button><button id="pdfLoadView">PDF表示モード</button></div><div class="pdfLoadHint">自動判定：対応形式だけ距離/RBを解析。未知形式はPDF表示。<br>コマ練：対応するコマ練形式として解析。非対応形式は読み込みません。<br>PDF表示：距離/RBを一切解析せず、固定送り＋自由スクロールで表示。</div><button id="pdfLoadCancel" class="pdfLoadCancel">キャンセル</button></div></div><footer class="foot"><button id="loadBtn">LOAD PDF</button><button id="pagePrev">PAGE ‹</button><button id="pageNext">PAGE ›</button><button id="startBtn">START</button><button id="backBtn">BACK</button><button id="nextBtn">NEXT</button></footer>
+<div id="gpsCorrModal" class="gpsCorrModal" aria-hidden="true"><div class="gpsCorrDialog"><div class="gpsCorrTitle">GPS距離補正</div><div id="gpsCorrModalValue" class="gpsCorrModalValue">100.0%</div><div class="gpsCorrModalControls"><button id="gpsCorrModalMinus">−0.1%</button><button id="gpsCorrModalPlus">＋0.1%</button></div><button id="gpsCorrClose" class="gpsCorrClose">閉じる</button></div></div><div id="pdfStepModal" class="pdfStepModal" aria-hidden="true"><div class="pdfStepDialog"><div class="pdfStepTitle">PDFコマ送り量</div><div id="pdfStepModalValue" class="pdfStepValue" title="長押しで数値入力">100.0%</div><div class="pdfStepControls"><button id="pdfStepModalMinus">−0.1%</button><button id="pdfStepModalPlus">＋0.1%</button></div><div class="pdfStepHint">NEXT：次へ　BACK：前へ<br>1回の送り量＝現在の表示エリア高さ × 設定倍率<br>スワイプ：PDFを任意の位置へ自由に移動</div><div class="portraitPdfStepBox"><div class="portraitPdfStepTitle">縦RALLY VIEW 送り補正 <span>(縦画面のPDF表示モードのみ)</span></div><div id="portraitPdfStepCorrectionValue" class="portraitPdfStepValue">100.0%</div><div class="portraitPdfStepControls"><button id="portraitPdfStepCorrectionMinus">−0.1%</button><button id="portraitPdfStepCorrectionPlus">＋0.1%</button></div><div class="portraitPdfStepHint">表示値20.0%のまま、実際の縦送り幅だけ微調整します。<br>80.0～110.0%・0.1%刻み / 長押しで連続調整</div></div><button id="pdfStepClose" class="pdfStepClose">閉じる</button></div></div><div id="pdfStepInputModal" class="pdfStepInputModal" aria-hidden="true"><div class="pdfStepInputDialog"><div class="pdfStepInputTitle">PDFコマ送り量を直接入力</div><input id="pdfStepInput" class="pdfStepInput" type="number" inputmode="decimal" min="20" max="200" step="0.1" autocomplete="off" aria-label="PDFコマ送り量"><div class="pdfStepInputHint">20.0～200.0%・0.1%刻み<br>例：87.3</div><div class="pdfStepInputControls"><button id="pdfStepInputApply">設定</button><button id="pdfStepInputCancel">キャンセル</button></div></div></div><div id="pdfLoadModal" class="pdfLoadModal" aria-hidden="true"><div class="pdfLoadDialog"><div class="pdfLoadTitle">PDF読み込みモード</div><div id="pdfLoadName" class="pdfLoadName"></div><div class="pdfLoadOptions"><button id="pdfLoadAuto">自動判定</button><button id="pdfLoadKoma">コマ練モード</button><button id="pdfLoadView">PDF表示モード</button></div><div class="pdfLoadHint">自動判定：対応形式だけ距離/RBを解析。未知形式はPDF表示。<br>コマ練：対応するコマ練形式として解析。非対応形式は読み込みません。<br>PDF表示：距離/RBを一切解析せず、固定送り＋自由スクロールで表示。</div><button id="pdfLoadCancel" class="pdfLoadCancel">キャンセル</button></div></div><footer class="foot"><button id="loadBtn">LOAD PDF</button><button id="pagePrev">PAGE ‹</button><button id="pageNext">PAGE ›</button><button id="startBtn">START</button><button id="backBtn">BACK</button><button id="nextBtn">NEXT</button></footer>
 <input id="pdfFile" class="file" type="file" accept="application/pdf,.pdf">
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
@@ -292,9 +292,9 @@ let gpsDistance=0,gpsRawDistance=0,totalZeroBase=0,totalOffset=0,legBase=0,legOf
 let reverseMode=false,reverseDistanceKm=0;
 const AUTO_NEXT_TRIGGER_M=0;
 const SESSION_KEY='matsu-rallycon-session-v0651-a5dev';
-const APP_VERSION='0.8.53-KOMAREN-KANTO-A5-HIGHLIGHT';
-const A5_DEV_LABEL='A4/A5 AUTO + UNIVERSAL PDF DISPLAY: A5 KomaRen parser + fallback PDF viewer';
-const LEGACY_SESSION_VERSIONS=new Set(['0.8.50-PAGE-LIFECYCLE-DIAGNOSTIC','0.8.51-KOMAREN-KANTO-PDF-REPLACED','0.8.52-KOMAREN-KANTO-TOTAL-FIX','0.6.38','0.6.39','0.6.40','0.6.41','0.6.42','0.6.43','0.6.44','0.6.45','0.6.46','0.6.47','0.6.48','0.6.49','0.7.1','0.7.2-GPS-DEV','0.7.2-GPS-DEV2','0.7.3-LONG-PDF','0.7.5-UNIVERSAL-PDF','0.7.6-UNIVERSAL-PDF','0.7.7-UNIVERSAL-PDF','0.7.8-UNIVERSAL-PDF','0.7.9-UNIVERSAL-PDF','0.8.0-UNIVERSAL-PDF','0.8.1-UNIVERSAL-PDF']);
+const APP_VERSION='0.8.55-GPS-CORR-0.1-TOTAL-RB-SYNC';
+const A5_DEV_LABEL='Matsu RallyCon v0.8.55: GPS correction 0.1% + TOTAL/RB sync';
+const LEGACY_SESSION_VERSIONS=new Set(['0.8.53-KOMAREN-KANTO-A5-HIGHLIGHT','0.8.50-PAGE-LIFECYCLE-DIAGNOSTIC','0.8.51-KOMAREN-KANTO-PDF-REPLACED','0.8.52-KOMAREN-KANTO-TOTAL-FIX','0.6.38','0.6.39','0.6.40','0.6.41','0.6.42','0.6.43','0.6.44','0.6.45','0.6.46','0.6.47','0.6.48','0.6.49','0.7.1','0.7.2-GPS-DEV','0.7.2-GPS-DEV2','0.7.3-LONG-PDF','0.7.5-UNIVERSAL-PDF','0.7.6-UNIVERSAL-PDF','0.7.7-UNIVERSAL-PDF','0.7.8-UNIVERSAL-PDF','0.7.9-UNIVERSAL-PDF','0.8.0-UNIVERSAL-PDF','0.8.1-UNIVERSAL-PDF']);
 let wakeLock=null, suppressSessionSave=false, restoredPortraitScrollTop=0;
 let pointers=new Map(),pinchStartDist=0,pinchStartZoom=1,gestureMoved=false;
 const dpr=()=>Math.min(window.devicePixelRatio||1,2);
@@ -309,7 +309,7 @@ function capturePdfViewportState(){
   return {zoom,panX,panY,pdfViewLayout,portraitScrollTop};
 }
 function saveSession(){if(suppressSessionSave)return;try{const view=capturePdfViewportState();localStorage.setItem(SESSION_KEY,JSON.stringify({version:APP_VERSION,stageStarted,running:false,gpsDistance,gpsRawDistance,gpsDistanceRate,gpsCorrectionRate,gpsTotalMeters,totalZeroBase,totalOffset,legBase,legOffset,elapsedMs:elapsedMs+(running&&timerStart?performance.now()-timerStart:0),rb,autoNext,logicalPage,page,reverseMode,reverseDistanceKm,view}))}catch(e){}}
-function restoreSession(){try{const raw=localStorage.getItem(SESSION_KEY);if(!raw)return false;const x=JSON.parse(raw);const versionOk=x?.version===APP_VERSION||x?.version==='0.8.45-UNIVERSAL-PDF-A5-RALLY-VIEW'||LEGACY_SESSION_VERSIONS.has(x?.version);if(!versionOk||!x.stageStarted)return false;gpsDistance=Number(x.gpsDistance)||0;gpsRawDistance=Number.isFinite(Number(x.gpsRawDistance))?Number(x.gpsRawDistance):gpsDistance;gpsTotalMeters=gpsRawDistance*1000;gpsDistanceRate=clamp(Number(x.gpsDistanceRate)||1,0.5,1.5);gpsCorrectionRate=Math.round(gpsDistanceRate*100);$('gpsCorrValue').textContent=`${gpsCorrectionRate}%`;totalZeroBase=Number(x.totalZeroBase)||0;totalOffset=Number(x.totalOffset)||0;legBase=Number(x.legBase)||0;legOffset=Number(x.legOffset)||0;elapsedMs=Math.max(0,Number(x.elapsedMs)||0);rb=clamp(Number(x.rb)||0,0,ROUTE.length-1);autoNext=x.autoNext!==false;running=false;stageStarted=true;timerStart=null;logicalPage=clamp(Number(x.logicalPage)||1,1,logicalCount);page=mapping(logicalPage).pdf;const v=x.view||{};zoom=clamp(Number(v.zoom)||1,.5,4);panX=Number.isFinite(Number(v.panX))?Number(v.panX):0;panY=Number.isFinite(Number(v.panY))?Number(v.panY):0;pdfViewLayout=(v.pdfViewLayout==='twoUp'||v.pdfViewLayout==='single')?v.pdfViewLayout:pdfViewLayout;restoredPortraitScrollTop=Math.max(0,Number(v.portraitScrollTop)||0);return true}catch(e){return false}}
+function restoreSession(){try{const raw=localStorage.getItem(SESSION_KEY);if(!raw)return false;const x=JSON.parse(raw);const versionOk=x?.version===APP_VERSION||x?.version==='0.8.45-UNIVERSAL-PDF-A5-RALLY-VIEW'||LEGACY_SESSION_VERSIONS.has(x?.version);if(!versionOk||!x.stageStarted)return false;gpsDistance=Number(x.gpsDistance)||0;gpsRawDistance=Number.isFinite(Number(x.gpsRawDistance))?Number(x.gpsRawDistance):gpsDistance;gpsTotalMeters=gpsRawDistance*1000;gpsDistanceRate=clamp(Number(x.gpsDistanceRate)||1,0.5,1.5);gpsCorrectionRate=Math.round(gpsDistanceRate*1000)/10;$('gpsCorrValue').textContent=`${gpsCorrectionRate.toFixed(1)}%`;totalZeroBase=Number(x.totalZeroBase)||0;totalOffset=Number(x.totalOffset)||0;legBase=Number(x.legBase)||0;legOffset=Number(x.legOffset)||0;elapsedMs=Math.max(0,Number(x.elapsedMs)||0);rb=clamp(Number(x.rb)||0,0,ROUTE.length-1);autoNext=x.autoNext!==false;running=false;stageStarted=true;timerStart=null;logicalPage=clamp(Number(x.logicalPage)||1,1,logicalCount);page=mapping(logicalPage).pdf;const v=x.view||{};zoom=clamp(Number(v.zoom)||1,.5,4);panX=Number.isFinite(Number(v.panX))?Number(v.panX):0;panY=Number.isFinite(Number(v.panY))?Number(v.panY):0;pdfViewLayout=(v.pdfViewLayout==='twoUp'||v.pdfViewLayout==='single')?v.pdfViewLayout:pdfViewLayout;restoredPortraitScrollTop=Math.max(0,Number(v.portraitScrollTop)||0);return true}catch(e){return false}}
 function clearSession(){try{localStorage.removeItem(SESSION_KEY)}catch(e){}}
 async function resetRally(){
   const ok=window.confirm('現在のラリー記録をすべてリセットします。\n\nTOTAL・LEG・TIME・現在のRB・GPS距離を初期状態に戻します。\n\nリセットしますか？');
@@ -339,8 +339,8 @@ async function resetRally(){
     legBase=0;
     legOffset=0;
     rb=1;
-    $('gpsCorrValue').textContent=`${gpsCorrectionRate}%`;
-    if($('gpsCorrModalValue'))$('gpsCorrModalValue').textContent=`${gpsCorrectionRate}%`;
+    $('gpsCorrValue').textContent=`${gpsCorrectionRate.toFixed(1)}%`;
+    if($('gpsCorrModalValue'))$('gpsCorrModalValue').textContent=`${gpsCorrectionRate.toFixed(1)}%`;
     logicalPage=logicalFromRB();
     page=mapping(logicalPage).pdf;
     zoom=1;
@@ -623,7 +623,7 @@ async function loadBytes(buf,name,preserveSession=false,mode='AUTO'){
   }catch(err){setStatus('PDF PARSE ERROR: '+(err?.message||err));console.error(err);return false;}
   pdf=doc;
   pdfPanHistory=new Map();
-  logicalPage=1;page=1;rb=0;stageStarted=false;running=false;timerStart=null;elapsedMs=0;gpsLast=null;gpsDistance=0;gpsRawDistance=0;gpsDistanceRate=1;gpsCorrectionRate=100;gpsLostAnchor=null;reverseMode=false;reverseDistanceKm=0;portraitFallbackKomaStepPx=0;$('gpsCorrValue').textContent='100%';totalZeroBase=0;totalOffset=0;legBase=0;legOffset=0;zoom=1;panX=0;panY=0;pdfStepRate=100;portraitPdfStepCorrection=100;
+  logicalPage=1;page=1;rb=0;stageStarted=false;running=false;timerStart=null;elapsedMs=0;gpsLast=null;gpsDistance=0;gpsRawDistance=0;gpsDistanceRate=1;gpsCorrectionRate=100;gpsLostAnchor=null;reverseMode=false;reverseDistanceKm=0;portraitFallbackKomaStepPx=0;$('gpsCorrValue').textContent='100.0%';totalZeroBase=0;totalOffset=0;legBase=0;legOffset=0;zoom=1;panX=0;panY=0;pdfStepRate=100;portraitPdfStepCorrection=100;
   if(!preserveSession)clearSession();
   await releaseWakeLock();
   await renderPage();
@@ -833,7 +833,17 @@ $('backBtn').onclick=()=>{
   if(isPortraitFallback()&&portraitFallbackReady){portraitFallbackScrollStep(-1);return}
   if(isFallbackPdf())pdfMoveDisplayUnit(1);else moveRB(-1)
 };
-function adjustTotal(delta){totalOffset+=delta;display();checkAutoNext()}
+function syncRBToTotal(){
+  if(!Array.isArray(ROUTE)||!ROUTE.length)return;
+  const total=getTotalKm();
+  let next=ROUTE.length-1;
+  for(let i=0;i<ROUTE.length;i++){
+    const distance=Number(ROUTE[i]?.dist);
+    if(Number.isFinite(distance)&&distance>total+1e-9){next=i;break}
+  }
+  if(next!==rb)setRB(next,false);
+}
+function adjustTotal(delta){totalOffset+=delta;if(delta<0)syncRBToTotal();display();checkAutoNext()}
 function zeroTotal(){totalZeroBase=gpsDistance;totalOffset=0;display();checkAutoNext()}
 function adjustLeg(delta){legOffset+=delta;display(false)}
 function zeroLeg(){legBase=gpsDistance;legOffset=0;display(false)}
@@ -1080,11 +1090,11 @@ function resetGpsReference(pos){
 }
 function gpsDistanceKm(){return gpsRawDistance}
 function setGpsCorrectionRate(percent){
-  const next=clamp(Math.round(Number(percent)||100),50,150);
+  const next=clamp(Math.round((Number(percent)||100)*10)/10,50,150);
   gpsCorrectionRate=next;
   gpsDistanceRate=next/100;
-  $('gpsCorrValue').textContent=`${next}%`;
-  if($('gpsCorrModalValue'))$('gpsCorrModalValue').textContent=`${next}%`;
+  $('gpsCorrValue').textContent=`${next.toFixed(1)}%`;
+  if($('gpsCorrModalValue'))$('gpsCorrModalValue').textContent=`${next.toFixed(1)}%`;
   display(false);
   saveSession();
 }
@@ -1294,7 +1304,7 @@ $('pdfStepInputCancel').onclick=closePdfStepInputModal;
 $('pdfStepInput').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();applyPdfStepInput()}else if(e.key==='Escape'){e.preventDefault();closePdfStepInputModal()}});
 $('pdfStepInputModal').addEventListener('click',e=>{if(e.target.id==='pdfStepInputModal')closePdfStepInputModal()});
 $('pdfStepModal').addEventListener('click',e=>{if(e.target.id==='pdfStepModal')closePdfStepModal();});
-function syncGpsCorrectionModal(){ $('gpsCorrModalValue').textContent=`${gpsCorrectionRate}%`; }
+function syncGpsCorrectionModal(){ $('gpsCorrModalValue').textContent=`${gpsCorrectionRate.toFixed(1)}%`; }
 function openGpsCorrectionModal(){ syncGpsCorrectionModal(); const m=$('gpsCorrModal'); m.classList.add('open'); m.setAttribute('aria-hidden','false'); }
 function closeGpsCorrectionModal(){ const m=$('gpsCorrModal'); m.classList.remove('open'); m.setAttribute('aria-hidden','true'); }
 function bindGpsCorrectionHoldButton(id,delta){
@@ -1345,8 +1355,8 @@ function bindGpsCorrectionHoldButton(id,delta){
     if(ignoreClick){e.preventDefault();ignoreClick=false;}
   };
 }
-bindGpsCorrectionHoldButton('gpsCorrModalMinus',-1);
-bindGpsCorrectionHoldButton('gpsCorrModalPlus',1);
+bindGpsCorrectionHoldButton('gpsCorrModalMinus',-0.1);
+bindGpsCorrectionHoldButton('gpsCorrModalPlus',0.1);
 $('gpsCorrClose').onclick=closeGpsCorrectionModal;
 $('gpsCorrModal').addEventListener('click',e=>{if(e.target.id==='gpsCorrModal')closeGpsCorrectionModal()});
 let gpsHoldTimer=null,gpsHoldTriggered=false,gpsSuppressClick=false;
@@ -1782,7 +1792,7 @@ function updateClock(){
   const d=new Date();
   $('clockTime').textContent=`${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
 }
-$('gpsCorrValue').textContent=`${gpsCorrectionRate}%`;if($('gpsCorrModalValue'))$('gpsCorrModalValue').textContent=`${gpsCorrectionRate}%`;if($('pdfStepModalValue'))$('pdfStepModalValue').textContent=`${pdfStepRate.toFixed(1)}%`;if($('portraitPdfStepCorrectionValue'))$('portraitPdfStepCorrectionValue').textContent=`${portraitPdfStepCorrection.toFixed(1)}%`;
+$('gpsCorrValue').textContent=`${gpsCorrectionRate.toFixed(1)}%`;if($('gpsCorrModalValue'))$('gpsCorrModalValue').textContent=`${gpsCorrectionRate.toFixed(1)}%`;if($('pdfStepModalValue'))$('pdfStepModalValue').textContent=`${pdfStepRate.toFixed(1)}%`;if($('portraitPdfStepCorrectionValue'))$('portraitPdfStepCorrectionValue').textContent=`${portraitPdfStepCorrection.toFixed(1)}%`;
 updateClock();
 setInterval(updateClock,1000);
 function recenterTargetAfterLayout(){
