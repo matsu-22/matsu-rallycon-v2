@@ -1,15 +1,18 @@
-Matsu RallyCon v0.8.55 — REMOTE TOTAL ADJUST
+Matsu RallyCon v0.8.55 — GPS Correction 0.1% + TOTAL/RB Sync
 
-基準：ユーザー提供のGitHub版 ZIP（matsu-rallycon-v2-main）を維持し、既存の内蔵PDF・GPS・コマ図処理を保持。
+基準：ユーザー指定の GitHub ZIP（matsu-rallycon-v2-main）
 
 変更内容
-- ブラウザに届くキーボード／リモコン入力でTOTAL距離を10m単位で増減できる処理を追加。
-- 左／下：TOTALを10m減らす。右／上：TOTALを10m増やす。
-- AudioVolumeDown / AudioVolumeUp がWebページへ配信される環境では、それらも減算／加算として扱う。
-- 既存の adjustTotal() を使用し、表示更新と既存の自動コマ送り判定を利用。
-- GPS計算、PDF、NEXT/BACK、SmartRemoteの既存処理は変更していない。
-- バージョン表記を v0.8.55 に統一。
+- GPS距離補正を50.0〜150.0%の範囲で0.1%刻みに変更。モーダル表示、連続押し、セッション復元表示も小数1桁に統一。
+- TOTALを減らしたとき、TOTAL距離より先にある最初のターゲットコマへRB表示を戻すように変更。
+- アプリのタイトル、APP_VERSION、VERSION.txt、README、Web App Manifestの名前とバージョンをv0.8.55へ統一。
+- セッション保存キーと旧バージョン互換リストは維持。既存セッション復元への不要な影響を避けるため。
+- 内蔵PDFおよび既存のPDF表示、GPS距離積算、NEXT/BACK、AUTO NEXT、SmartRemoteの処理は今回の変更対象外。
 
-注意・未検証事項
-- Androidが音量キーをOS側で処理している場合、Webページにはキーイベントが届かないため、この変更だけでは上下ボタンを捕捉できない可能性がある。
-- 物理リモコンを接続したAndroid実機での動作確認は未実施。ブラウザが入力イベントを渡す場合に限り動作する。
+検証
+- JavaScript構文検査（node --check）を実施。
+- ZIP整合性検査を実施。
+- 変更差分を確認。
+
+注意
+- 実機でのGPS走行・TOTAL減算・NEXT/BACK・AUTO NEXT・SmartRemote・セッション復元の最終確認は別途必要です。
