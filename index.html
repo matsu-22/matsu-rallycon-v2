@@ -186,7 +186,9 @@ async function parseA5Page(page,pageNo){
   // KM-INTER is in the inner-left column and aligns vertically with its RB row.
   const interCandidates=[];
   for(const x of nums){
-    if(x.x>=80 && x.x<170){
+    // This roadbook shifts wide INTER values slightly left (x=79.7pt).
+    // Use the row alignment, not a rigid x>=80 cutoff, to identify INTER.
+    if(x.x>=25 && x.x<170){
       const slot=a5Nearest(x.y,rbCenters,12);
       if(slot!==null)interCandidates.push({...x,slot});
     }
@@ -219,7 +221,8 @@ async function parseA5Page(page,pageNo){
     // KomaRen A5's six roadbook rows occupy this stable table area. Keep the
     // physical row-centre ratio in the parsed route so rendering can center
     // the actual row without relying on RB text baseline.
-    const rowCenterRatio=(76.08+(slot+0.5)*(576.96-76.08)/6)/vp.height;
+    // Use the actual RB text anchor so organizer-specific row spacing is preserved.
+    const rowCenterRatio=rb[slot].y/vp.height;
     const r={
       no:Number(rb[slot].text),
       dist:total?Number(total.text):null,

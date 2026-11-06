@@ -24,3 +24,11 @@ Matsu RallyCon v0.8.55 — Rally de KOVE 2026 Default Roadbook
 - PDF本文・図・コメントは加工せず、提供ファイルをそのまま内蔵。
 - A5解析ロジック、GPS、GPS補正、TOTAL/RB同期、PDF操作ロジックは変更していません。
 - 新しいPDFは `Rally_de_KOVE_2026.pdf` として同梱。
+
+
+## Rally de KOVE 2026 A5自動解析対応
+- INTER数値の左寄せ（x=79.7pt）に対応するため、固定x座標下限を廃止し、RB行との縦位置で判定。
+- 行表示位置は固定テンプレート値ではなく、PDF内のRB番号の実座標から算出。
+- 添付PDF全21コマ図ページを対象に、RB 1〜126、INTER、TOTALの連続性を検証。
+- 検証結果：126行取得、最終TOTAL 222.45 km、累積TOTAL不一致0件。
+- GPS、距離補正、TOTAL/RB同期、NEXT/BACK、PDF表示処理は変更なし。
