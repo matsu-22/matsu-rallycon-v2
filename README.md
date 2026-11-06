@@ -1,4 +1,4 @@
-Matsu RallyCon v0.8.55 — GPS Correction 0.1% + TOTAL/RB Sync
+Matsu RallyCon v0.8.55 — Rally de KOVE 2026 Default Roadbook
 
 基準：ユーザー指定の GitHub ZIP（matsu-rallycon-v2-main）
 
@@ -16,3 +16,11 @@ Matsu RallyCon v0.8.55 — GPS Correction 0.1% + TOTAL/RB Sync
 
 注意
 - 実機でのGPS走行・TOTAL減算・NEXT/BACK・AUTO NEXT・SmartRemote・セッション復元の最終確認は別途必要です。
+
+
+## デフォルトコマ図差し替え
+- 起動時の内蔵A5 PDFを「Rally de KOVE 2026 SHIMODA」に変更。
+- PDFは22ページ（表紙1ページ＋コマ図21ページ）、RB 1〜126、最終TOTAL 222.45 km。
+- PDF本文・図・コメントは加工せず、提供ファイルをそのまま内蔵。
+- A5解析ロジック、GPS、GPS補正、TOTAL/RB同期、PDF操作ロジックは変更していません。
+- 新しいPDFは `Rally_de_KOVE_2026.pdf` として同梱。
