@@ -1368,6 +1368,10 @@ bindGpsCorrectionHoldButton('gpsCorrModalPlus',0.1);
 $('gpsCorrClose').onclick=closeGpsCorrectionModal;
 $('gpsCorrModal').addEventListener('click',e=>{if(e.target.id==='gpsCorrModal')closeGpsCorrectionModal()});
 let gpsHoldTimer=null,gpsHoldTriggered=false,gpsSuppressClick=false;
+function toggleGpsFromButton(){
+  if(gpsWatchId!==null)stopGps();
+  else startGps();
+}
 $('gpsBtn').addEventListener('contextmenu',e=>e.preventDefault());
 $('gpsBtn').addEventListener('pointerdown',e=>{
   e.preventDefault();
@@ -1380,10 +1384,22 @@ $('gpsBtn').addEventListener('pointerdown',e=>{
 $('gpsBtn').addEventListener('pointerup',e=>{
   e.preventDefault();
   clearTimeout(gpsHoldTimer);
-  if(gpsHoldTriggered)e.stopPropagation();
+  if(gpsHoldTriggered){
+    e.stopPropagation();
+    return;
+  }
+  // Handle a short touch/pointer press here. Some iOS Safari/WebKit
+  // versions do not dispatch the compatibility click after pointer
+  // handlers call preventDefault().
+  gpsSuppressClick=true;
+  toggleGpsFromButton();
 });
 $('gpsBtn').addEventListener('pointercancel',()=>{clearTimeout(gpsHoldTimer);gpsHoldTriggered=false;gpsSuppressClick=false});
-$('gpsBtn').onclick=()=>{if(gpsSuppressClick){gpsSuppressClick=false;gpsHoldTriggered=false;return}if(gpsWatchId!==null)stopGps();else startGps()};
+$('gpsBtn').onclick=()=>{
+  if(gpsSuppressClick){gpsSuppressClick=false;gpsHoldTriggered=false;return}
+  // Keep keyboard and assistive-technology click activation working.
+  toggleGpsFromButton();
+};
 
 let compassOn=false;
 let compassHandler=null;
