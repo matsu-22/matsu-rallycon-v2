@@ -1570,14 +1570,10 @@ function fitPortraitFallbackFirstPageToBottom(){
   const topPad=Math.max(0,Math.round(viewportH-pageH));
   e.stack.style.paddingTop=topPad+'px';
   e.stack.style.paddingBottom='0px';
-  // Initial position is ALWAYS the beginning of the first PDF page.
-  // When a page is taller than the viewport, using the overall stack maxTop
-  // would jump all the way to the LAST page. The viewport bottom remains the
-  // fixed lower boundary; the PDF itself is then scrolled normally from page 1.
-  requestAnimationFrame(()=>{
-    if(!e.scroll)return;
-    e.scroll.scrollTop=0;
-  });
+  // Do not reset scrollTop here. This helper is also called during viewport
+  // refreshes (including resize/wake-lock related changes) while the rider is
+  // reading mid-roadbook. Initial PDF construction explicitly sets scrollTop=0
+  // at its call site; routine layout fitting must preserve the current position.
 }
 function portraitRallySignature(width){
   return `${RALLY_FORMAT}|${pdf?.numPages||0}|${ROUTE_META?.roadbook_pages||0}|${Math.round(width)}`;
