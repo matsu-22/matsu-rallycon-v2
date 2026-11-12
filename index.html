@@ -1058,7 +1058,10 @@ $('startBtn').onclick=async()=>{
     $('startBtn').textContent='START';
     await releaseWakeLock();
     setStatus(gpsWatchId!==null?'GPS PAUSE':'READY');
-    if(window.matchMedia?.('(orientation: portrait)').matches)refreshPortraitRallyView(false);
+    // STOP must preserve the user's current portrait PDF scroll position.
+    // The already-built portrait view does not need a refresh when only
+    // running/stopped state changes; refreshPortraitRallyView() fits the
+    // fallback view to page 1 and resets scrollTop to 0.
     saveSession();
   }
 };
