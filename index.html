@@ -1019,6 +1019,9 @@ $('startBtn').addEventListener('pointercancel',()=>clearTimeout(resetHoldTimer))
 $('startBtn').onclick=async()=>{
   if(resetHoldTriggered){resetHoldTriggered=false;return}
   if(!running){
+    // Remember whether this is a resume after STOP. A resumed stage must
+    // keep the user's current portrait PDF scroll position.
+    const resumeExistingStage=stageStarted;
     if(!stageStarted){
       stageStarted=true;
       totalZeroBase=gpsDistance;
@@ -1038,11 +1041,10 @@ $('startBtn').onclick=async()=>{
     $('startBtn').textContent='STOP';
     await requestWakeLock();
     setStatus(gpsWatchId!==null?'GPS RUN':'GPS未接続');
-    if(window.matchMedia?.('(orientation: portrait)').matches){
+    if(!resumeExistingStage && window.matchMedia?.('(orientation: portrait)').matches){
+      // Only a brand-new stage starts at the first page. On START after STOP,
+      // leave the already displayed PDF viewport exactly where the rider left it.
       if(isPortraitFallback()&&portraitFallbackReady){
-        // Keep the PDF viewport strictly below the TOTAL/SPEED HUD and keep
-        // the first page bottom-anchored. Do not run the logical-page
-        // synchronizer here; it intentionally shifts the PDF upward.
         fitPortraitFallbackFirstPageToBottom();
         const pe=portraitRallyEls(); if(pe.scroll)pe.scroll.scrollTop=0;
       }else refreshPortraitRallyView(false);
