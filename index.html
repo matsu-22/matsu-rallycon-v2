@@ -1679,8 +1679,21 @@ async function buildPortraitFallbackView(){
   const width=Math.max(240,Math.floor(e.scroll.clientWidth||$('stage')?.clientWidth||0));
   if(width<120){requestAnimationFrame(buildPortraitFallbackView);return false;}
   const signature=portraitFallbackSignature(width);
-  if(portraitFallbackReady&&portraitFallbackBuiltSignature===signature){showPortraitRallyView();fitPortraitFallbackFirstPageToBottom();e.scroll.scrollTop=0;return true;}
+  if(portraitFallbackReady&&portraitFallbackBuiltSignature===signature){
+    // Re-showing an already-built PDF after app/background transitions must
+    // never jump back to the first page.
+    showPortraitRallyView();
+    fitPortraitFallbackFirstPageToBottom();
+    return true;
+  }
   if(portraitFallbackBuildInProgress)return false;
+  // Keep the current scroll offset if a viewport/signature change requires
+  // rebuilding the rendered PDF pages. On the first build, use the value
+  // restored from the saved session (if any).
+  const hadPortraitFallback=portraitFallbackReady;
+  const keepScrollTop=hadPortraitFallback
+    ? Number(e.scroll.scrollTop)||0
+    : Math.max(0,Number(restoredPortraitScrollTop)||0);
   const token=++portraitFallbackBuildToken; portraitFallbackBuildInProgress=true;
   e.loading.classList.add('show'); e.stack.replaceChildren(); portraitRallyReady=false;
   try{
@@ -1719,7 +1732,13 @@ async function buildPortraitFallbackView(){
     }
     if(token!==portraitFallbackBuildToken)throw new Error('portrait fallback build superseded');
     portraitFallbackBuiltSignature=signature; portraitFallbackReady=true; showPortraitRallyView(); e.loading.classList.remove('show');
-    requestAnimationFrame(()=>{fitPortraitFallbackFirstPageToBottom();e.scroll.scrollTop=0}); return true;
+    requestAnimationFrame(()=>{
+      fitPortraitFallbackFirstPageToBottom();
+      const max=Math.max(0,e.scroll.scrollHeight-e.scroll.clientHeight);
+      const target=Math.max(0,Math.min(max,keepScrollTop));
+      e.scroll.scrollTop=target;
+      restoredPortraitScrollTop=target;
+    }); return true;
   }catch(err){
     if(token===portraitFallbackBuildToken)console.warn('Fallback portrait RALLY VIEW build skipped:',err);
     e.loading.classList.remove('show'); if(token===portraitFallbackBuildToken)portraitFallbackReady=false; return false;
@@ -1875,6 +1894,21 @@ function resumeFromBackground(){
     restorePdfViewportState();
     recenterTargetAfterLayout();
   }
+}
+// Persist the portrait PDF position as the rider scrolls, so iOS can
+// restore it even if the page is suspended or discarded before pagehide.
+let portraitScrollSaveQueued=false;
+const portraitScrollEl=$('portraitRallyScroll');
+if(portraitScrollEl){
+  portraitScrollEl.addEventListener('scroll',()=>{
+    restoredPortraitScrollTop=Math.max(0,Number(portraitScrollEl.scrollTop)||0);
+    if(portraitScrollSaveQueued)return;
+    portraitScrollSaveQueued=true;
+    requestAnimationFrame(()=>{
+      portraitScrollSaveQueued=false;
+      saveSession();
+    });
+  },{passive:true});
 }
 document.addEventListener('visibilitychange',()=>{
   if(document.visibilityState==='hidden'){
